@@ -1,0 +1,7 @@
+node_modules
+src/test.ts
+src/new-test.ts
+dist/src/test.js
+dist/src/new-test.js
+dist/data
+data

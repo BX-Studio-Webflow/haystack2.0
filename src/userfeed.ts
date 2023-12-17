@@ -1,0 +1,874 @@
+// import { XanoClient } from "@xano/js-sdk";
+const xano_userFeed = new XanoClient({
+  apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU",
+});
+const xano_wmx = new XanoClient({
+  apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140",
+});
+console.log("pre");
+document.addEventListener("DOMContentLoaded", async () => {
+  const searchObject: SearchObject = {
+    search: "",
+    checkboxes: {
+      companyType: [],
+      sourceCat: [],
+      techCat: [],
+      lineOfBus: [],
+      insightClass: [],
+    },
+  };
+  const sortObject = {
+    sortBy: "created_at",
+    orderBy: "asc",
+  };
+
+  var userFollowingAndFavourite: UserFollowingAndFavourite | null = null;
+
+  const insightSearchInput = qs<HTMLInputElement>("[dev-search-target]");
+
+  const insightTemplate = qs(`[dev-template="insight-item"]`);
+  const insightTagTemplate = qs(`[dev-template="insight-tag"]`);
+  const checkboxItemTemplate = qs(`[dev-template="checkbox-item"]`);
+  const followingItemTemplate = qs(`[dev-template="following-item"]`);
+
+  const allTabsTarget = qs(`[dev-target="insight-all"]`);
+  const followingTabsTarget = qs(`[dev-target="insight-following"]`);
+  const favouriteTabsTarget = qs(`[dev-target="insight-favourite"]`);
+
+  const followingCompanyTarget = qs(`[dev-target="following-companies"]`);
+  const followingTechCatTarget = qs(`[dev-target="following-tech-cat"]`);
+  const followingPeopleTarget = qs(`[dev-target="following-people"]`);
+  const followingEventsTarget = qs(`[dev-target="following-events"]`);
+
+  const filterCompanyTypeTarget = qs(`[dev-target="filter-company-type"]`);
+  const filterSourceCatTarget = qs(`[dev-target="filter-source-cat"]`);
+  const filterTechCatTarget = qs(`[dev-target="filter-tech-cat"]`);
+  const filterLineOfBusTarget = qs(`[dev-target="filter-line-of-business"]`);
+  const filterInsightClassTarget = qs(`[dev-target="filter-insight-class"]`);
+
+  const paginationTemplate = qs(`[dev-target=pagination-wrapper]`);
+
+  const memberStackUserToken = localStorage.getItem("_ms-mid");
+  if (!memberStackUserToken) {
+    return console.error("No memberstack token");
+  }
+
+  const lsInsights = localStorage.getItem("insights");
+  const lsUserFollowingFavourite = localStorage.getItem(
+    "user-following-favourite"
+    );
+    if (lsUserFollowingFavourite) {
+      userFollowingAndFavourite = JSON.parse(lsUserFollowingFavourite);
+    }
+    if (lsInsights) {
+      userFollowingAndFavourite &&
+      initInsights(
+        JSON.parse(lsInsights) as Insight,
+        allTabsTarget,
+        userFollowingAndFavourite
+        );
+        paginationLogic(JSON.parse(lsInsights) as Insight, "all")
+  }
+
+  await getXanoAccessToken(memberStackUserToken);
+  await getUserFollowingAndFavourite();
+  userFeedInit();
+
+  function userFeedInit() {
+    insightSearchInput.addEventListener("input", (e) => {
+      searchObject.search = insightSearchInput.value;
+      searchDebounce();
+    });
+
+    getInsights("/insight-all-tab", {}, allTabsTarget);
+    getInsights("/insight-following-tab", {}, followingTabsTarget);
+    getInsights("/insight-favourite-tab", {}, favouriteTabsTarget);
+
+    getFilters("/company_type", {}, "companyType", filterCompanyTypeTarget);
+    getFilters("/source_category", {}, "sourceCat", filterSourceCatTarget);
+    getFilters("/technology_category", {}, "techCat", filterTechCatTarget);
+    getFilters("/line_of_business", {}, "lineOfBus", filterLineOfBusTarget);
+    getFilters(
+      "/insight_classification",
+      {},
+      "insightClass",
+      filterInsightClassTarget
+    );
+
+    sortLogicInit();
+  }
+
+  // async function getUser
+
+  async function getXanoAccessToken(memberstackToken: string) {
+    try {
+      const res = await xano_wmx.post("/auth-user", {
+        memberstack_token: memberstackToken,
+      });
+      const xanoAuthToken = res.getBody().authToken as string;
+      xano_userFeed.setAuthToken(xanoAuthToken);
+      return xanoAuthToken;
+    } catch (error) {
+      console.log("getXanoAccessToken_error", error);
+      return null;
+    }
+  }
+  async function getInsights(
+    endPoint:
+      | "/insight-all-tab"
+      | "/insight-favourite-tab"
+      | "/insight-following-tab",
+    payload: InsightPayload,
+    target: HTMLDivElement
+  ) {
+    const {
+      page = 0,
+      perPage = 0,
+      offset = 0,
+      filtering = {
+        search: "",
+        checkboxes: {
+          companyType: [],
+          sourceCat: [],
+          techCat: [],
+          lineOfBus: [],
+          insightClass: [],
+        },
+      },
+    } = payload;
+    try {
+      const res = await xano_userFeed.get(endPoint, {
+        page,
+        perPage,
+        offset,
+        sortBy: sortObject.sortBy,
+        orderBy: sortObject.orderBy,
+        filtering,
+      });
+      const insights = res.getBody() as Insight;
+      target.innerHTML = "";
+
+      if (
+        endPoint === "/insight-all-tab" &&
+        page === 0 &&
+        perPage === 0 &&
+        offset === 0 &&
+        filtering.search === "" &&
+        filtering.checkboxes?.companyType?.length === 0 &&
+        filtering.checkboxes?.sourceCat?.length === 0 &&
+        filtering.checkboxes?.techCat?.length === 0 &&
+        filtering.checkboxes?.lineOfBus?.length === 0 &&
+        filtering.checkboxes?.insightClass?.length === 0 &&
+        sortObject.sortBy === "created_at" &&
+        sortObject.orderBy === "asc"
+      ) {
+        localStorage.setItem("insights", JSON.stringify(insights));
+      }
+      userFollowingAndFavourite &&
+        initInsights(insights, target, userFollowingAndFavourite);
+
+      endPoint === "/insight-all-tab" && paginationLogic(insights, "all");
+      endPoint === "/insight-following-tab" &&
+        paginationLogic(insights, "following");
+      endPoint === "/insight-favourite-tab" &&
+        paginationLogic(insights, "favourite");
+
+      return insights;
+    } catch (error) {
+      console.error(`getInsights_${endPoint}_error`, error);
+      return null;
+    }
+  }
+
+  async function getFilters(
+    endPoint:
+      | "/company_type"
+      | "/insight_classification"
+      | "/line_of_business"
+      | "/source_category"
+      | "/technology_category",
+    payload: { page?: number; perPage?: number; offset?: number },
+    type:
+      | "companyType"
+      | "sourceCat"
+      | "techCat"
+      | "lineOfBus"
+      | "insightClass",
+    targetWrapper: HTMLDivElement
+  ) {
+    const { page = 0, perPage = 0, offset = 0 } = payload;
+    try {
+      const res = await xano_userFeed.get(endPoint, {
+        page,
+        perPage,
+        offset,
+      });
+      const filters = res.getBody() as FilterResponse;
+      filters.items.forEach((filter) => {
+        const newFilter = checkboxItemTemplate.cloneNode(
+          true
+        ) as HTMLDivElement;
+        const input =
+          newFilter.querySelector<HTMLInputElement>("[dev-target=input]");
+        input && fakeCheckboxToggle(input);
+        input?.addEventListener("change", () => {
+          if (input.checked) {
+            searchObject.checkboxes[type].push(filter.id);
+          } else {
+            searchObject.checkboxes[type] = searchObject.checkboxes[
+              type
+            ].filter((item) => item != filter.id);
+          }
+          insightSearch();
+        });
+        newFilter.querySelector("[dev-target=name]")!.textContent = filter.name;
+        targetWrapper.appendChild(newFilter);
+      });
+      return filters;
+    } catch (error) {
+      console.error(`getFilters_${endPoint}_error`, error);
+      return null;
+    }
+  }
+
+  async function getUserFollowingAndFavourite() {
+    try {
+      const res = await xano_userFeed.get("/user-following-and-favourite");
+      const followingAndFavourite = res.getBody() as UserFollowingAndFavourite;
+      const { user_following } = followingAndFavourite;
+      userFollowingAndFavourite = followingAndFavourite;
+      localStorage.setItem(
+        "user-following-favourite",
+        JSON.stringify(followingAndFavourite)
+      );
+
+      followingSectionInit(
+        user_following.company_id,
+        "company_id",
+        convertArrayOfObjToNumber(user_following.company_id),
+        followingCompanyTarget
+      );
+      followingSectionInit(
+        user_following.technology_category_id,
+        "technology_category_id",
+        convertArrayOfObjToNumber(user_following.technology_category_id),
+        followingTechCatTarget
+      );
+      followingSectionInit(
+        user_following.people_id,
+        "people_id",
+        convertArrayOfObjToNumber(user_following.people_id),
+        followingPeopleTarget
+      );
+      followingSectionInit(
+        user_following.event_id,
+        "event_id",
+        convertArrayOfObjToNumber(user_following.event_id),
+        followingEventsTarget
+      );
+      return followingAndFavourite;
+    } catch (error) {
+      console.error(`getUserFollowingAndFavourite_error`, error);
+      return null;
+    }
+  }
+
+  function initInsights(
+    insights: Insight,
+    target: HTMLDivElement,
+    userFollowingAndFavourite: UserFollowingAndFavourite
+  ) {
+    insights.items.forEach((insight) => {
+      const newInsight = insightTemplate.cloneNode(true) as HTMLDivElement;
+
+      const tagsWrapperTarget = newInsight.querySelector<HTMLDivElement>(
+        `[dev-target=tags-container]`
+      );
+
+      const insightNameTarget = newInsight.querySelector(
+        `[dev-target=insight-name]`
+      );
+      const curatedDateTarget = newInsight.querySelector(
+        `[dev-target="curated-date"]`
+      );
+      const publishedDateTarget = newInsight.querySelector(
+        `[dev-target="published-date"]`
+      );
+      const sourceTarget = newInsight.querySelector(
+        `[dev-target="source-name-link"]`
+      );
+      const sourceAuthorTarget = newInsight.querySelector(
+        `[dev-target="source-author"]`
+      );
+      const favouriteInput = newInsight.querySelector<HTMLInputElement>(
+        `[dev-target=favourite-input]`
+      );
+      const companyInput = newInsight.querySelector<HTMLInputElement>(
+        `[dev-target=company-input]`
+      );
+
+      const curatedDate = insight.curated?.toLocaleString("en-US", {
+        month: "short",
+        year: "numeric",
+      });
+      const publishedDate = insight["source-publication-date"]?.toLocaleString(
+        "en-US",
+        {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }
+      );
+      const sourceCatArray = insight.source_category_id;
+      const companyTypeArray = insight.company_type_id;
+      const insightClassArray = insight.insight_classification_id;
+      const lineOfBusArray = insight.line_of_business_id;
+      const techCatArray = insight.technology_category_id;
+
+      fakeCheckboxToggle(companyInput!);
+      fakeCheckboxToggle(favouriteInput!);
+
+      favouriteInput?.setAttribute("dev-input-type", "favourite");
+      favouriteInput?.setAttribute("dev-input-id", insight.id.toString());
+      companyInput?.setAttribute("dev-input-type", "company_id");
+      companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
+
+      favouriteInput && followFavouriteLogic(favouriteInput);
+      companyInput && followFavouriteLogic(companyInput);
+
+      favouriteInput &&
+        setCheckboxesInitialState(
+          favouriteInput,
+          userFollowingAndFavourite.user_favourite.insight_id
+        );
+      companyInput &&
+        setCheckboxesInitialState(
+          companyInput,
+          convertArrayOfObjToNumber(
+            userFollowingAndFavourite.user_following.company_id
+          )
+        );
+
+      addTagsToInsight(sourceCatArray, tagsWrapperTarget!, false);
+      addTagsToInsight(companyTypeArray, tagsWrapperTarget!, false);
+      addTagsToInsight(insightClassArray, tagsWrapperTarget!, false);
+      addTagsToInsight(lineOfBusArray, tagsWrapperTarget!, false);
+      addTagsToInsight(
+        techCatArray,
+        tagsWrapperTarget!,
+        true,
+        "technology_category_id"
+      );
+
+      insightNameTarget!.textContent = insight.name;
+      curatedDateTarget!.textContent = curatedDate ?? "";
+      publishedDateTarget!.textContent = publishedDate ?? "";
+      sourceTarget!.setAttribute("href", insight["source-url"]);
+      sourceTarget!.textContent = insight.source;
+      sourceAuthorTarget!.textContent = insight.source_author;
+      target.appendChild(newInsight);
+    });
+  }
+
+  function sortLogicInit() {
+    const sortItems = qsa<HTMLLinkElement>(`[dev-target="sort"]`);
+    sortItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        const orderBy = item.getAttribute("dev-orderby");
+        const sortBy = item.getAttribute("dev-sortby");
+
+        if (sortBy && orderBy) {
+          sortObject.sortBy = sortBy;
+          sortObject.orderBy = orderBy;
+        }
+
+        getInsights("/insight-all-tab", {}, allTabsTarget);
+        getInsights("/insight-following-tab", {}, followingTabsTarget);
+        getInsights("/insight-favourite-tab", {}, favouriteTabsTarget);
+      });
+    });
+  }
+
+  function followFavouriteLogic(input: HTMLInputElement) {
+    input.addEventListener("change", async () => {
+      // send follow/favourite request
+      const type = input.getAttribute("dev-input-type")!;
+      const id = input.getAttribute("dev-input-id")!;
+      const endPoint =
+        type === "favourite" ? "/toggle-favourite" : "/toggle-follow";
+      try {
+        const res = await xano_userFeed.get(endPoint, {
+          id: Number(id),
+          target: type,
+        });
+        console.log("userFollowingAndFavourite-1", userFollowingAndFavourite);
+        await getUserFollowingAndFavourite();
+        // run function to updated all-tab inputs
+        console.log("userFollowingAndFavourite-2", userFollowingAndFavourite);
+
+        allTabsTarget.childNodes.forEach((insight) => {
+          // console.log("insights",insight)
+          updateInsightsInputs(insight as HTMLDivElement);
+        });
+
+        // refetch following and favourite tabs
+        getInsights("/insight-following-tab", {}, followingTabsTarget);
+        getInsights("/insight-favourite-tab", {}, favouriteTabsTarget);
+      } catch (error) {
+        console.error(`followFavouriteLogic${endPoint}_error`, error);
+        return null;
+      }
+    });
+  }
+
+  // Function to toggle fake checkboxes
+  function fakeCheckboxToggle(input: HTMLInputElement) {
+    input.addEventListener("change", () => {
+      const inputWrapper = input.closest(
+        "[dev-fake-checkbox-wrapper]"
+      ) as HTMLDivElement;
+      inputWrapper.classList[input.checked ? "add" : "remove"]("checked");
+    });
+  }
+
+  function setCheckboxesInitialState(
+    input: HTMLInputElement,
+    slugArray: number[]
+  ) {
+    const inputId = input.getAttribute("dev-input-id");
+
+    if (slugArray.includes(Number(inputId))) {
+      input.checked = true;
+      input
+        .closest<HTMLDivElement>("[dev-fake-checkbox-wrapper]")
+        ?.classList.add("checked");
+    } else {
+      input.checked = false;
+      input
+        .closest<HTMLDivElement>("[dev-fake-checkbox-wrapper]")
+        ?.classList.remove("checked");
+    }
+  }
+
+  function updateInsightsInputs(insight: HTMLDivElement) {
+    const companyInput = insight.querySelector<HTMLInputElement>(
+      `[dev-input-type="company_id"]`
+    );
+    const favourite = insight.querySelector<HTMLInputElement>(
+      `[dev-input="fav-insight"]`
+    );
+    const tagInputs = insight.querySelectorAll<HTMLInputElement>(
+      `[dev-input-type="technology_category_id"]`
+    );
+
+    console.log("1-2-3", companyInput, favourite, tagInputs);
+    console.log(
+      "userFollowingAndFavourite?.user_favourite.insight_id!",
+      userFollowingAndFavourite?.user_favourite.insight_id!
+    );
+
+    companyInput &&
+      setCheckboxesInitialState(
+        companyInput,
+        convertArrayOfObjToNumber(
+          userFollowingAndFavourite?.user_following.company_id!
+        )
+      );
+    favourite &&
+      setCheckboxesInitialState(
+        favourite,
+        userFollowingAndFavourite?.user_favourite.insight_id!
+      );
+
+    tagInputs?.forEach((tag) => {
+      setCheckboxesInitialState(
+        tag,
+        convertArrayOfObjToNumber(
+          userFollowingAndFavourite?.user_following.technology_category_id!
+        )
+      );
+    });
+  }
+
+  function addTagsToInsight(
+    tagArray: (
+      | 0
+      | {
+          id: number;
+          name: string;
+          slug: string;
+        }
+      | null
+    )[],
+    targetWrapper: HTMLDivElement,
+    showCheckbox: boolean,
+    type?: "technology_category_id"
+  ) {
+    tagArray.forEach((item) => {
+      if (typeof item === "object" && item !== null) {
+        const newTag = insightTagTemplate.cloneNode(true) as HTMLDivElement;
+        const tagCheckbox = newTag.querySelector<HTMLDivElement>(
+          `[dev-target=fake-checkbox]`
+        );
+        const tagInput = newTag.querySelector<HTMLInputElement>(
+          `[dev-target=tag-input]`
+        );
+        tagInput && fakeCheckboxToggle(tagInput);
+        type && tagInput && tagInput.setAttribute("dev-input-type", type);
+        tagInput && tagInput.setAttribute("dev-input-id", item.id.toString());
+        tagInput && followFavouriteLogic(tagInput);
+        newTag.querySelector(`[dev-target=tag-name]`)!.textContent =
+          item?.name!;
+
+        if (tagCheckbox && !showCheckbox) {
+          tagCheckbox.style.display = "none";
+        }
+        if (showCheckbox && tagInput && userFollowingAndFavourite) {
+          setCheckboxesInitialState(
+            tagInput,
+            convertArrayOfObjToNumber(
+              userFollowingAndFavourite?.user_following.technology_category_id
+            )
+          );
+        }
+
+        targetWrapper?.appendChild(newTag);
+      }
+    });
+  }
+
+  function paginationLogic(
+    insight: Insight,
+    target: "all" | "following" | "favourite"
+  ) {
+    let endPoint:
+      | "/insight-all-tab"
+      | "/insight-following-tab"
+      | "/insight-favourite-tab";
+    let paginationTarget: HTMLDivElement;
+    let tagTarget: HTMLDivElement;
+    if (target === "all") {
+      endPoint = "/insight-all-tab";
+      paginationTarget = qs(`[dev-target="all-tab-pagination_wrapper"]`);
+      tagTarget = allTabsTarget;
+    } else if (target === "following") {
+      endPoint = "/insight-following-tab";
+      paginationTarget = qs(`[dev-target="following-tab-pagination_wrapper"]`);
+      tagTarget = followingTabsTarget;
+    } else {
+      endPoint = "/insight-favourite-tab";
+      paginationTarget = qs(`[dev-target="favourite-tab-pagination_wrapper"]`);
+      tagTarget = favouriteTabsTarget;
+    }
+
+    const { curPage, nextPage, prevPage, pageTotal } = insight;
+    const pagination = paginationTemplate.cloneNode(true) as HTMLDivElement;
+    const prevBtn = pagination.querySelector(
+      `[dev-target=pagination-previous]`
+    ) as HTMLButtonElement;
+    const nextBtn = pagination.querySelector(
+      `[dev-target=pagination-next]`
+    ) as HTMLButtonElement;
+    const pageItemWrapper = pagination.querySelector(
+      `[dev-target=pagination-number-wrapper]`
+    ) as HTMLDivElement;
+    const pageItem = pagination
+      .querySelector(`[dev-target=page-number-temp]`)
+      ?.cloneNode(true) as HTMLButtonElement;
+
+    paginationTarget.innerHTML = "";
+    pageItemWrapper.innerHTML = "";
+
+    if (pageTotal <= 6) {
+      for (let i = 1; i <= pageTotal; i++) {
+        const pageNumItem = pageItem.cloneNode(true) as HTMLDivElement;
+        pageNumItem.textContent = i.toString();
+        pageNumItem.classList[curPage === i ? "add" : "remove"]("active");
+        pageNumItem.addEventListener("click", () => {
+          getInsights(endPoint, { page: i }, tagTarget);
+        });
+        pageItemWrapper.appendChild(pageNumItem);
+      }
+    } else {
+      const firstPageNumItem = pageItem.cloneNode(true) as HTMLButtonElement;
+      firstPageNumItem.textContent = "1";
+      firstPageNumItem.classList[curPage === 1 ? "add" : "remove"]("active");
+      firstPageNumItem.addEventListener("click", () => {
+        getInsights(endPoint, { page: 1 }, tagTarget);
+      });
+      pageItemWrapper.appendChild(firstPageNumItem);
+
+      if (curPage > 3) {
+        const pagItemDots = pageItem.cloneNode(true) as HTMLButtonElement
+        pagItemDots.textContent = "...";
+        pagItemDots.classList["add"]("not-allowed");
+        pageItemWrapper.appendChild(pagItemDots);
+      }
+
+      for (
+        let i = Math.max(2, curPage - 1);
+        i <= Math.min(curPage + 1, pageTotal - 1);
+        i++
+      ) {
+        const pageNumItem = pageItem.cloneNode(true) as HTMLButtonElement;
+        pageNumItem.classList[curPage === i ? "add" : "remove"]("active");
+        pageNumItem.textContent = i.toString();
+        pageNumItem.addEventListener("click", () => {
+          getInsights(endPoint, { page: i }, tagTarget);
+        });
+        pageItemWrapper.appendChild(pageNumItem);
+      }
+
+      if (curPage < pageTotal - 2) {
+        const pagItemDots = pageItem.cloneNode(true) as HTMLButtonElement
+        pagItemDots.textContent = "...";
+        pagItemDots.classList["add"]("not-allowed");
+        pageItemWrapper.appendChild(pagItemDots);
+      }
+
+      const pageNumItem = pageItem.cloneNode(true) as HTMLButtonElement;
+      pageNumItem.textContent = pageTotal.toString();
+      pageNumItem.classList[curPage === pageTotal ? "add" : "remove"]("active");
+      pageNumItem.addEventListener("click", () => {
+        getInsights(endPoint, { page: pageTotal }, tagTarget);
+      });
+      pageItemWrapper.appendChild(pageNumItem);
+    }
+
+    prevBtn.classList[prevPage ? "remove" : "add"]("disabled");
+    nextBtn.classList[nextPage ? "remove" : "add"]("disabled");
+
+    nextPage &&
+      nextBtn.addEventListener("click", () => {
+        getInsights(endPoint, { page: curPage + 1 }, tagTarget);
+      });
+    prevPage &&
+      prevBtn.addEventListener("click", () => {
+        getInsights(endPoint, { page: curPage - 1 }, tagTarget);
+      });
+    pagination.style.display = pageTotal === 1 ? "none" : "flex";
+    paginationTarget.appendChild(pagination);
+  }
+
+  function insightSearch() {
+    getInsights(
+      "/insight-all-tab",
+      {
+        filtering: searchObject,
+        orderBy: sortObject.orderBy,
+        sortBy: sortObject.sortBy,
+      },
+      allTabsTarget
+    );
+    getInsights(
+      "/insight-following-tab",
+      {
+        filtering: searchObject,
+        orderBy: sortObject.orderBy,
+        sortBy: sortObject.sortBy,
+      },
+      followingTabsTarget
+    );
+    getInsights(
+      "/insight-favourite-tab",
+      {
+        filtering: searchObject,
+        orderBy: sortObject.orderBy,
+        sortBy: sortObject.sortBy,
+      },
+      favouriteTabsTarget
+    );
+  }
+
+  const searchDebounce = debounce(insightSearch, 500);
+
+  function followingSectionInit(
+    userFollowing: {
+      id: number;
+      name: string;
+      slug: string;
+    }[],
+    inputType:
+      | "company_id"
+      | "technology_category_id"
+      | "people_id"
+      | "event_id",
+    slugArray: number[],
+    followingTarget: HTMLDivElement
+  ) {
+    followingTarget.innerHTML = "";
+    userFollowing.forEach((item) => {
+      const newFollowingItem = followingItemTemplate.cloneNode(
+        true
+      ) as HTMLDivElement;
+      newFollowingItem
+        .querySelector("[dev-target=link]")
+        ?.setAttribute("href", item.slug);
+      newFollowingItem.querySelector("[dev-target=name]")!.textContent =
+        item.name;
+      const newFollowingItemInput =
+        newFollowingItem.querySelector<HTMLInputElement>("[dev-target=input]");
+      newFollowingItemInput?.setAttribute("dev-input-type", inputType);
+      newFollowingItemInput?.setAttribute("dev-input-id", item.id.toString());
+      newFollowingItemInput && followFavouriteLogic(newFollowingItemInput);
+      newFollowingItemInput &&
+        userFollowingAndFavourite &&
+        setCheckboxesInitialState(newFollowingItemInput, slugArray);
+      newFollowingItemInput && fakeCheckboxToggle(newFollowingItemInput);
+      followingTarget.appendChild(newFollowingItem);
+    });
+  }
+  // Function to debounce a given function
+  function debounce(func: (...args: any[]) => void, delay: number) {
+    let debounceTimer: ReturnType<typeof setTimeout>;
+    return function (this: any, ...args: any[]) {
+      const context = this;
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => func.apply(context, args), delay);
+    };
+  }
+
+  // Function for querying a single element by selector
+  function qs<T extends HTMLElement = HTMLDivElement>(selector: string): T {
+    return document.querySelector(selector) as T;
+  }
+
+  function convertArrayOfObjToNumber(data: { id: number }[]) {
+    return data.map((item) => item.id);
+  }
+
+  // Function for querying multiple elements by selector
+  function qsa<T extends HTMLElement = HTMLDivElement>(
+    selector: string
+  ): NodeListOf<T> {
+    return document.querySelectorAll(selector) as NodeListOf<T>;
+  }
+});
+
+interface InsightPayload {
+  page?: number;
+  perPage?: number;
+  offset?: number;
+  orderBy?: string;
+  sortBy?: string;
+  filtering?: {
+    search?: string;
+    checkboxes?: {
+      companyType?: number[];
+      sourceCat?: number[];
+      techCat?: number[];
+      lineOfBus?: number[];
+      insightClass?: number[];
+    };
+  };
+}
+
+interface Insight {
+  itemsReceived: number;
+  curPage: number;
+  nextPage: number | null;
+  prevPage: number | null;
+  offset: number;
+  itemsTotal: number;
+  pageTotal: number;
+  items: {
+    id: number;
+    created_at: number;
+    name: string;
+    slug: string;
+    company_id: number;
+    description: string;
+    "insight-detail": string;
+    curated: Date | null;
+    source_author: string;
+    source: string;
+    "source-url": string;
+    "source-publication-date": Date | null;
+    source_category_id: (
+      | { id: number; name: string; slug: string }
+      | null
+      | 0
+    )[];
+    company_type_id: ({ id: number; name: string; slug: string } | null | 0)[];
+    insight_classification_id: (
+      | { id: number; name: string; slug: string }
+      | null
+      | 0
+    )[];
+    line_of_business_id: (
+      | { id: number; name: string; slug: string }
+      | null
+      | 0
+    )[];
+    technology_category_id: (
+      | { id: number; name: string; slug: string }
+      | null
+      | 0
+    )[];
+    "companies-mentioned": number[];
+    people_id: number[];
+    event_id: number;
+    published: boolean;
+  }[];
+}
+
+interface UserFollowingAndFavourite {
+  user_following: {
+    id: number;
+    created_at: number;
+    xano_user_id: number;
+    company_id: {
+      id: number;
+      name: string;
+      slug: string;
+    }[];
+    technology_category_id: {
+      id: number;
+      name: string;
+      slug: string;
+    }[];
+    people_id: {
+      id: number;
+      name: string;
+      slug: string;
+    }[];
+    event_id: {
+      id: number;
+      name: string;
+      slug: string;
+    }[];
+  };
+  user_favourite: {
+    id: number;
+    xano_user_id: number;
+    insight_id: number[];
+  };
+}
+
+interface FilterResponse {
+  itemsReceived: number;
+  curPage: number;
+  nextPage: number | null;
+  prevPage: number | null;
+  offset: number;
+  itemsTotal: number;
+  pageTotal: number;
+  items: {
+    id: number;
+    created_at: number;
+    name: string;
+    slug: string;
+    published: boolean;
+  }[];
+}
+
+interface SearchObject {
+  search: string;
+  checkboxes: {
+    companyType: number[];
+    sourceCat: number[];
+    techCat: number[];
+    lineOfBus: number[];
+    insightClass: number[];
+  };
+}
