@@ -1,13 +1,12 @@
 "use strict";
 // import { XanoClient } from "@xano/js-sdk";
-const xano_userFeed = new XanoClient({
-    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU",
-});
-const xano_wmx = new XanoClient({
-    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140",
-});
-console.log("pre");
 document.addEventListener("DOMContentLoaded", async () => {
+    const xano_userFeed = new XanoClient({
+        apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU",
+    });
+    const xano_wmx = new XanoClient({
+        apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140",
+    });
     const searchObject = {
         search: "",
         checkboxes: {
@@ -46,6 +45,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         return console.error("No memberstack token");
     }
     const lsInsights = localStorage.getItem("insights");
+    const lsFollowingInsights = localStorage.getItem("insightsFollowing");
+    const lsFavouriteInsights = localStorage.getItem("insightsFavourite");
     const lsUserFollowingFavourite = localStorage.getItem("user-following-favourite");
     if (lsUserFollowingFavourite) {
         userFollowingAndFavourite = JSON.parse(lsUserFollowingFavourite);
@@ -54,6 +55,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         userFollowingAndFavourite &&
             initInsights(JSON.parse(lsInsights), allTabsTarget, userFollowingAndFavourite);
         paginationLogic(JSON.parse(lsInsights), "all");
+    }
+    if (lsFollowingInsights) {
+        userFollowingAndFavourite &&
+            initInsights(JSON.parse(lsFollowingInsights), followingTabsTarget, userFollowingAndFavourite);
+        paginationLogic(JSON.parse(lsFollowingInsights), "following");
+    }
+    if (lsFavouriteInsights) {
+        userFollowingAndFavourite &&
+            initInsights(JSON.parse(lsFavouriteInsights), favouriteTabsTarget, userFollowingAndFavourite);
+        paginationLogic(JSON.parse(lsFavouriteInsights), "favourite");
     }
     await getXanoAccessToken(memberStackUserToken);
     await getUserFollowingAndFavourite();
@@ -193,6 +204,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const newInsight = insightTemplate.cloneNode(true);
             const tagsWrapperTarget = newInsight.querySelector(`[dev-target=tags-container]`);
             const insightNameTarget = newInsight.querySelector(`[dev-target=insight-name]`);
+            const insightLink = newInsight.querySelector(`[dev-target=insight-link]`);
             const curatedDateTarget = newInsight.querySelector(`[dev-target="curated-date"]`);
             const publishedDateTarget = newInsight.querySelector(`[dev-target="published-date"]`);
             const sourceTarget = newInsight.querySelector(`[dev-target="source-name-link"]`);
@@ -233,6 +245,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             insightNameTarget.textContent = insight.name;
             curatedDateTarget.textContent = curatedDate ?? "";
             publishedDateTarget.textContent = publishedDate ?? "";
+            insightLink.setAttribute("href", "/insight/" + insight.slug);
             sourceTarget.setAttribute("href", insight["source-url"]);
             sourceTarget.textContent = insight.source;
             sourceAuthorTarget.textContent = insight.source_author;

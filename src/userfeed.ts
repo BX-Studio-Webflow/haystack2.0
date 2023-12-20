@@ -1,12 +1,11 @@
 // import { XanoClient } from "@xano/js-sdk";
-const xano_userFeed = new XanoClient({
-  apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU",
-});
-const xano_wmx = new XanoClient({
-  apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140",
-});
-console.log("pre");
 document.addEventListener("DOMContentLoaded", async () => {
+  const xano_userFeed = new XanoClient({
+    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU",
+  });
+  const xano_wmx = new XanoClient({
+    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140",
+  });
   const searchObject: SearchObject = {
     search: "",
     checkboxes: {
@@ -54,20 +53,40 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const lsInsights = localStorage.getItem("insights");
+  const lsFollowingInsights = localStorage.getItem("insightsFollowing");
+  const lsFavouriteInsights = localStorage.getItem("insightsFavourite");
   const lsUserFollowingFavourite = localStorage.getItem(
     "user-following-favourite"
-    );
-    if (lsUserFollowingFavourite) {
-      userFollowingAndFavourite = JSON.parse(lsUserFollowingFavourite);
-    }
-    if (lsInsights) {
-      userFollowingAndFavourite &&
+  );
+  if (lsUserFollowingFavourite) {
+    userFollowingAndFavourite = JSON.parse(lsUserFollowingFavourite);
+  }
+  if (lsInsights) {
+    userFollowingAndFavourite &&
       initInsights(
         JSON.parse(lsInsights) as Insight,
         allTabsTarget,
         userFollowingAndFavourite
-        );
-        paginationLogic(JSON.parse(lsInsights) as Insight, "all")
+      );
+    paginationLogic(JSON.parse(lsInsights) as Insight, "all");
+  }
+  if (lsFollowingInsights) {
+    userFollowingAndFavourite &&
+      initInsights(
+        JSON.parse(lsFollowingInsights) as Insight,
+        followingTabsTarget,
+        userFollowingAndFavourite
+      );
+    paginationLogic(JSON.parse(lsFollowingInsights) as Insight, "following");
+  }
+  if (lsFavouriteInsights) {
+    userFollowingAndFavourite &&
+      initInsights(
+        JSON.parse(lsFavouriteInsights) as Insight,
+        favouriteTabsTarget,
+        userFollowingAndFavourite
+      );
+    paginationLogic(JSON.parse(lsFavouriteInsights) as Insight, "favourite");
   }
 
   await getXanoAccessToken(memberStackUserToken);
@@ -288,6 +307,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const insightNameTarget = newInsight.querySelector(
         `[dev-target=insight-name]`
       );
+      const insightLink = newInsight.querySelector(`[dev-target=insight-link]`);
       const curatedDateTarget = newInsight.querySelector(
         `[dev-target="curated-date"]`
       );
@@ -363,6 +383,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       insightNameTarget!.textContent = insight.name;
       curatedDateTarget!.textContent = curatedDate ?? "";
       publishedDateTarget!.textContent = publishedDate ?? "";
+      insightLink!.setAttribute("href", "/insight/" + insight.slug);
       sourceTarget!.setAttribute("href", insight["source-url"]);
       sourceTarget!.textContent = insight.source;
       sourceAuthorTarget!.textContent = insight.source_author;
@@ -599,7 +620,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       pageItemWrapper.appendChild(firstPageNumItem);
 
       if (curPage > 3) {
-        const pagItemDots = pageItem.cloneNode(true) as HTMLButtonElement
+        const pagItemDots = pageItem.cloneNode(true) as HTMLButtonElement;
         pagItemDots.textContent = "...";
         pagItemDots.classList["add"]("not-allowed");
         pageItemWrapper.appendChild(pagItemDots);
@@ -620,7 +641,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       if (curPage < pageTotal - 2) {
-        const pagItemDots = pageItem.cloneNode(true) as HTMLButtonElement
+        const pagItemDots = pageItem.cloneNode(true) as HTMLButtonElement;
         pagItemDots.textContent = "...";
         pagItemDots.classList["add"]("not-allowed");
         pageItemWrapper.appendChild(pagItemDots);
