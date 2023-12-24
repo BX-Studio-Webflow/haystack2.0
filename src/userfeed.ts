@@ -21,9 +21,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     orderBy: "asc",
   };
 
-  var userFollowingAndFavourite: UserFollowingAndFavourite | null = null;
+  let userFollowingAndFavourite: UserFollowingAndFavourite | null = null;
 
   const insightSearchInput = qs<HTMLInputElement>("[dev-search-target]");
+  const insightFilterForm = qs<HTMLFormElement>("[dev-target=filter-form]");
+  const insightClearFilters = qs<HTMLFormElement>("[dev-target=clear-filters]");
+  const inputEvent = new Event("input", { bubbles: true, cancelable: true });
 
   const insightTemplate = qs(`[dev-template="insight-item"]`);
   const insightTagTemplate = qs(`[dev-template="insight-tag"]`);
@@ -94,9 +97,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   userFeedInit();
 
   function userFeedInit() {
+    insightFilterForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
     insightSearchInput.addEventListener("input", (e) => {
       searchObject.search = insightSearchInput.value;
       searchDebounce();
+    });
+    insightClearFilters.addEventListener("click", () => {
+      const checkedFilters = qsa<HTMLInputElement>(
+        "[dev-input-checkbox]:checked"
+      );
+
+      insightSearchInput.value = "";
+      insightSearchInput.dispatchEvent(inputEvent);
+      checkedFilters.forEach((input) => {
+        input.click();
+      });
     });
 
     getInsights("/insight-all-tab", {}, allTabsTarget);
@@ -183,6 +201,38 @@ document.addEventListener("DOMContentLoaded", async () => {
       ) {
         localStorage.setItem("insights", JSON.stringify(insights));
       }
+      if (
+        endPoint === "/insight-following-tab" &&
+        page === 0 &&
+        perPage === 0 &&
+        offset === 0 &&
+        filtering.search === "" &&
+        filtering.checkboxes?.companyType?.length === 0 &&
+        filtering.checkboxes?.sourceCat?.length === 0 &&
+        filtering.checkboxes?.techCat?.length === 0 &&
+        filtering.checkboxes?.lineOfBus?.length === 0 &&
+        filtering.checkboxes?.insightClass?.length === 0 &&
+        sortObject.sortBy === "created_at" &&
+        sortObject.orderBy === "asc"
+      ) {
+        localStorage.setItem("insightsFollowing", JSON.stringify(insights));
+      }
+      if (
+        endPoint === "/insight-favourite-tab" &&
+        page === 0 &&
+        perPage === 0 &&
+        offset === 0 &&
+        filtering.search === "" &&
+        filtering.checkboxes?.companyType?.length === 0 &&
+        filtering.checkboxes?.sourceCat?.length === 0 &&
+        filtering.checkboxes?.techCat?.length === 0 &&
+        filtering.checkboxes?.lineOfBus?.length === 0 &&
+        filtering.checkboxes?.insightClass?.length === 0 &&
+        sortObject.sortBy === "created_at" &&
+        sortObject.orderBy === "asc"
+      ) {
+        localStorage.setItem("insightsFavourite", JSON.stringify(insights));
+      }
       userFollowingAndFavourite &&
         initInsights(insights, target, userFollowingAndFavourite);
 
@@ -238,7 +288,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               type
             ].filter((item) => item != filter.id);
           }
-          insightSearch();
+          searchDebounce();
         });
         newFilter.querySelector("[dev-target=name]")!.textContent = filter.name;
         targetWrapper.appendChild(newFilter);
@@ -410,36 +460,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  const followFavouriteDebounce = debounce(followFavouriteListener, 500);
+
+  async function followFavouriteListener(input: HTMLInputElement) {
+    const type = input.getAttribute("dev-input-type")!;
+    const id = input.getAttribute("dev-input-id")!;
+    const endPoint =
+      type === "favourite" ? "/toggle-favourite" : "/toggle-follow";
+    try {
+      const res = await xano_userFeed.get(endPoint, {
+        id: Number(id),
+        target: type,
+      });
+      console.log("userFollowingAndFavourite-1", userFollowingAndFavourite);
+      await getUserFollowingAndFavourite();
+      // run function to updated all-tab inputs
+      console.log("userFollowingAndFavourite-2", userFollowingAndFavourite);
+
+      allTabsTarget.childNodes.forEach((insight) => {
+        // console.log("insights",insight)
+        updateInsightsInputs(insight as HTMLDivElement);
+      });
+
+      // refetch following and favourite tabs
+      getInsights("/insight-following-tab", {}, followingTabsTarget);
+      getInsights("/insight-favourite-tab", {}, favouriteTabsTarget);
+    } catch (error) {
+      console.error(`followFavouriteLogic${endPoint}_error`, error);
+      return null;
+    }
+  }
+
   function followFavouriteLogic(input: HTMLInputElement) {
-    input.addEventListener("change", async () => {
-      // send follow/favourite request
-      const type = input.getAttribute("dev-input-type")!;
-      const id = input.getAttribute("dev-input-id")!;
-      const endPoint =
-        type === "favourite" ? "/toggle-favourite" : "/toggle-follow";
-      try {
-        const res = await xano_userFeed.get(endPoint, {
-          id: Number(id),
-          target: type,
-        });
-        console.log("userFollowingAndFavourite-1", userFollowingAndFavourite);
-        await getUserFollowingAndFavourite();
-        // run function to updated all-tab inputs
-        console.log("userFollowingAndFavourite-2", userFollowingAndFavourite);
-
-        allTabsTarget.childNodes.forEach((insight) => {
-          // console.log("insights",insight)
-          updateInsightsInputs(insight as HTMLDivElement);
-        });
-
-        // refetch following and favourite tabs
-        getInsights("/insight-following-tab", {}, followingTabsTarget);
-        getInsights("/insight-favourite-tab", {}, favouriteTabsTarget);
-      } catch (error) {
-        console.error(`followFavouriteLogic${endPoint}_error`, error);
-        return null;
-      }
-    });
+    input.addEventListener("change", async () =>
+      followFavouriteDebounce(input)
+    );
   }
 
   // Function to toggle fake checkboxes
@@ -480,12 +535,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
     const tagInputs = insight.querySelectorAll<HTMLInputElement>(
       `[dev-input-type="technology_category_id"]`
-    );
-
-    console.log("1-2-3", companyInput, favourite, tagInputs);
-    console.log(
-      "userFollowingAndFavourite?.user_favourite.insight_id!",
-      userFollowingAndFavourite?.user_favourite.insight_id!
     );
 
     companyInput &&
@@ -582,7 +631,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       tagTarget = favouriteTabsTarget;
     }
 
-    const { curPage, nextPage, prevPage, pageTotal } = insight;
+    const { curPage, nextPage, prevPage, pageTotal, itemsReceived } = insight;
+    const paginationWrapper = paginationTarget.closest(
+      `[dev-target="insight-pagination-wrapper"]`
+    );
     const pagination = paginationTemplate.cloneNode(true) as HTMLDivElement;
     const prevBtn = pagination.querySelector(
       `[dev-target=pagination-previous]`
@@ -600,12 +652,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     paginationTarget.innerHTML = "";
     pageItemWrapper.innerHTML = "";
 
+    if (itemsReceived === 0) {
+      paginationTarget?.classList.add("hide");
+      paginationWrapper
+        ?.querySelector(`[dev-tab-empty-state]`)
+        ?.classList.remove("hide");
+    } else {
+      paginationTarget?.classList.remove("hide");
+      paginationWrapper
+        ?.querySelector(`[dev-tab-empty-state]`)
+        ?.classList.add("hide");
+    }
+
     if (pageTotal <= 6) {
       for (let i = 1; i <= pageTotal; i++) {
         const pageNumItem = pageItem.cloneNode(true) as HTMLDivElement;
         pageNumItem.textContent = i.toString();
         pageNumItem.classList[curPage === i ? "add" : "remove"]("active");
         pageNumItem.addEventListener("click", () => {
+          paginationWrapper?.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
           getInsights(endPoint, { page: i }, tagTarget);
         });
         pageItemWrapper.appendChild(pageNumItem);
@@ -615,6 +687,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       firstPageNumItem.textContent = "1";
       firstPageNumItem.classList[curPage === 1 ? "add" : "remove"]("active");
       firstPageNumItem.addEventListener("click", () => {
+        paginationWrapper?.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
         getInsights(endPoint, { page: 1 }, tagTarget);
       });
       pageItemWrapper.appendChild(firstPageNumItem);
@@ -635,6 +715,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         pageNumItem.classList[curPage === i ? "add" : "remove"]("active");
         pageNumItem.textContent = i.toString();
         pageNumItem.addEventListener("click", () => {
+          paginationWrapper?.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
           getInsights(endPoint, { page: i }, tagTarget);
         });
         pageItemWrapper.appendChild(pageNumItem);
@@ -651,6 +739,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       pageNumItem.textContent = pageTotal.toString();
       pageNumItem.classList[curPage === pageTotal ? "add" : "remove"]("active");
       pageNumItem.addEventListener("click", () => {
+        paginationWrapper?.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
         getInsights(endPoint, { page: pageTotal }, tagTarget);
       });
       pageItemWrapper.appendChild(pageNumItem);
@@ -661,10 +757,26 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     nextPage &&
       nextBtn.addEventListener("click", () => {
+        paginationWrapper?.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
         getInsights(endPoint, { page: curPage + 1 }, tagTarget);
       });
     prevPage &&
       prevBtn.addEventListener("click", () => {
+        paginationWrapper?.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
         getInsights(endPoint, { page: curPage - 1 }, tagTarget);
       });
     pagination.style.display = pageTotal === 1 ? "none" : "flex";
