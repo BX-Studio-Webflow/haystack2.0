@@ -865,9 +865,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       const newFollowingItem = followingItemTemplate.cloneNode(
         true
       ) as HTMLDivElement;
-      newFollowingItem
-        .querySelector("[dev-target=link]")
-        ?.setAttribute("href", item.slug);
+      if(inputType ==="company_id"){
+        newFollowingItem
+          .querySelector("[dev-target=link]")
+          ?.setAttribute("href", "/company/"+item.slug);
+      }
+      if(inputType ==="event_id"){
+        newFollowingItem
+          .querySelector("[dev-target=link]")
+          ?.setAttribute("href", "/event/"+item.slug);
+      }
+      if(inputType ==="people_id"){
+        newFollowingItem
+          .querySelector("[dev-target=link]")
+          ?.setAttribute("href", "/person/"+item.slug);
+      }
       newFollowingItem.querySelector("[dev-target=name]")!.textContent =
         item.name;
       const newFollowingItemInput =
