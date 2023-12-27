@@ -2,7 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("insight-dev");
-  const xano_insight = new XanoClient({
+  const xano_individual_pages = new XanoClient({
     apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:CvEH0ZFk",
   });
   const xano_wmx = new XanoClient({
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const insightTagTemplate = qs(`[dev-template="insight-tag"]`);
 
   let userFollowingAndFavourite: UserFollowingAndFavourite | null = null;
-  let insight: InsightResponse | null = null;
+  let xanoToken: string | null = null;
 
   const insightTemplate = qs(`[dev-target="insight-template"]`);
   const companyCard = qs(`[dev-target="company-card"]`);
@@ -26,6 +26,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const lsUserFollowingFavourite = localStorage.getItem(
     "user-following-favourite"
   );
+  const lsXanoAuthToken = localStorage.getItem("AuthToken");
+  if (lsXanoAuthToken) {
+    xanoToken = lsXanoAuthToken;
+  }
 
   if (lsUserFollowingFavourite) {
     userFollowingAndFavourite = JSON.parse(lsUserFollowingFavourite);
@@ -40,12 +44,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     return console.error("No memberstack token");
   }
 
-  await getXanoAccessToken(memberStackUserToken);
-  await getUserFollowingAndFavourite();
-  await getInsight(insightSlug);
-  insightPageInit();
+  if (xanoToken) {
+    xano_userFeed.setAuthToken(xanoToken);
+    xano_individual_pages.setAuthToken(xanoToken);
+    getXanoAccessToken(memberStackUserToken);
+  } else {
+    await getXanoAccessToken(memberStackUserToken);
+  }
+  lsUserFollowingFavourite
+    ? getUserFollowingAndFavourite()
+    : await getUserFollowingAndFavourite();
+  insightPageInit(insightSlug);
 
-  function insightPageInit() {
+  async function insightPageInit(insightSlug: string) {
+    const insight = await getInsight(insightSlug);
     if (insight) {
       const companyItemTemplate = companyCard.querySelector<HTMLDivElement>(
         `[dev-target="company-template"]`
@@ -70,6 +82,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
       const companyInput = insightTemplate.querySelector<HTMLInputElement>(
         `[dev-target=company-input]`
+      );
+      const companyImage = insightTemplate.querySelector<HTMLImageElement>(
+        `[dev-target=company-image]`
       );
       const companyLink = insightTemplate.querySelector<HTMLLinkElement>(
         `[dev-target=company-link]`
@@ -123,6 +138,17 @@ document.addEventListener("DOMContentLoaded", async () => {
           )
         );
 
+      companyImage!.src =
+        "https://logo.clearbit.com/" +
+        insight.company_details["company-website"];
+      fetch(
+        "https://logo.clearbit.com/" +
+          insight.company_details["company-website"]
+      ).catch(
+        () =>
+          (companyImage!.src =
+            "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
+      );
       curatedDateTarget!.textContent = curatedDate ?? "";
       publishedDateTarget!.textContent = publishedDate ?? "";
       sourceTarget!.setAttribute("href", insight["source-url"]);
@@ -164,7 +190,21 @@ document.addEventListener("DOMContentLoaded", async () => {
           const companyInput = companyItem.querySelector<HTMLInputElement>(
             `[dev-target="company-input"]`
           );
+          const companyImage = companyItem.querySelector<HTMLImageElement>(
+            `[dev-target="company-image"]`
+          );
 
+          companyImage!.src =
+            "https://logo.clearbit.com/" +
+            item["company-website"];
+          fetch(
+            "https://logo.clearbit.com/" +
+              insight.company_details["company-website"]
+          ).catch(
+            () =>
+              (companyImage!.src =
+                "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
+          );
           companyPictureLink!.href = "/company/" + item.slug;
           companyLink!.href = "/company/" + item.slug;
           companyLink!.textContent = item.name;
@@ -208,7 +248,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             `[dev-target="company-link"]`
           );
           const personName = person.name;
-          const personLink = "/people/" + person.slug;
+          const personLink = "/person/" + person.slug;
           const companyName = person._company.name;
           const companyLink = "/company/" + person._company.slug;
 
@@ -251,13 +291,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function getInsight(slug: string) {
     try {
-      const res = await xano_insight.get("/insight", {
+      const res = await xano_individual_pages.get("/insight", {
         slug,
       });
       const insightResponse = res.getBody() as InsightResponse;
 
       console.log("insightResponse", insightResponse);
-      insight = insightResponse;
       return insightResponse;
     } catch (error) {
       console.log("getInsight_error", error);
@@ -271,7 +310,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         memberstack_token: memberstackToken,
       });
       const xanoAuthToken = res.getBody().authToken as string;
-      xano_insight.setAuthToken(xanoAuthToken);
+      xano_individual_pages.setAuthToken(xanoAuthToken);
       xano_userFeed.setAuthToken(xanoAuthToken);
       return xanoAuthToken;
     } catch (error) {
@@ -466,6 +505,7 @@ interface InsightResponse {
     id: number;
     name: string;
     slug: string;
+    "company-website": string;
   }[];
   people_id: {
     id: number;
@@ -484,6 +524,7 @@ interface InsightResponse {
     id: number;
     name: string;
     slug: string;
+    "company-website": string;
   };
   event_details: {
     id: number;

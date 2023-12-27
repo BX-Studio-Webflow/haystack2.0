@@ -2,7 +2,7 @@
 // import { XanoClient } from "@xano/js-sdk";
 document.addEventListener("DOMContentLoaded", async () => {
     console.log("insight-dev");
-    const xano_insight = new XanoClient({
+    const xano_individual_pages = new XanoClient({
         apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:CvEH0ZFk",
     });
     const xano_wmx = new XanoClient({
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     const insightTagTemplate = qs(`[dev-template="insight-tag"]`);
     let userFollowingAndFavourite = null;
-    let insight = null;
+    let xanoToken = null;
     const insightTemplate = qs(`[dev-target="insight-template"]`);
     const companyCard = qs(`[dev-target="company-card"]`);
     const peopleCard = qs(`[dev-target="people-card"]`);
@@ -21,6 +21,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const searchParams = new URLSearchParams(window.location.search);
     const insightSlug = searchParams.get("name");
     const lsUserFollowingFavourite = localStorage.getItem("user-following-favourite");
+    const lsXanoAuthToken = localStorage.getItem("AuthToken");
+    if (lsXanoAuthToken) {
+        xanoToken = lsXanoAuthToken;
+    }
     if (lsUserFollowingFavourite) {
         userFollowingAndFavourite = JSON.parse(lsUserFollowingFavourite);
     }
@@ -31,11 +35,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!memberStackUserToken) {
         return console.error("No memberstack token");
     }
-    await getXanoAccessToken(memberStackUserToken);
-    await getUserFollowingAndFavourite();
-    await getInsight(insightSlug);
-    insightPageInit();
-    function insightPageInit() {
+    if (xanoToken) {
+        xano_userFeed.setAuthToken(xanoToken);
+        xano_individual_pages.setAuthToken(xanoToken);
+        getXanoAccessToken(memberStackUserToken);
+    }
+    else {
+        await getXanoAccessToken(memberStackUserToken);
+    }
+    lsUserFollowingFavourite
+        ? getUserFollowingAndFavourite()
+        : await getUserFollowingAndFavourite();
+    insightPageInit(insightSlug);
+    async function insightPageInit(insightSlug) {
+        const insight = await getInsight(insightSlug);
         if (insight) {
             const companyItemTemplate = companyCard.querySelector(`[dev-target="company-template"]`);
             const peopleItemTemplate = peopleCard.querySelector(`[dev-target="people-template"]`);
@@ -45,6 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const insightRichtext = insightTemplate.querySelector(`[dev-target="rich-text"]`);
             const favouriteInput = insightTemplate.querySelector(`[dev-target=favourite-input]`);
             const companyInput = insightTemplate.querySelector(`[dev-target=company-input]`);
+            const companyImage = insightTemplate.querySelector(`[dev-target=company-image]`);
             const companyLink = insightTemplate.querySelector(`[dev-target=company-link]`);
             const curatedDateTarget = insightTemplate.querySelector(`[dev-target="curated-date"]`);
             const publishedDateTarget = insightTemplate.querySelector(`[dev-target="published-date"]`);
@@ -71,6 +85,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 setCheckboxesInitialState(favouriteInput, userFollowingAndFavourite.user_favourite.insight_id);
             companyInput &&
                 setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id));
+            companyImage.src =
+                "https://logo.clearbit.com/" +
+                    insight.company_details["company-website"];
+            fetch("https://logo.clearbit.com/" +
+                insight.company_details["company-website"]).catch(() => (companyImage.src =
+                "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
             curatedDateTarget.textContent = curatedDate ?? "";
             publishedDateTarget.textContent = publishedDate ?? "";
             sourceTarget.setAttribute("href", insight["source-url"]);
@@ -92,6 +112,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const companyPictureLink = companyItem.querySelector(`[dev-target="company-picture-link"]`);
                     const companyLink = companyItem.querySelector(`[dev-target="company-link"]`);
                     const companyInput = companyItem.querySelector(`[dev-target="company-input"]`);
+                    const companyImage = companyItem.querySelector(`[dev-target="company-image"]`);
+                    companyImage.src =
+                        "https://logo.clearbit.com/" +
+                            item["company-website"];
+                    fetch("https://logo.clearbit.com/" +
+                        insight.company_details["company-website"]).catch(() => (companyImage.src =
+                        "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
                     companyPictureLink.href = "/company/" + item.slug;
                     companyLink.href = "/company/" + item.slug;
                     companyLink.textContent = item.name;
@@ -120,7 +147,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const personItemLink = peopleItem.querySelector(`[dev-target="people-link"]`);
                     const companyItemLink = peopleItem.querySelector(`[dev-target="company-link"]`);
                     const personName = person.name;
-                    const personLink = "/people/" + person.slug;
+                    const personLink = "/person/" + person.slug;
                     const companyName = person._company.name;
                     const companyLink = "/company/" + person._company.slug;
                     personItemLink.textContent = personName;
@@ -157,12 +184,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     async function getInsight(slug) {
         try {
-            const res = await xano_insight.get("/insight", {
+            const res = await xano_individual_pages.get("/insight", {
                 slug,
             });
             const insightResponse = res.getBody();
             console.log("insightResponse", insightResponse);
-            insight = insightResponse;
             return insightResponse;
         }
         catch (error) {
@@ -176,7 +202,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 memberstack_token: memberstackToken,
             });
             const xanoAuthToken = res.getBody().authToken;
-            xano_insight.setAuthToken(xanoAuthToken);
+            xano_individual_pages.setAuthToken(xanoAuthToken);
             xano_userFeed.setAuthToken(xanoAuthToken);
             return xanoAuthToken;
         }

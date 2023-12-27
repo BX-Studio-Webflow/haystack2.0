@@ -1,11 +1,16 @@
 // import { XanoClient } from "@xano/js-sdk";
+
 document.addEventListener("DOMContentLoaded", async () => {
-  const xano_userFeed = new XanoClient({
-    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU",
+  const xano_individual_pages = new XanoClient({
+    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:CvEH0ZFk",
   });
   const xano_wmx = new XanoClient({
     apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140",
   });
+  const xano_userFeed = new XanoClient({
+    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU",
+  });
+
   const searchObject: SearchObject = {
     search: "",
     checkboxes: {
@@ -21,8 +26,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     orderBy: "asc",
   };
 
+  const searchParams = new URLSearchParams(window.location.search);
+  const personSlug = searchParams.get("name");
+
   let userFollowingAndFavourite: UserFollowingAndFavourite | null = null;
   let xanoToken: string | null = null;
+
+  const personCard = qs("[dev-target=person-card]");
+  const personDetails = qs("[dev-target=person-details]");
 
   const insightSearchInput = qs<HTMLInputElement>("[dev-search-target]");
   const insightFilterForm = qs<HTMLFormElement>("[dev-target=filter-form]");
@@ -32,16 +43,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const insightTemplate = qs(`[dev-template="insight-item"]`);
   const insightTagTemplate = qs(`[dev-template="insight-tag"]`);
   const checkboxItemTemplate = qs(`[dev-template="checkbox-item"]`);
-  const followingItemTemplate = qs(`[dev-template="following-item"]`);
 
   const allTabsTarget = qs(`[dev-target="insight-all"]`);
-  const followingTabsTarget = qs(`[dev-target="insight-following"]`);
-  const favouriteTabsTarget = qs(`[dev-target="insight-favourite"]`);
-
-  const followingCompanyTarget = qs(`[dev-target="following-companies"]`);
-  const followingTechCatTarget = qs(`[dev-target="following-tech-cat"]`);
-  const followingPeopleTarget = qs(`[dev-target="following-people"]`);
-  const followingEventsTarget = qs(`[dev-target="following-events"]`);
 
   const filterCompanyTypeTarget = qs(`[dev-target="filter-company-type"]`);
   const filterSourceCatTarget = qs(`[dev-target="filter-source-cat"]`);
@@ -56,9 +59,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     return console.error("No memberstack token");
   }
 
-  const lsInsights = localStorage.getItem("insights");
-  const lsFollowingInsights = localStorage.getItem("insightsFollowing");
-  const lsFavouriteInsights = localStorage.getItem("insightsFavourite");
   const lsUserFollowingFavourite = localStorage.getItem(
     "user-following-favourite"
   );
@@ -69,36 +69,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (lsUserFollowingFavourite) {
     userFollowingAndFavourite = JSON.parse(lsUserFollowingFavourite);
   }
-  if (lsInsights) {
-    userFollowingAndFavourite &&
-      initInsights(
-        JSON.parse(lsInsights) as Insight,
-        allTabsTarget,
-        userFollowingAndFavourite
-      );
-    paginationLogic(JSON.parse(lsInsights) as Insight, "all");
-  }
-  if (lsFollowingInsights) {
-    userFollowingAndFavourite &&
-      initInsights(
-        JSON.parse(lsFollowingInsights) as Insight,
-        followingTabsTarget,
-        userFollowingAndFavourite
-      );
-    paginationLogic(JSON.parse(lsFollowingInsights) as Insight, "following");
-  }
-  if (lsFavouriteInsights) {
-    userFollowingAndFavourite &&
-      initInsights(
-        JSON.parse(lsFavouriteInsights) as Insight,
-        favouriteTabsTarget,
-        userFollowingAndFavourite
-      );
-    paginationLogic(JSON.parse(lsFavouriteInsights) as Insight, "favourite");
+
+  if (!personSlug) {
+    return console.error("add person name in the url eg /person/andre-gouin");
   }
 
   if (xanoToken) {
     xano_userFeed.setAuthToken(xanoToken);
+    xano_individual_pages.setAuthToken(xanoToken);
     getXanoAccessToken(memberStackUserToken);
   } else {
     await getXanoAccessToken(memberStackUserToken);
@@ -106,16 +84,51 @@ document.addEventListener("DOMContentLoaded", async () => {
   lsUserFollowingFavourite
     ? getUserFollowingAndFavourite()
     : await getUserFollowingAndFavourite();
-  userFeedInit();
+  peoplePageInit(personSlug);
 
-  function userFeedInit() {
+  async function getXanoAccessToken(memberstackToken: string) {
+    try {
+      const res = await xano_wmx.post("/auth-user", {
+        memberstack_token: memberstackToken,
+      });
+      const xanoAuthToken = res.getBody().authToken as string;
+      xano_userFeed.setAuthToken(xanoAuthToken);
+      xano_individual_pages.setAuthToken(xanoAuthToken);
+      return xanoAuthToken;
+    } catch (error) {
+      console.log("getXanoAccessToken_error", error);
+      return null;
+    }
+  }
+
+  async function getUserFollowingAndFavourite() {
+    try {
+      const res = await xano_userFeed.get("/user-following-and-favourite");
+      const followingAndFavourite = res.getBody() as UserFollowingAndFavourite;
+      const { user_following } = followingAndFavourite;
+      userFollowingAndFavourite = followingAndFavourite;
+      localStorage.setItem(
+        "user-following-favourite",
+        JSON.stringify(followingAndFavourite)
+      );
+
+      return followingAndFavourite;
+    } catch (error) {
+      console.error(`getUserFollowingAndFavourite_error`, error);
+      return null;
+    }
+  }
+
+  async function peoplePageInit(personSlug: string) {
+    getPersonInsights(personSlug, {});
+    getPerson(personSlug);
     insightFilterForm.addEventListener("submit", (e) => {
       e.preventDefault();
       e.stopPropagation();
     });
     insightSearchInput.addEventListener("input", (e) => {
       searchObject.search = insightSearchInput.value;
-      searchDebounce();
+      searchDebounce(personSlug);
     });
     insightClearFilters.addEventListener("click", () => {
       const checkedFilters = qsa<HTMLInputElement>(
@@ -128,47 +141,112 @@ document.addEventListener("DOMContentLoaded", async () => {
         input.click();
       });
     });
-
-    getInsights("/insight-all-tab", {}, allTabsTarget);
-    getInsights("/insight-following-tab", {}, followingTabsTarget);
-    getInsights("/insight-favourite-tab", {}, favouriteTabsTarget);
-
-    getFilters("/company_type", {}, "companyType", filterCompanyTypeTarget);
-    getFilters("/source_category", {}, "sourceCat", filterSourceCatTarget);
-    getFilters("/technology_category", {}, "techCat", filterTechCatTarget);
-    getFilters("/line_of_business", {}, "lineOfBus", filterLineOfBusTarget);
+    getFilters(
+      "/company_type",
+      {},
+      "companyType",
+      filterCompanyTypeTarget,
+      personSlug
+    );
+    getFilters(
+      "/source_category",
+      {},
+      "sourceCat",
+      filterSourceCatTarget,
+      personSlug
+    );
+    getFilters(
+      "/technology_category",
+      {},
+      "techCat",
+      filterTechCatTarget,
+      personSlug
+    );
+    getFilters(
+      "/line_of_business",
+      {},
+      "lineOfBus",
+      filterLineOfBusTarget,
+      personSlug
+    );
     getFilters(
       "/insight_classification",
       {},
       "insightClass",
-      filterInsightClassTarget
+      filterInsightClassTarget,
+      personSlug
     );
-
-    sortLogicInit();
+    sortLogicInit(personSlug);
   }
 
-  // async function getUser
-
-  async function getXanoAccessToken(memberstackToken: string) {
+  async function getPerson(slug: string) {
     try {
-      const res = await xano_wmx.post("/auth-user", {
-        memberstack_token: memberstackToken,
+      const res = await xano_individual_pages.get("/person", {
+        slug,
       });
-      const xanoAuthToken = res.getBody().authToken as string;
-      xano_userFeed.setAuthToken(xanoAuthToken);
-      return xanoAuthToken;
+      const person = res.getBody() as Person;
+      console.log("person", person);
+
+      const personName = personCard.querySelector<HTMLHeadingElement>(
+        `[dev-target=person-name]`
+      );
+      const personTitle = personCard.querySelector<HTMLParagraphElement>(
+        `[dev-target=person-title]`
+      );
+      const personBio = personCard.querySelector<HTMLParagraphElement>(
+        `[dev-target=person-bio]`
+      );
+      const personCompanyLink = personCard.querySelector<HTMLLinkElement>(
+        `[dev-target=person-company-link]`
+      );
+      const personLinkedinLink = personCard.querySelector<HTMLLinkElement>(
+        `[dev-target=linkedin-link]`
+      );
+      const personImageWrapper = personCard.querySelector(
+        `[dev-target=person-image-wrapper]`
+      );
+      const personImageLink =
+        personImageWrapper?.querySelector<HTMLLinkElement>(
+          `[dev-target=person-picture-link]`
+        );
+      const PersonImage = personImageWrapper?.querySelector(
+        `[dev-target=person-image]`
+      );
+      const personInput = personImageWrapper?.querySelector<HTMLInputElement>(
+        `[dev-target=person-input]`
+      );
+
+      personName!.textContent = person.name;
+      personTitle!.textContent = person.title;
+      personBio!.textContent = person.bio;
+      personCompanyLink!.textContent = person.company_details.name;
+      personCompanyLink!.href = "company/" + person.company_details.slug;
+      personLinkedinLink!.href = person.linkedin;
+
+      fakeCheckboxToggle(personInput!);
+      personInput?.setAttribute("dev-input-type", "people_id");
+      personInput?.setAttribute("dev-input-id", person.id.toString());
+      personInput && followFavouriteLogic(personInput);
+      personInput &&
+        setCheckboxesInitialState(
+          personInput,
+          convertArrayOfObjToNumber(
+            userFollowingAndFavourite!.user_following.people_id
+          )
+        );
+
+      personDetails.classList.remove("opacity-hide");
+
+      return person;
     } catch (error) {
-      console.log("getXanoAccessToken_error", error);
+      console.log("getPerson_error", error);
       return null;
     }
   }
-  async function getInsights(
-    endPoint:
-      | "/insight-all-tab"
-      | "/insight-favourite-tab"
-      | "/insight-following-tab",
+
+  async function getPersonInsights(
+    slug: string,
     payload: InsightPayload,
-    target: HTMLDivElement
   ) {
     const {
       page = 0,
@@ -186,7 +264,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       },
     } = payload;
     try {
-      const res = await xano_userFeed.get(endPoint, {
+      const res = await xano_individual_pages.get("/person_insights", {
+        slug,
         page,
         perPage,
         offset,
@@ -194,69 +273,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         orderBy: sortObject.orderBy,
         filtering,
       });
-      const insights = res.getBody() as Insight;
-      target.innerHTML = "";
+      const personInsightResponse = res.getBody() as PersonInsightResponse;
+      allTabsTarget.innerHTML = "";
 
-      if (
-        endPoint === "/insight-all-tab" &&
-        page === 0 &&
-        perPage === 0 &&
-        offset === 0 &&
-        filtering.search === "" &&
-        filtering.checkboxes?.companyType?.length === 0 &&
-        filtering.checkboxes?.sourceCat?.length === 0 &&
-        filtering.checkboxes?.techCat?.length === 0 &&
-        filtering.checkboxes?.lineOfBus?.length === 0 &&
-        filtering.checkboxes?.insightClass?.length === 0 &&
-        sortObject.sortBy === "created_at" &&
-        sortObject.orderBy === "asc"
-      ) {
-        localStorage.setItem("insights", JSON.stringify(insights));
-      }
-      if (
-        endPoint === "/insight-following-tab" &&
-        page === 0 &&
-        perPage === 0 &&
-        offset === 0 &&
-        filtering.search === "" &&
-        filtering.checkboxes?.companyType?.length === 0 &&
-        filtering.checkboxes?.sourceCat?.length === 0 &&
-        filtering.checkboxes?.techCat?.length === 0 &&
-        filtering.checkboxes?.lineOfBus?.length === 0 &&
-        filtering.checkboxes?.insightClass?.length === 0 &&
-        sortObject.sortBy === "created_at" &&
-        sortObject.orderBy === "asc"
-      ) {
-        localStorage.setItem("insightsFollowing", JSON.stringify(insights));
-      }
-      if (
-        endPoint === "/insight-favourite-tab" &&
-        page === 0 &&
-        perPage === 0 &&
-        offset === 0 &&
-        filtering.search === "" &&
-        filtering.checkboxes?.companyType?.length === 0 &&
-        filtering.checkboxes?.sourceCat?.length === 0 &&
-        filtering.checkboxes?.techCat?.length === 0 &&
-        filtering.checkboxes?.lineOfBus?.length === 0 &&
-        filtering.checkboxes?.insightClass?.length === 0 &&
-        sortObject.sortBy === "created_at" &&
-        sortObject.orderBy === "asc"
-      ) {
-        localStorage.setItem("insightsFavourite", JSON.stringify(insights));
-      }
+      paginationLogic(personInsightResponse, slug);
+
       userFollowingAndFavourite &&
-        initInsights(insights, target, userFollowingAndFavourite);
+        initInsights(
+          personInsightResponse,
+          allTabsTarget,
+          userFollowingAndFavourite
+        );
 
-      endPoint === "/insight-all-tab" && paginationLogic(insights, "all");
-      endPoint === "/insight-following-tab" &&
-        paginationLogic(insights, "following");
-      endPoint === "/insight-favourite-tab" &&
-        paginationLogic(insights, "favourite");
-
-      return insights;
+      console.log("personInsightResponse", personInsightResponse);
+      return personInsightResponse;
     } catch (error) {
-      console.error(`getInsights_${endPoint}_error`, error);
+      console.log("getPersonInsights_error", error);
       return null;
     }
   }
@@ -275,14 +307,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       | "techCat"
       | "lineOfBus"
       | "insightClass",
-    targetWrapper: HTMLDivElement
+    targetWrapper: HTMLDivElement,
+    personSlug: string
   ) {
     const { page = 0, perPage = 0, offset = 0 } = payload;
     try {
-      const res = await xano_userFeed.get(endPoint, {
+      const res = await xano_individual_pages.get(endPoint, {
         page,
         perPage,
         offset,
+        type: {
+          people: {
+            slug: personSlug,
+            value: true,
+          },
+        },
       });
       const filters = res.getBody() as FilterResponse;
       filters.items.forEach((filter) => {
@@ -300,7 +339,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               type
             ].filter((item) => item != filter.id);
           }
-          searchDebounce();
+          searchDebounce(personSlug);
         });
         newFilter.querySelector("[dev-target=name]")!.textContent = filter.name;
         targetWrapper.appendChild(newFilter);
@@ -312,50 +351,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  async function getUserFollowingAndFavourite() {
-    try {
-      const res = await xano_userFeed.get("/user-following-and-favourite");
-      const followingAndFavourite = res.getBody() as UserFollowingAndFavourite;
-      const { user_following } = followingAndFavourite;
-      userFollowingAndFavourite = followingAndFavourite;
-      localStorage.setItem(
-        "user-following-favourite",
-        JSON.stringify(followingAndFavourite)
-      );
-
-      followingSectionInit(
-        user_following.company_id,
-        "company_id",
-        convertArrayOfObjToNumber(user_following.company_id),
-        followingCompanyTarget
-      );
-      followingSectionInit(
-        user_following.technology_category_id,
-        "technology_category_id",
-        convertArrayOfObjToNumber(user_following.technology_category_id),
-        followingTechCatTarget
-      );
-      followingSectionInit(
-        user_following.people_id,
-        "people_id",
-        convertArrayOfObjToNumber(user_following.people_id),
-        followingPeopleTarget
-      );
-      followingSectionInit(
-        user_following.event_id,
-        "event_id",
-        convertArrayOfObjToNumber(user_following.event_id),
-        followingEventsTarget
-      );
-      return followingAndFavourite;
-    } catch (error) {
-      console.error(`getUserFollowingAndFavourite_error`, error);
-      return null;
-    }
-  }
-
   function initInsights(
-    insights: Insight,
+    insights: PersonInsightResponse,
     target: HTMLDivElement,
     userFollowingAndFavourite: UserFollowingAndFavourite
   ) {
@@ -446,9 +443,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         "technology_category_id"
       );
 
-      companyImage!.src =
-        "https://logo.clearbit.com/" +
-        insight.company_details["company-website"];
+      companyImage!.src = "https://logo.clearbit.com/"+insight.company_details["company-website"]
       fetch(
         "https://logo.clearbit.com/" +
           insight.company_details["company-website"]
@@ -472,7 +467,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  function sortLogicInit() {
+  const searchDebounce = debounce(insightSearch, 500);
+
+  function insightSearch(personSlug: string) {
+    getPersonInsights(personSlug, {
+      filtering: searchObject,
+      orderBy: sortObject.orderBy,
+      sortBy: sortObject.sortBy,
+    });
+  }
+
+  function sortLogicInit(personSlug: string) {
     const sortItems = qsa<HTMLLinkElement>(`[dev-target="sort"]`);
     sortItems.forEach((item) => {
       item.addEventListener("click", () => {
@@ -484,11 +489,19 @@ document.addEventListener("DOMContentLoaded", async () => {
           sortObject.orderBy = orderBy;
         }
 
-        getInsights("/insight-all-tab", {}, allTabsTarget);
-        getInsights("/insight-following-tab", {}, followingTabsTarget);
-        getInsights("/insight-favourite-tab", {}, favouriteTabsTarget);
+        getPersonInsights(personSlug, {});
+
+        // getInsights("/insight-all-tab", {}, allTabsTarget);
+        // getInsights("/insight-following-tab", {}, followingTabsTarget);
+        // getInsights("/insight-favourite-tab", {}, favouriteTabsTarget);
       });
     });
+  }
+
+  function followFavouriteLogic(input: HTMLInputElement) {
+    input.addEventListener("change", async () =>
+      followFavouriteDebounce(input)
+    );
   }
 
   const followFavouriteDebounce = debounce(followFavouriteListener, 500);
@@ -503,57 +516,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         id: Number(id),
         target: type,
       });
-      console.log("userFollowingAndFavourite-1", userFollowingAndFavourite);
       await getUserFollowingAndFavourite();
       // run function to updated all-tab inputs
-      console.log("userFollowingAndFavourite-2", userFollowingAndFavourite);
 
       allTabsTarget.childNodes.forEach((insight) => {
-        // console.log("insights",insight)
         updateInsightsInputs(insight as HTMLDivElement);
       });
-
-      // refetch following and favourite tabs
-      getInsights("/insight-following-tab", {}, followingTabsTarget);
-      getInsights("/insight-favourite-tab", {}, favouriteTabsTarget);
     } catch (error) {
       console.error(`followFavouriteLogic${endPoint}_error`, error);
       return null;
-    }
-  }
-
-  function followFavouriteLogic(input: HTMLInputElement) {
-    input.addEventListener("change", async () =>
-      followFavouriteDebounce(input)
-    );
-  }
-
-  // Function to toggle fake checkboxes
-  function fakeCheckboxToggle(input: HTMLInputElement) {
-    input.addEventListener("change", () => {
-      const inputWrapper = input.closest(
-        "[dev-fake-checkbox-wrapper]"
-      ) as HTMLDivElement;
-      inputWrapper.classList[input.checked ? "add" : "remove"]("checked");
-    });
-  }
-
-  function setCheckboxesInitialState(
-    input: HTMLInputElement,
-    slugArray: number[]
-  ) {
-    const inputId = input.getAttribute("dev-input-id");
-
-    if (slugArray.includes(Number(inputId))) {
-      input.checked = true;
-      input
-        .closest<HTMLDivElement>("[dev-fake-checkbox-wrapper]")
-        ?.classList.add("checked");
-    } else {
-      input.checked = false;
-      input
-        .closest<HTMLDivElement>("[dev-fake-checkbox-wrapper]")
-        ?.classList.remove("checked");
     }
   }
 
@@ -589,6 +560,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         )
       );
     });
+  }
+
+  function setCheckboxesInitialState(
+    input: HTMLInputElement,
+    slugArray: number[]
+  ) {
+    const inputId = input.getAttribute("dev-input-id");
+
+    if (slugArray.includes(Number(inputId))) {
+      input.checked = true;
+      input
+        .closest<HTMLDivElement>("[dev-fake-checkbox-wrapper]")
+        ?.classList.add("checked");
+    } else {
+      input.checked = false;
+      input
+        .closest<HTMLDivElement>("[dev-fake-checkbox-wrapper]")
+        ?.classList.remove("checked");
+    }
   }
 
   function addTagsToInsight(
@@ -638,29 +628,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  function paginationLogic(
-    insight: Insight,
-    target: "all" | "following" | "favourite"
-  ) {
-    let endPoint:
-      | "/insight-all-tab"
-      | "/insight-following-tab"
-      | "/insight-favourite-tab";
-    let paginationTarget: HTMLDivElement;
-    let tagTarget: HTMLDivElement;
-    if (target === "all") {
-      endPoint = "/insight-all-tab";
-      paginationTarget = qs(`[dev-target="all-tab-pagination_wrapper"]`);
-      tagTarget = allTabsTarget;
-    } else if (target === "following") {
-      endPoint = "/insight-following-tab";
-      paginationTarget = qs(`[dev-target="following-tab-pagination_wrapper"]`);
-      tagTarget = followingTabsTarget;
-    } else {
-      endPoint = "/insight-favourite-tab";
-      paginationTarget = qs(`[dev-target="favourite-tab-pagination_wrapper"]`);
-      tagTarget = favouriteTabsTarget;
-    }
+  function paginationLogic(insight: PersonInsightResponse, personSlug: string) {
+    const paginationTarget = qs(`[dev-target="all-tab-pagination_wrapper"]`);
 
     const { curPage, nextPage, prevPage, pageTotal, itemsReceived } = insight;
     const paginationWrapper = paginationTarget.closest(
@@ -709,7 +678,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             top: 0,
             behavior: "smooth",
           });
-          getInsights(endPoint, { page: i }, tagTarget);
+          getPersonInsights(personSlug, { page: i });
+          //   getInsights(endPoint, { page: i }, tagTarget);
         });
         pageItemWrapper.appendChild(pageNumItem);
       }
@@ -726,7 +696,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           top: 0,
           behavior: "smooth",
         });
-        getInsights(endPoint, { page: 1 }, tagTarget);
+        getPersonInsights(personSlug, { page: 1 });
+        // getInsights(endPoint, { page: 1 }, tagTarget);
       });
       pageItemWrapper.appendChild(firstPageNumItem);
 
@@ -754,7 +725,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             top: 0,
             behavior: "smooth",
           });
-          getInsights(endPoint, { page: i }, tagTarget);
+          getPersonInsights(personSlug, { page: i });
+          //   getInsights(endPoint, { page: i }, tagTarget);
         });
         pageItemWrapper.appendChild(pageNumItem);
       }
@@ -778,7 +750,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           top: 0,
           behavior: "smooth",
         });
-        getInsights(endPoint, { page: pageTotal }, tagTarget);
+        getPersonInsights(personSlug, { page: 1 });
+        // getInsights(endPoint, { page: pageTotal }, tagTarget);
       });
       pageItemWrapper.appendChild(pageNumItem);
     }
@@ -796,7 +769,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           top: 0,
           behavior: "smooth",
         });
-        getInsights(endPoint, { page: curPage + 1 }, tagTarget);
+        getPersonInsights(personSlug, { page: curPage + 1 });
+        // getInsights(endPoint, { page: curPage + 1 }, tagTarget);
       });
     prevPage &&
       prevBtn.addEventListener("click", () => {
@@ -808,80 +782,13 @@ document.addEventListener("DOMContentLoaded", async () => {
           top: 0,
           behavior: "smooth",
         });
-        getInsights(endPoint, { page: curPage - 1 }, tagTarget);
+        getPersonInsights(personSlug, { page: curPage - 1 });
+        // getInsights(endPoint, { page: curPage - 1 }, tagTarget);
       });
     pagination.style.display = pageTotal === 1 ? "none" : "flex";
     paginationTarget.appendChild(pagination);
   }
 
-  function insightSearch() {
-    getInsights(
-      "/insight-all-tab",
-      {
-        filtering: searchObject,
-        orderBy: sortObject.orderBy,
-        sortBy: sortObject.sortBy,
-      },
-      allTabsTarget
-    );
-    getInsights(
-      "/insight-following-tab",
-      {
-        filtering: searchObject,
-        orderBy: sortObject.orderBy,
-        sortBy: sortObject.sortBy,
-      },
-      followingTabsTarget
-    );
-    getInsights(
-      "/insight-favourite-tab",
-      {
-        filtering: searchObject,
-        orderBy: sortObject.orderBy,
-        sortBy: sortObject.sortBy,
-      },
-      favouriteTabsTarget
-    );
-  }
-
-  const searchDebounce = debounce(insightSearch, 500);
-
-  function followingSectionInit(
-    userFollowing: {
-      id: number;
-      name: string;
-      slug: string;
-    }[],
-    inputType:
-      | "company_id"
-      | "technology_category_id"
-      | "people_id"
-      | "event_id",
-    slugArray: number[],
-    followingTarget: HTMLDivElement
-  ) {
-    followingTarget.innerHTML = "";
-    userFollowing.forEach((item) => {
-      const newFollowingItem = followingItemTemplate.cloneNode(
-        true
-      ) as HTMLDivElement;
-      newFollowingItem
-        .querySelector("[dev-target=link]")
-        ?.setAttribute("href", item.slug);
-      newFollowingItem.querySelector("[dev-target=name]")!.textContent =
-        item.name;
-      const newFollowingItemInput =
-        newFollowingItem.querySelector<HTMLInputElement>("[dev-target=input]");
-      newFollowingItemInput?.setAttribute("dev-input-type", inputType);
-      newFollowingItemInput?.setAttribute("dev-input-id", item.id.toString());
-      newFollowingItemInput && followFavouriteLogic(newFollowingItemInput);
-      newFollowingItemInput &&
-        userFollowingAndFavourite &&
-        setCheckboxesInitialState(newFollowingItemInput, slugArray);
-      newFollowingItemInput && fakeCheckboxToggle(newFollowingItemInput);
-      followingTarget.appendChild(newFollowingItem);
-    });
-  }
   // Function to debounce a given function
   function debounce(func: (...args: any[]) => void, delay: number) {
     let debounceTimer: ReturnType<typeof setTimeout>;
@@ -897,6 +804,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     return document.querySelector(selector) as T;
   }
 
+  // Function to toggle fake checkboxes
+  function fakeCheckboxToggle(input: HTMLInputElement) {
+    input.addEventListener("change", () => {
+      const inputWrapper = input.closest(
+        "[dev-fake-checkbox-wrapper]"
+      ) as HTMLDivElement;
+      inputWrapper.classList[input.checked ? "add" : "remove"]("checked");
+    });
+  }
+
   function convertArrayOfObjToNumber(data: { id: number }[]) {
     return data.map((item) => item.id);
   }
@@ -909,29 +826,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-interface InsightPayload {
-  page?: number;
-  perPage?: number;
-  offset?: number;
-  orderBy?: string;
-  sortBy?: string;
-  filtering?: {
-    search?: string;
-    checkboxes?: {
-      companyType?: number[];
-      sourceCat?: number[];
-      techCat?: number[];
-      lineOfBus?: number[];
-      insightClass?: number[];
-    };
+interface Person {
+  id: number;
+  name: string;
+  slug: string;
+  title: string;
+  bio: string;
+  company_id: number;
+  linkedin: string;
+  picture: null;
+  company_details: {
+    id: number;
+    name: string;
+    slug: string;
   };
 }
 
-interface Insight {
+interface PersonInsightResponse {
   itemsReceived: number;
   curPage: number;
-  nextPage: number | null;
-  prevPage: number | null;
+  nextPage: null;
+  prevPage: null;
   offset: number;
   itemsTotal: number;
   pageTotal: number;
@@ -943,102 +858,37 @@ interface Insight {
     company_id: number;
     description: string;
     "insight-detail": string;
-    curated: Date | null;
+    curated: Date;
     source_author: string;
     source: string;
     "source-url": string;
-    "source-publication-date": Date | null;
-    source_category_id: (
-      | { id: number; name: string; slug: string }
-      | null
-      | 0
-    )[];
-    company_type_id: ({ id: number; name: string; slug: string } | null | 0)[];
-    insight_classification_id: (
-      | { id: number; name: string; slug: string }
-      | null
-      | 0
-    )[];
-    line_of_business_id: (
-      | { id: number; name: string; slug: string }
-      | null
-      | 0
-    )[];
-    technology_category_id: (
-      | { id: number; name: string; slug: string }
-      | null
-      | 0
-    )[];
-    "companies-mentioned": number[];
-    people_id: number[];
-    event_id: number;
-    company_details: {
-      id: number;
-      name: string;
-      slug: string;
-      "company-website": string;
-    };
-    published: boolean;
-  }[];
-}
-
-interface UserFollowingAndFavourite {
-  user_following: {
-    id: number;
-    created_at: number;
-    xano_user_id: number;
-    company_id: {
+    "source-publication-date": Date;
+    source_category_id: any[];
+    company_type_id: {
       id: number;
       name: string;
       slug: string;
     }[];
+    insight_classification_id: {
+      id: number;
+      name: string;
+      slug: string;
+    }[];
+    line_of_business_id: any[];
     technology_category_id: {
       id: number;
       name: string;
       slug: string;
     }[];
-    people_id: {
-      id: number;
-      name: string;
-      slug: string;
-    }[];
-    event_id: {
-      id: number;
-      name: string;
-      slug: string;
-    }[];
-  };
-  user_favourite: {
-    id: number;
-    xano_user_id: number;
-    insight_id: number[];
-  };
-}
-
-interface FilterResponse {
-  itemsReceived: number;
-  curPage: number;
-  nextPage: number | null;
-  prevPage: number | null;
-  offset: number;
-  itemsTotal: number;
-  pageTotal: number;
-  items: {
-    id: number;
-    created_at: number;
-    name: string;
-    slug: string;
+    "companies-mentioned": any[];
+    people_id: number[];
+    event_id: number;
     published: boolean;
+    company_details: {
+      id: number;
+      name: string;
+      slug: string;
+      "company-website":string
+    };
   }[];
-}
-
-interface SearchObject {
-  search: string;
-  checkboxes: {
-    companyType: number[];
-    sourceCat: number[];
-    techCat: number[];
-    lineOfBus: number[];
-    insightClass: number[];
-  };
 }
