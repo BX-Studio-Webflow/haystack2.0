@@ -199,7 +199,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             item["company-website"];
           fetch(
             "https://logo.clearbit.com/" +
-              insight.company_details["company-website"]
+            item["company-website"]
           ).catch(
             () =>
               (companyImage!.src =

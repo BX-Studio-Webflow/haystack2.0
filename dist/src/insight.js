@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "https://logo.clearbit.com/" +
                             item["company-website"];
                     fetch("https://logo.clearbit.com/" +
-                        insight.company_details["company-website"]).catch(() => (companyImage.src =
+                        item["company-website"]).catch(() => (companyImage.src =
                         "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
                     companyPictureLink.href = "/company/" + item.slug;
                     companyLink.href = "/company/" + item.slug;
