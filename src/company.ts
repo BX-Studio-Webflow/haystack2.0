@@ -360,7 +360,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         setCheckboxesInitialState(
           companyInput,
           convertArrayOfObjToNumber(
-            userFollowingAndFavourite!.user_following.people_id
+            userFollowingAndFavourite!.user_following.company_id
           )
         );
 

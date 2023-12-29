@@ -256,7 +256,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             companyInput?.setAttribute("dev-input-id", company.id.toString());
             companyInput && followFavouriteLogic(companyInput);
             companyInput &&
-                setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.people_id));
+                setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id));
             if (company["related-business-entities"].length === 0) {
                 relatedBusinessCard
                     .querySelector(`[dev-target=related-business-empty-state]`)
