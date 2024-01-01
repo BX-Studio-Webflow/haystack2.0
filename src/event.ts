@@ -546,6 +546,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const sortItems = qsa<HTMLLinkElement>(`[dev-target="sort"]`);
     sortItems.forEach((item) => {
       item.addEventListener("click", () => {
+        sortItems.forEach((sortItem)=>{
+          sortItem.classList.remove("active")
+        })
+        item.classList.add("active")
+        const value = item.textContent;
+        qs(`[dev-target=sorted-item-name]`).textContent = value
         const orderBy = item.getAttribute("dev-orderby");
         const sortBy = item.getAttribute("dev-sortby");
 
