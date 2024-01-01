@@ -856,10 +856,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         const tagInput = newTag.querySelector<HTMLInputElement>(
           `[dev-target=tag-input]`
         );
-        tagInput && fakeCheckboxToggle(tagInput);
-        type && tagInput && tagInput.setAttribute("dev-input-type", type);
-        tagInput && tagInput.setAttribute("dev-input-id", item.id.toString());
-        tagInput && followFavouriteLogic(tagInput);
+        showCheckbox && tagInput && fakeCheckboxToggle(tagInput);
+        showCheckbox && type && tagInput && tagInput.setAttribute("dev-input-type", type);
+        showCheckbox && tagInput && tagInput.setAttribute("dev-input-id", item.id.toString());
+        showCheckbox && tagInput && followFavouriteLogic(tagInput);
         newTag.querySelector(`[dev-target=tag-name]`)!.textContent =
           item?.name!;
 
