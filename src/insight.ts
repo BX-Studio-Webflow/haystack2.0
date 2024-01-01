@@ -295,6 +295,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         slug,
       });
       const insightResponse = res.getBody() as InsightResponse;
+      qs("title").textContent = insightResponse.name
 
       console.log("insightResponse", insightResponse);
       return insightResponse;

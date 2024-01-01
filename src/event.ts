@@ -663,6 +663,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         slug,
       });
       const event = res.getBody() as Event;
+      qs("title").textContent = event.name
       console.log("event", event);
 
       const eventName = eventCard.querySelector<HTMLHeadingElement>(

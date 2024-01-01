@@ -267,6 +267,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         slug,
       });
       const company = res.getBody() as Company;
+      qs("title").textContent = company.name
       console.log("company", company);
 
       const location = companyCard.querySelector<HTMLDivElement>(

@@ -188,6 +188,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 slug,
             });
             const insightResponse = res.getBody();
+            qs("title").textContent = insightResponse.name;
             console.log("insightResponse", insightResponse);
             return insightResponse;
         }

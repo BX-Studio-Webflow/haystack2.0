@@ -185,6 +185,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         slug,
       });
       const person = res.getBody() as Person;
+      qs("title").textContent = person.name
       console.log("person", person);
 
       const personName = personCard.querySelector<HTMLHeadingElement>(

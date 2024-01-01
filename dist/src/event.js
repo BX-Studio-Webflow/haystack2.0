@@ -468,6 +468,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 slug,
             });
             const event = res.getBody();
+            qs("title").textContent = event.name;
             console.log("event", event);
             const eventName = eventCard.querySelector(`[dev-target=event-name]`);
             const eventDatesWrapper = eventCard.querySelector(`[dev-target=dates-wrapper]`);
