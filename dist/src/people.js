@@ -29,6 +29,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     let userFollowingAndFavourite = null;
     let xanoToken = null;
     const personCard = qs("[dev-target=person-card]");
+    const cardSkeleton = qs("[dev-target=card-skeleton]");
+    const insightsSkeleton = qs("[dev-target=skeleton-insights]");
     const personDetails = qs("[dev-target=person-details]");
     const insightSearchInput = qs("[dev-search-target]");
     const insightFilterForm = qs("[dev-target=filter-form]");
@@ -149,6 +151,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             personCompanyLink.textContent = person.company_details.name;
             personCompanyLink.href = "company/" + person.company_details.slug;
             personLinkedinLink.href = person.linkedin;
+            cardSkeleton.remove();
+            personCard.classList.remove("dev-hide");
             fakeCheckboxToggle(personInput);
             personInput?.setAttribute("dev-input-type", "people_id");
             personInput?.setAttribute("dev-input-id", person.id.toString());
@@ -189,6 +193,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             paginationLogic(personInsightResponse, slug);
             userFollowingAndFavourite &&
                 initInsights(personInsightResponse, allTabsTarget, userFollowingAndFavourite);
+            insightsSkeleton.remove();
             console.log("personInsightResponse", personInsightResponse);
             return personInsightResponse;
         }

@@ -33,6 +33,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   let xanoToken: string | null = null;
 
   const eventCard = qs("[dev-target=event-card]");
+  const cardSkeleton = qs("[dev-target=card-skeleton]");
+  const insightsSkeleton = qs("[dev-target=skeleton-insights]");
   const eventDetails = qsa("[dev-event-details]");
 
   const insightSearchInput = qs<HTMLInputElement>("[dev-search-target]");
@@ -216,7 +218,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           allTabsTarget,
           userFollowingAndFavourite
         );
-
+      insightsSkeleton.remove()
       console.log("eventInsightResponse", eventInsightResponse);
       return eventInsightResponse;
     } catch (error) {
@@ -727,6 +729,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       }else{
         eventCityWrapper?.classList.add("hide")
       }
+
+      cardSkeleton.remove()
+      eventCard.classList.remove("dev-hide")
 
       fakeCheckboxToggle(eventInput!);
       eventInput?.setAttribute("dev-input-type", "event_id");

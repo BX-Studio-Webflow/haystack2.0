@@ -34,6 +34,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const relatedBusinessCard = qs("[dev-target=related-business-card]");
   const companyCard = qs("[dev-target=company-card]");
+  const cardSkeleton = qs("[dev-target=card-skeleton]");
+  const insightsSkeleton = qs("[dev-target=skeleton-insights]");
   const companyDetails = qsa("[dev-target=company-details]");
 
   const insightSearchInput = qs<HTMLInputElement>("[dev-search-target]");
@@ -219,7 +221,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           allTabsTarget,
           userFollowingAndFavourite
         );
-
+      insightsSkeleton.remove()
       console.log("personInsightResponse", personInsightResponse);
       return personInsightResponse;
     } catch (error) {
@@ -358,6 +360,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           (companyImage!.src =
             "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
       );
+
+      cardSkeleton.remove()
+      companyCard.classList.remove("dev-hide")
 
       fakeCheckboxToggle(companyInput!);
       companyInput?.setAttribute("dev-input-type", "company_id");

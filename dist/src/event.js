@@ -29,6 +29,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     let userFollowingAndFavourite = null;
     let xanoToken = null;
     const eventCard = qs("[dev-target=event-card]");
+    const cardSkeleton = qs("[dev-target=card-skeleton]");
+    const insightsSkeleton = qs("[dev-target=skeleton-insights]");
     const eventDetails = qsa("[dev-event-details]");
     const insightSearchInput = qs("[dev-search-target]");
     const insightFilterForm = qs("[dev-target=filter-form]");
@@ -152,6 +154,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             paginationLogic(eventInsightResponse, slug);
             userFollowingAndFavourite &&
                 initInsights(eventInsightResponse, allTabsTarget, userFollowingAndFavourite);
+            insightsSkeleton.remove();
             console.log("eventInsightResponse", eventInsightResponse);
             return eventInsightResponse;
         }
@@ -515,6 +518,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             else {
                 eventCityWrapper?.classList.add("hide");
             }
+            cardSkeleton.remove();
+            eventCard.classList.remove("dev-hide");
             fakeCheckboxToggle(eventInput);
             eventInput?.setAttribute("dev-input-type", "event_id");
             eventInput?.setAttribute("dev-input-id", event.id.toString());

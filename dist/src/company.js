@@ -30,6 +30,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     let xanoToken = null;
     const relatedBusinessCard = qs("[dev-target=related-business-card]");
     const companyCard = qs("[dev-target=company-card]");
+    const cardSkeleton = qs("[dev-target=card-skeleton]");
+    const insightsSkeleton = qs("[dev-target=skeleton-insights]");
     const companyDetails = qsa("[dev-target=company-details]");
     const insightSearchInput = qs("[dev-search-target]");
     const insightFilterForm = qs("[dev-target=filter-form]");
@@ -153,6 +155,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             paginationLogic(personInsightResponse, slug);
             userFollowingAndFavourite &&
                 initInsights(personInsightResponse, allTabsTarget, userFollowingAndFavourite);
+            insightsSkeleton.remove();
             console.log("personInsightResponse", personInsightResponse);
             return personInsightResponse;
         }
@@ -258,6 +261,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             companyImage.src = `https://logo.clearbit.com/${company["company-website"]}`;
             fetch("https://logo.clearbit.com/" + company["company-website"]).catch(() => (companyImage.src =
                 "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
+            cardSkeleton.remove();
+            companyCard.classList.remove("dev-hide");
             fakeCheckboxToggle(companyInput);
             companyInput?.setAttribute("dev-input-type", "company_id");
             companyInput?.setAttribute("dev-input-id", company.id.toString());

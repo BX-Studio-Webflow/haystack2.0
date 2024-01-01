@@ -33,6 +33,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   let xanoToken: string | null = null;
 
   const personCard = qs("[dev-target=person-card]");
+  const cardSkeleton = qs("[dev-target=card-skeleton]");
+  const insightsSkeleton = qs("[dev-target=skeleton-insights]");
   const personDetails = qs("[dev-target=person-details]");
 
   const insightSearchInput = qs<HTMLInputElement>("[dev-search-target]");
@@ -224,6 +226,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       personCompanyLink!.href = "company/" + person.company_details.slug;
       personLinkedinLink!.href = person.linkedin;
 
+      cardSkeleton.remove()
+      personCard.classList.remove("dev-hide")
+
       fakeCheckboxToggle(personInput!);
       personInput?.setAttribute("dev-input-type", "people_id");
       personInput?.setAttribute("dev-input-id", person.id.toString());
@@ -285,7 +290,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           allTabsTarget,
           userFollowingAndFavourite
         );
-
+      insightsSkeleton.remove()
       console.log("personInsightResponse", personInsightResponse);
       return personInsightResponse;
     } catch (error) {
