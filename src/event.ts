@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
   const sortObject = {
     sortBy: "created_at",
-    orderBy: "asc",
+    orderBy: "desc",
   };
 
   const searchParams = new URLSearchParams(window.location.search);

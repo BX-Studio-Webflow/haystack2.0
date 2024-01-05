@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
   const sortObject = {
     sortBy: "created_at",
-    orderBy: "asc",
+    orderBy: "desc",
   };
 
   let userFollowingAndFavourite: UserFollowingAndFavourite | null = null;
@@ -209,7 +209,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         filtering.checkboxes?.lineOfBus?.length === 0 &&
         filtering.checkboxes?.insightClass?.length === 0 &&
         sortObject.sortBy === "created_at" &&
-        sortObject.orderBy === "asc"
+        sortObject.orderBy === "desc"
       ) {
         localStorage.setItem("insights", JSON.stringify(insights));
       }
@@ -225,7 +225,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         filtering.checkboxes?.lineOfBus?.length === 0 &&
         filtering.checkboxes?.insightClass?.length === 0 &&
         sortObject.sortBy === "created_at" &&
-        sortObject.orderBy === "asc"
+        sortObject.orderBy === "desc"
       ) {
         localStorage.setItem("insightsFollowing", JSON.stringify(insights));
       }
@@ -241,7 +241,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         filtering.checkboxes?.lineOfBus?.length === 0 &&
         filtering.checkboxes?.insightClass?.length === 0 &&
         sortObject.sortBy === "created_at" &&
-        sortObject.orderBy === "asc"
+        sortObject.orderBy === "desc"
       ) {
         localStorage.setItem("insightsFavourite", JSON.stringify(insights));
       }
