@@ -60,19 +60,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             const companyInput = insightTemplate.querySelector(`[dev-target=company-input]`);
             const companyImage = insightTemplate.querySelector(`[dev-target=company-image]`);
             const companyLink = insightTemplate.querySelector(`[dev-target=company-link]`);
+            const curatedDateTargetWrapper = insightTemplate.querySelector(`[dev-target="curated-date-wrapper"]`);
             const curatedDateTarget = insightTemplate.querySelector(`[dev-target="curated-date"]`);
+            const publishedDateTargetWrapper = insightTemplate.querySelectorAll(`[dev-target="published-date-wrapper"]`);
             const publishedDateTarget = insightTemplate.querySelector(`[dev-target="published-date"]`);
+            const sourceTargetWrapper = insightTemplate.querySelector(`[dev-target="source-name-link-wrapper"]`);
             const sourceTarget = insightTemplate.querySelector(`[dev-target="source-name-link"]`);
+            const sourceAuthorTargetWrapper = insightTemplate.querySelectorAll(`[dev-target="source-author-wrapper"]`);
             const sourceAuthorTarget = insightTemplate.querySelector(`[dev-target="source-author"]`);
-            const curatedDate = insight.curated?.toLocaleString("en-US", {
-                month: "short",
-                year: "numeric",
-            });
-            const publishedDate = insight["source-publication-date"]?.toLocaleString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-            });
+            const curatedDate = insight.curated ? formatCuratedDate(insight.curated) : "";
+            const publishedDate = insight["source-publication-date"] ? formatPublishedDate(insight["source-publication-date"]) : "";
             fakeCheckboxToggle(companyInput);
             fakeCheckboxToggle(favouriteInput);
             favouriteInput?.setAttribute("dev-input-type", "favourite");
@@ -91,10 +88,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             fetch("https://logo.clearbit.com/" +
                 insight.company_details["company-website"]).catch(() => (companyImage.src =
                 "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
+            curatedDateTargetWrapper?.classList[curatedDate ? "remove" : "add"]("hide");
             curatedDateTarget.textContent = curatedDate ?? "";
             publishedDateTarget.textContent = publishedDate ?? "";
+            publishedDateTargetWrapper.forEach((item) => item.classList[publishedDate ? "remove" : "add"]("hide"));
             sourceTarget.setAttribute("href", insight["source-url"]);
+            sourceTargetWrapper?.classList[insight["source-url"] ? "remove" : "add"]("hide");
             sourceTarget.textContent = insight.source;
+            sourceAuthorTargetWrapper.forEach((item) => item.classList[insight.source_author ? "remove" : "add"]("hide"));
             sourceAuthorTarget.textContent = insight.source_author;
             insightName.textContent = insight.name;
             companyLink.textContent = insight.company_details.name;
@@ -293,6 +294,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 .closest("[dev-fake-checkbox-wrapper]")
                 ?.classList.remove("checked");
         }
+    }
+    function formatCuratedDate(inputDate) {
+        const date = new Date(inputDate);
+        return `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
+    }
+    function formatPublishedDate(inputDate) {
+        const date = new Date(inputDate);
+        return `${date.toLocaleString('default', { month: 'long' })} ${date.getDate()}, ${date.getFullYear()}`;
     }
     function debounce(func, delay) {
         let debounceTimer;

@@ -225,6 +225,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       personCompanyLink!.textContent = person.company_details.name;
       personCompanyLink!.href = "company/" + person.company_details.slug;
       personLinkedinLink!.href = person.linkedin;
+      personLinkedinLink?.classList[person.linkedin ? "remove":"add"]("hide")
 
       cardSkeleton.remove()
       personCard.classList.remove("dev-hide")
@@ -377,14 +378,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         `[dev-target=insight-name]`
       );
       const insightLink = newInsight.querySelector(`[dev-target=insight-link]`);
+      const curatedDateTargetWrapper = newInsight.querySelector(
+        `[dev-target="curated-date-wrapper"]`
+      );
       const curatedDateTarget = newInsight.querySelector(
         `[dev-target="curated-date"]`
+      );
+      const publishedDateTargetWrapper = newInsight.querySelectorAll(
+        `[dev-target="published-date-wrapper"]`
       );
       const publishedDateTarget = newInsight.querySelector(
         `[dev-target="published-date"]`
       );
+      const sourceTargetWrapper = newInsight.querySelector(
+        `[dev-target="source-name-link-wrapper"]`
+      );
       const sourceTarget = newInsight.querySelector(
         `[dev-target="source-name-link"]`
+      );
+      const sourceAuthorTargetWrapper = newInsight.querySelectorAll(
+        `[dev-target="source-author-wrapper"]`
       );
       const sourceAuthorTarget = newInsight.querySelector(
         `[dev-target="source-author"]`
@@ -396,18 +409,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         `[dev-target=company-input]`
       );
 
-      const curatedDate = insight.curated?.toLocaleString("en-US", {
-        month: "short",
-        year: "numeric",
-      });
-      const publishedDate = insight["source-publication-date"]?.toLocaleString(
-        "en-US",
-        {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        }
-      );
+      const curatedDate = insight.curated ? formatCuratedDate(insight.curated):"";
+      const publishedDate = insight["source-publication-date"]?formatPublishedDate(insight["source-publication-date"]):"";
       const sourceCatArray = insight.source_category_id;
       const companyTypeArray = insight.company_type_id;
       const insightClassArray = insight.insight_classification_id;
@@ -459,15 +462,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
       );
       insightNameTarget!.textContent = insight.name;
+      curatedDateTargetWrapper?.classList[curatedDate ? "remove":"add"]("hide")
       curatedDateTarget!.textContent = curatedDate ?? "";
       publishedDateTarget!.textContent = publishedDate ?? "";
+      publishedDateTargetWrapper.forEach((item)=>item.classList[publishedDate ? "remove":"add"]("hide"))
       insightLink!.setAttribute("href", "/insight/" + insight.slug);
       sourceTarget!.setAttribute("href", insight["source-url"]);
+      sourceTargetWrapper?.classList[insight["source-url"] ? "remove":"add"]("hide")
       companyLink!.setAttribute(
         "href",
         "/company/" + insight.company_details.slug
       );
       sourceTarget!.textContent = insight.source;
+      sourceAuthorTargetWrapper.forEach((item)=>item.classList[insight.source_author ? "remove":"add"]("hide"))
       sourceAuthorTarget!.textContent = insight.source_author;
       target.appendChild(newInsight);
     });
@@ -810,6 +817,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       debounceTimer = setTimeout(() => func.apply(context, args), delay);
     };
   }
+
+  function formatCuratedDate(inputDate:Date) {
+    const date = new Date(inputDate);
+    return `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
+  }
+
+  function formatPublishedDate(inputDate:Date) {
+    const date = new Date(inputDate);
+    return `${date.toLocaleString('default', { month: 'long' })} ${date.getDate()}, ${date.getFullYear()}`;
+  }
+
 
   // Function for querying a single element by selector
   function qs<T extends HTMLElement = HTMLDivElement>(selector: string): T {
