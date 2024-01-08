@@ -340,7 +340,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         });
     }
-    const followFavouriteDebounce = debounce(followFavouriteListener, 500);
+    const followFavouriteDebounce = debounce(followFavouriteListener, 300);
     async function followFavouriteListener(input) {
         const type = input.getAttribute("dev-input-type");
         const id = input.getAttribute("dev-input-id");
