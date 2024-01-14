@@ -259,16 +259,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       page = 0,
       perPage = 0,
       offset = 0,
-      filtering = {
-        search: "",
-        checkboxes: {
-          companyType: [],
-          sourceCat: [],
-          techCat: [],
-          lineOfBus: [],
-          insightClass: [],
-        },
-      },
     } = payload;
     try {
       const res = await xano_individual_pages.get("/person_insights", {
@@ -278,7 +268,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         offset,
         sortBy: sortObject.sortBy,
         orderBy: sortObject.orderBy,
-        filtering,
+        filtering:searchObject,
       });
       const personInsightResponse = res.getBody() as PersonInsightResponse;
       allTabsTarget.innerHTML = "";
@@ -484,7 +474,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function insightSearch(personSlug: string) {
     getPersonInsights(personSlug, {
-      filtering: searchObject,
       orderBy: sortObject.orderBy,
       sortBy: sortObject.sortBy,
     });

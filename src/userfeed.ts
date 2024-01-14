@@ -174,16 +174,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       page = 0,
       perPage = 0,
       offset = 0,
-      filtering = {
-        search: "",
-        checkboxes: {
-          companyType: [],
-          sourceCat: [],
-          techCat: [],
-          lineOfBus: [],
-          insightClass: [],
-        },
-      },
     } = payload;
     try {
       const res = await xano_userFeed.get(endPoint, {
@@ -192,7 +182,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         offset,
         sortBy: sortObject.sortBy,
         orderBy: sortObject.orderBy,
-        filtering,
+        filtering:searchObject,
       });
       const insights = res.getBody() as Insight;
       target.innerHTML = "";
@@ -202,12 +192,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         page === 0 &&
         perPage === 0 &&
         offset === 0 &&
-        filtering.search === "" &&
-        filtering.checkboxes?.companyType?.length === 0 &&
-        filtering.checkboxes?.sourceCat?.length === 0 &&
-        filtering.checkboxes?.techCat?.length === 0 &&
-        filtering.checkboxes?.lineOfBus?.length === 0 &&
-        filtering.checkboxes?.insightClass?.length === 0 &&
+        searchObject.search === "" &&
+        searchObject.checkboxes?.companyType?.length === 0 &&
+        searchObject.checkboxes?.sourceCat?.length === 0 &&
+        searchObject.checkboxes?.techCat?.length === 0 &&
+        searchObject.checkboxes?.lineOfBus?.length === 0 &&
+        searchObject.checkboxes?.insightClass?.length === 0 &&
         sortObject.sortBy === "created_at" &&
         sortObject.orderBy === "desc"
       ) {
@@ -218,12 +208,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         page === 0 &&
         perPage === 0 &&
         offset === 0 &&
-        filtering.search === "" &&
-        filtering.checkboxes?.companyType?.length === 0 &&
-        filtering.checkboxes?.sourceCat?.length === 0 &&
-        filtering.checkboxes?.techCat?.length === 0 &&
-        filtering.checkboxes?.lineOfBus?.length === 0 &&
-        filtering.checkboxes?.insightClass?.length === 0 &&
+        searchObject.search === "" &&
+        searchObject.checkboxes?.companyType?.length === 0 &&
+        searchObject.checkboxes?.sourceCat?.length === 0 &&
+        searchObject.checkboxes?.techCat?.length === 0 &&
+        searchObject.checkboxes?.lineOfBus?.length === 0 &&
+        searchObject.checkboxes?.insightClass?.length === 0 &&
         sortObject.sortBy === "created_at" &&
         sortObject.orderBy === "desc"
       ) {
@@ -234,12 +224,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         page === 0 &&
         perPage === 0 &&
         offset === 0 &&
-        filtering.search === "" &&
-        filtering.checkboxes?.companyType?.length === 0 &&
-        filtering.checkboxes?.sourceCat?.length === 0 &&
-        filtering.checkboxes?.techCat?.length === 0 &&
-        filtering.checkboxes?.lineOfBus?.length === 0 &&
-        filtering.checkboxes?.insightClass?.length === 0 &&
+        searchObject.search === "" &&
+        searchObject.checkboxes?.companyType?.length === 0 &&
+        searchObject.checkboxes?.sourceCat?.length === 0 &&
+        searchObject.checkboxes?.techCat?.length === 0 &&
+        searchObject.checkboxes?.lineOfBus?.length === 0 &&
+        searchObject.checkboxes?.insightClass?.length === 0 &&
         sortObject.sortBy === "created_at" &&
         sortObject.orderBy === "desc"
       ) {
@@ -840,7 +830,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     getInsights(
       "/insight-all-tab",
       {
-        filtering: searchObject,
         orderBy: sortObject.orderBy,
         sortBy: sortObject.sortBy,
       },
@@ -849,7 +838,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     getInsights(
       "/insight-following-tab",
       {
-        filtering: searchObject,
         orderBy: sortObject.orderBy,
         sortBy: sortObject.sortBy,
       },
@@ -858,7 +846,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     getInsights(
       "/insight-favourite-tab",
       {
-        filtering: searchObject,
         orderBy: sortObject.orderBy,
         sortBy: sortObject.sortBy,
       },

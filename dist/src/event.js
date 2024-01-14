@@ -129,16 +129,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         sortLogicInit(eventSlug);
     }
     async function getEventInsights(slug, payload) {
-        const { page = 0, perPage = 0, offset = 0, filtering = {
-            search: "",
-            checkboxes: {
-                companyType: [],
-                sourceCat: [],
-                techCat: [],
-                lineOfBus: [],
-                insightClass: [],
-            },
-        }, } = payload;
+        const { page = 0, perPage = 0, offset = 0, } = payload;
         try {
             const res = await xano_individual_pages.get("/event_insights", {
                 slug,
@@ -147,7 +138,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 offset,
                 sortBy: sortObject.sortBy,
                 orderBy: sortObject.orderBy,
-                filtering,
+                filtering: searchObject,
             });
             const eventInsightResponse = res.getBody();
             allTabsTarget.innerHTML = "";
@@ -367,7 +358,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const searchDebounce = debounce(insightSearch, 500);
     function insightSearch(eventSlug) {
         getEventInsights(eventSlug, {
-            filtering: searchObject,
             orderBy: sortObject.orderBy,
             sortBy: sortObject.sortBy,
         });

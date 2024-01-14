@@ -128,16 +128,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
     async function getInsights(endPoint, payload, target) {
-        const { page = 0, perPage = 0, offset = 0, filtering = {
-            search: "",
-            checkboxes: {
-                companyType: [],
-                sourceCat: [],
-                techCat: [],
-                lineOfBus: [],
-                insightClass: [],
-            },
-        }, } = payload;
+        const { page = 0, perPage = 0, offset = 0, } = payload;
         try {
             const res = await xano_userFeed.get(endPoint, {
                 page,
@@ -145,7 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 offset,
                 sortBy: sortObject.sortBy,
                 orderBy: sortObject.orderBy,
-                filtering,
+                filtering: searchObject,
             });
             const insights = res.getBody();
             target.innerHTML = "";
@@ -153,12 +144,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 page === 0 &&
                 perPage === 0 &&
                 offset === 0 &&
-                filtering.search === "" &&
-                filtering.checkboxes?.companyType?.length === 0 &&
-                filtering.checkboxes?.sourceCat?.length === 0 &&
-                filtering.checkboxes?.techCat?.length === 0 &&
-                filtering.checkboxes?.lineOfBus?.length === 0 &&
-                filtering.checkboxes?.insightClass?.length === 0 &&
+                searchObject.search === "" &&
+                searchObject.checkboxes?.companyType?.length === 0 &&
+                searchObject.checkboxes?.sourceCat?.length === 0 &&
+                searchObject.checkboxes?.techCat?.length === 0 &&
+                searchObject.checkboxes?.lineOfBus?.length === 0 &&
+                searchObject.checkboxes?.insightClass?.length === 0 &&
                 sortObject.sortBy === "created_at" &&
                 sortObject.orderBy === "desc") {
                 localStorage.setItem("insights", JSON.stringify(insights));
@@ -167,12 +158,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 page === 0 &&
                 perPage === 0 &&
                 offset === 0 &&
-                filtering.search === "" &&
-                filtering.checkboxes?.companyType?.length === 0 &&
-                filtering.checkboxes?.sourceCat?.length === 0 &&
-                filtering.checkboxes?.techCat?.length === 0 &&
-                filtering.checkboxes?.lineOfBus?.length === 0 &&
-                filtering.checkboxes?.insightClass?.length === 0 &&
+                searchObject.search === "" &&
+                searchObject.checkboxes?.companyType?.length === 0 &&
+                searchObject.checkboxes?.sourceCat?.length === 0 &&
+                searchObject.checkboxes?.techCat?.length === 0 &&
+                searchObject.checkboxes?.lineOfBus?.length === 0 &&
+                searchObject.checkboxes?.insightClass?.length === 0 &&
                 sortObject.sortBy === "created_at" &&
                 sortObject.orderBy === "desc") {
                 localStorage.setItem("insightsFollowing", JSON.stringify(insights));
@@ -181,12 +172,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 page === 0 &&
                 perPage === 0 &&
                 offset === 0 &&
-                filtering.search === "" &&
-                filtering.checkboxes?.companyType?.length === 0 &&
-                filtering.checkboxes?.sourceCat?.length === 0 &&
-                filtering.checkboxes?.techCat?.length === 0 &&
-                filtering.checkboxes?.lineOfBus?.length === 0 &&
-                filtering.checkboxes?.insightClass?.length === 0 &&
+                searchObject.search === "" &&
+                searchObject.checkboxes?.companyType?.length === 0 &&
+                searchObject.checkboxes?.sourceCat?.length === 0 &&
+                searchObject.checkboxes?.techCat?.length === 0 &&
+                searchObject.checkboxes?.lineOfBus?.length === 0 &&
+                searchObject.checkboxes?.insightClass?.length === 0 &&
                 sortObject.sortBy === "created_at" &&
                 sortObject.orderBy === "desc") {
                 localStorage.setItem("insightsFavourite", JSON.stringify(insights));
@@ -587,17 +578,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     function insightSearch() {
         getInsights("/insight-all-tab", {
-            filtering: searchObject,
             orderBy: sortObject.orderBy,
             sortBy: sortObject.sortBy,
         }, allTabsTarget);
         getInsights("/insight-following-tab", {
-            filtering: searchObject,
             orderBy: sortObject.orderBy,
             sortBy: sortObject.sortBy,
         }, followingTabsTarget);
         getInsights("/insight-favourite-tab", {
-            filtering: searchObject,
             orderBy: sortObject.orderBy,
             sortBy: sortObject.sortBy,
         }, favouriteTabsTarget);
