@@ -619,6 +619,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         newTag.querySelector(`[dev-target=tag-name]`)!.textContent =
           item?.name!;
 
+        if(showCheckbox){
+          newTag.style.cursor = "pointer"
+          newTag.querySelector<HTMLLabelElement>(`[dev-fake-checkbox-wrapper]`)!.style.cursor = "pointer"
+          newTag.querySelector<HTMLSpanElement>(`[dev-target="tag-name"]`)!.style.cursor = "pointer"
+        }
+
         if (tagCheckbox && !showCheckbox) {
           tagCheckbox.style.display = "none";
         }
