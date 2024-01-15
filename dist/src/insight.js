@@ -60,6 +60,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const companyInput = insightTemplate.querySelector(`[dev-target=company-input]`);
             const companyImage = insightTemplate.querySelector(`[dev-target=company-image]`);
             const companyLink = insightTemplate.querySelector(`[dev-target=company-link]`);
+            const companyPictureLink = insightTemplate.querySelector(`[dev-target=company-picture-link]`);
             const curatedDateTargetWrapper = insightTemplate.querySelector(`[dev-target="curated-date-wrapper"]`);
             const curatedDateTarget = insightTemplate.querySelector(`[dev-target="curated-date"]`);
             const publishedDateTargetWrapper = insightTemplate.querySelectorAll(`[dev-target="published-date-wrapper"]`);
@@ -100,6 +101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             insightName.textContent = insight.name;
             companyLink.textContent = insight.company_details.name;
             companyLink.href = "/company/" + insight.company_details.slug;
+            companyPictureLink.href = "/company/" + insight.company_details.slug;
             insightRichtext.innerHTML = insight["insight-detail"];
             addTagsToInsight(insight.company_type_id, tagsWrapperTarget, false);
             addTagsToInsight(insight.source_category_id, tagsWrapperTarget, false);

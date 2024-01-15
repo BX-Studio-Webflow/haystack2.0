@@ -89,6 +89,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const companyLink = insightTemplate.querySelector<HTMLLinkElement>(
         `[dev-target=company-link]`
       );
+      const companyPictureLink = insightTemplate.querySelector<HTMLLinkElement>(
+        `[dev-target=company-picture-link]`
+      );
       const curatedDateTargetWrapper = insightTemplate.querySelector(
         `[dev-target="curated-date-wrapper"]`
       );
@@ -164,6 +167,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       insightName!.textContent = insight.name;
       companyLink!.textContent = insight.company_details.name;
       companyLink!.href = "/company/" + insight.company_details.slug;
+      companyPictureLink!.href = "/company/" + insight.company_details.slug;
       insightRichtext!.innerHTML = insight["insight-detail"];
       addTagsToInsight(insight.company_type_id, tagsWrapperTarget!, false);
       addTagsToInsight(insight.source_category_id, tagsWrapperTarget!, false);
