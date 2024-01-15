@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             insightRichtext.innerHTML = insight["insight-detail"];
             addTagsToInsight(insight.company_type_id, tagsWrapperTarget, false);
             addTagsToInsight(insight.source_category_id, tagsWrapperTarget, false);
-            addTagsToInsight(insight.line_of_business_id, tagsWrapperTarget, false);
+            // addTagsToInsight(insight.line_of_business_id, tagsWrapperTarget!, false);
             addTagsToInsight(insight.insight_classification_id, tagsWrapperTarget, false);
             addTagsToInsight(insight.technology_category_id, tagsWrapperTarget, true, "technology_category_id");
             const companyWrapper = companyCard.querySelector(`[dev-target="company-wrapper"]`);

@@ -278,7 +278,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             addTagsToInsight(sourceCatArray, tagsWrapperTarget, false);
             addTagsToInsight(companyTypeArray, tagsWrapperTarget, false);
             addTagsToInsight(insightClassArray, tagsWrapperTarget, false);
-            addTagsToInsight(lineOfBusArray, tagsWrapperTarget, false);
+            // addTagsToInsight(lineOfBusArray, tagsWrapperTarget!, false);
             addTagsToInsight(techCatArray, tagsWrapperTarget, true, "technology_category_id");
             companyImage.src = "https://logo.clearbit.com/" + insight.company_details["company-website"];
             fetch("https://logo.clearbit.com/" +

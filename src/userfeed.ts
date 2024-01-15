@@ -430,7 +430,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       addTagsToInsight(sourceCatArray, tagsWrapperTarget!, false);
       addTagsToInsight(companyTypeArray, tagsWrapperTarget!, false);
       addTagsToInsight(insightClassArray, tagsWrapperTarget!, false);
-      addTagsToInsight(lineOfBusArray, tagsWrapperTarget!, false);
+      // addTagsToInsight(lineOfBusArray, tagsWrapperTarget!, false);
       addTagsToInsight(
         techCatArray,
         tagsWrapperTarget!,
