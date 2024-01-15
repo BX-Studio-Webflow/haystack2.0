@@ -136,7 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     getFilters("/company_type", {}, "companyType", filterCompanyTypeTarget);
     getFilters("/source_category", {}, "sourceCat", filterSourceCatTarget);
     getFilters("/technology_category", {}, "techCat", filterTechCatTarget);
-    getFilters("/line_of_business", {}, "lineOfBus", filterLineOfBusTarget);
+    // getFilters("/line_of_business", {}, "lineOfBus", filterLineOfBusTarget);
     getFilters(
       "/insight_classification",
       {},

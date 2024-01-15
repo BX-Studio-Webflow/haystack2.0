@@ -164,13 +164,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       filterTechCatTarget,
       eventSlug
     );
-    getFilters(
-      "/line_of_business",
-      {},
-      "lineOfBus",
-      filterLineOfBusTarget,
-      eventSlug
-    );
+    // getFilters(
+    //   "/line_of_business",
+    //   {},
+    //   "lineOfBus",
+    //   filterLineOfBusTarget,
+    //   eventSlug
+    // );
     getFilters(
       "/insight_classification",
       {},

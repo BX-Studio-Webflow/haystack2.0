@@ -124,7 +124,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         getFilters("/company_type", {}, "companyType", filterCompanyTypeTarget, eventSlug);
         getFilters("/source_category", {}, "sourceCat", filterSourceCatTarget, eventSlug);
         getFilters("/technology_category", {}, "techCat", filterTechCatTarget, eventSlug);
-        getFilters("/line_of_business", {}, "lineOfBus", filterLineOfBusTarget, eventSlug);
+        // getFilters(
+        //   "/line_of_business",
+        //   {},
+        //   "lineOfBus",
+        //   filterLineOfBusTarget,
+        //   eventSlug
+        // );
         getFilters("/insight_classification", {}, "insightClass", filterInsightClassTarget, eventSlug);
         sortLogicInit(eventSlug);
     }
