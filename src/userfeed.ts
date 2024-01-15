@@ -870,7 +870,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     followingTarget: HTMLDivElement
   ) {
     followingTarget.innerHTML = "";
-    userFollowing.forEach((item) => {
+    userFollowing.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })).forEach((item) => {
       const newFollowingItem = followingItemTemplate.cloneNode(
         true
       ) as HTMLDivElement;

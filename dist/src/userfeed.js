@@ -593,7 +593,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const searchDebounce = debounce(insightSearch, 500);
     function followingSectionInit(userFollowing, inputType, slugArray, followingTarget) {
         followingTarget.innerHTML = "";
-        userFollowing.forEach((item) => {
+        userFollowing.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })).forEach((item) => {
             const newFollowingItem = followingItemTemplate.cloneNode(true);
             if (inputType === "company_id") {
                 newFollowingItem
