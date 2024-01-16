@@ -25,14 +25,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         orderBy: "desc",
     };
     const searchParams = new URLSearchParams(window.location.search);
-    const companySlug = searchParams.get("name");
+    const technologySlug = searchParams.get("name");
     let userFollowingAndFavourite = null;
     let xanoToken = null;
-    const relatedBusinessCard = qs("[dev-target=related-business-card]");
-    const companyCard = qs("[dev-target=company-card]");
+    const techCatCard = qs("[dev-target=tech-cat-card]");
     const cardSkeleton = qs("[dev-target=card-skeleton]");
     const insightsSkeleton = qs("[dev-target=skeleton-insights]");
-    const companyDetails = qsa("[dev-target=company-details]");
+    const eventDetails = qsa("[dev-event-details]");
     const insightSearchInput = qs("[dev-search-target]");
     const insightFilterForm = qs("[dev-target=filter-form]");
     const insightClearFilters = qs("[dev-target=clear-filters]");
@@ -40,7 +39,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const insightTemplate = qs(`[dev-template="insight-item"]`);
     const insightTagTemplate = qs(`[dev-template="insight-tag"]`);
     const checkboxItemTemplate = qs(`[dev-template="checkbox-item"]`);
-    const relatedBusinessItemTemplate = qs(`[dev-template="related-business-item"]`);
     const allTabsTarget = qs(`[dev-target="insight-all"]`);
     const filterCompanyTypeTarget = qs(`[dev-target="filter-company-type"]`);
     const filterSourceCatTarget = qs(`[dev-target="filter-source-cat"]`);
@@ -54,14 +52,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     const lsUserFollowingFavourite = localStorage.getItem("user-following-favourite");
     const lsXanoAuthToken = localStorage.getItem("AuthToken");
-    if (lsUserFollowingFavourite) {
-        userFollowingAndFavourite = JSON.parse(lsUserFollowingFavourite);
-    }
     if (lsXanoAuthToken) {
         xanoToken = lsXanoAuthToken;
     }
-    if (!companySlug) {
-        return console.error("add company name in the url eg /company/oracle");
+    if (lsUserFollowingFavourite) {
+        userFollowingAndFavourite = JSON.parse(lsUserFollowingFavourite);
+    }
+    if (!technologySlug) {
+        return console.error("add event name in the url eg /technology/analytics");
     }
     if (xanoToken) {
         xano_userFeed.setAuthToken(xanoToken);
@@ -74,7 +72,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     lsUserFollowingFavourite
         ? getUserFollowingAndFavourite()
         : await getUserFollowingAndFavourite();
-    companyPageInit(companySlug);
+    technologyCatPageInit(technologySlug);
     async function getXanoAccessToken(memberstackToken) {
         try {
             const res = await xano_wmx.post("/auth-user", {
@@ -94,6 +92,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const res = await xano_userFeed.get("/user-following-and-favourite");
             const followingAndFavourite = res.getBody();
+            const { user_following } = followingAndFavourite;
             userFollowingAndFavourite = followingAndFavourite;
             localStorage.setItem("user-following-favourite", JSON.stringify(followingAndFavourite));
             return followingAndFavourite;
@@ -103,16 +102,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             return null;
         }
     }
-    async function companyPageInit(companySlug) {
-        getCompanyInsights(companySlug, {});
-        getCompany(companySlug);
+    async function technologyCatPageInit(technologySlug) {
+        getTechnologyCatInsights(technologySlug, {});
+        getTechnologyCat(technologySlug);
         insightFilterForm.addEventListener("submit", (e) => {
             e.preventDefault();
             e.stopPropagation();
         });
         insightSearchInput.addEventListener("input", (e) => {
             searchObject.search = insightSearchInput.value;
-            searchDebounce(companySlug);
+            searchDebounce(technologySlug);
         });
         insightClearFilters.addEventListener("click", () => {
             const checkedFilters = qsa("[dev-input-checkbox]:checked");
@@ -122,23 +121,23 @@ document.addEventListener("DOMContentLoaded", async () => {
                 input.click();
             });
         });
-        getFilters("/company_type", {}, "companyType", filterCompanyTypeTarget, companySlug);
-        getFilters("/source_category", {}, "sourceCat", filterSourceCatTarget, companySlug);
-        getFilters("/technology_category", {}, "techCat", filterTechCatTarget, companySlug);
+        getFilters("/company_type", {}, "companyType", filterCompanyTypeTarget, technologySlug);
+        getFilters("/source_category", {}, "sourceCat", filterSourceCatTarget, technologySlug);
+        getFilters("/technology_category", {}, "techCat", filterTechCatTarget, technologySlug);
         // getFilters(
         //   "/line_of_business",
         //   {},
         //   "lineOfBus",
         //   filterLineOfBusTarget,
-        //   companySlug
+        //   technologySlug
         // );
-        getFilters("/insight_classification", {}, "insightClass", filterInsightClassTarget, companySlug);
-        sortLogicInit(companySlug);
+        getFilters("/insight_classification", {}, "insightClass", filterInsightClassTarget, technologySlug);
+        sortLogicInit(technologySlug);
     }
-    async function getCompanyInsights(slug, payload) {
+    async function getTechnologyCatInsights(slug, payload) {
         const { page = 0, perPage = 0, offset = 0, } = payload;
         try {
-            const res = await xano_individual_pages.get("/company_insights", {
+            const res = await xano_individual_pages.get("/technology_category_insights", {
                 slug,
                 page,
                 perPage,
@@ -147,149 +146,157 @@ document.addEventListener("DOMContentLoaded", async () => {
                 orderBy: sortObject.orderBy,
                 filtering: searchObject,
             });
-            const personInsightResponse = res.getBody();
+            const eventInsightResponse = res.getBody();
             allTabsTarget.innerHTML = "";
-            paginationLogic(personInsightResponse, slug);
+            paginationLogic(eventInsightResponse, slug);
             userFollowingAndFavourite &&
-                initInsights(personInsightResponse, allTabsTarget, userFollowingAndFavourite);
+                initInsights(eventInsightResponse, allTabsTarget, userFollowingAndFavourite);
             insightsSkeleton.remove();
-            console.log("personInsightResponse", personInsightResponse);
-            return personInsightResponse;
+            console.log("eventInsightResponse", eventInsightResponse);
+            return eventInsightResponse;
         }
         catch (error) {
-            console.log("getCompanyInsights_error", error);
+            console.log("getTechnologyCatInsights_error", error);
             return null;
         }
     }
-    const searchDebounce = debounce(insightSearch, 500);
-    function insightSearch(companySlug) {
-        getCompanyInsights(companySlug, {
-            orderBy: sortObject.orderBy,
-            sortBy: sortObject.sortBy,
-        });
-    }
-    function sortLogicInit(companySlug) {
-        const sortItems = qsa(`[dev-target="sort"]`);
-        sortItems.forEach((item) => {
-            item.addEventListener("click", () => {
-                sortItems.forEach((sortItem) => {
-                    sortItem.classList.remove("active");
+    function paginationLogic(insight, technologySlug) {
+        const paginationTarget = qs(`[dev-target="all-tab-pagination_wrapper"]`);
+        const { curPage, nextPage, prevPage, pageTotal, itemsReceived } = insight;
+        const paginationWrapper = paginationTarget.closest(`[dev-target="insight-pagination-wrapper"]`);
+        const pagination = paginationTemplate.cloneNode(true);
+        const prevBtn = pagination.querySelector(`[dev-target=pagination-previous]`);
+        const nextBtn = pagination.querySelector(`[dev-target=pagination-next]`);
+        const pageItemWrapper = pagination.querySelector(`[dev-target=pagination-number-wrapper]`);
+        const pageItem = pagination
+            .querySelector(`[dev-target=page-number-temp]`)
+            ?.cloneNode(true);
+        paginationTarget.innerHTML = "";
+        pageItemWrapper.innerHTML = "";
+        if (itemsReceived === 0) {
+            paginationTarget?.classList.add("hide");
+            paginationWrapper
+                ?.querySelector(`[dev-tab-empty-state]`)
+                ?.classList.remove("hide");
+        }
+        else {
+            paginationTarget?.classList.remove("hide");
+            paginationWrapper
+                ?.querySelector(`[dev-tab-empty-state]`)
+                ?.classList.add("hide");
+        }
+        if (pageTotal <= 6) {
+            for (let i = 1; i <= pageTotal; i++) {
+                const pageNumItem = pageItem.cloneNode(true);
+                pageNumItem.textContent = i.toString();
+                pageNumItem.classList[curPage === i ? "add" : "remove"]("active");
+                pageNumItem.addEventListener("click", () => {
+                    paginationWrapper?.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                    });
+                    window.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                    });
+                    getTechnologyCatInsights(technologySlug, { page: i });
+                    //   getInsights(endPoint, { page: i }, tagTarget);
                 });
-                item.classList.add("active");
-                const value = item.textContent;
-                qs(`[dev-target=sorted-item-name]`).textContent = value;
-                const orderBy = item.getAttribute("dev-orderby");
-                const sortBy = item.getAttribute("dev-sortby");
-                if (sortBy && orderBy) {
-                    sortObject.sortBy = sortBy;
-                    sortObject.orderBy = orderBy;
-                }
-                getCompanyInsights(companySlug, {});
-            });
-        });
-    }
-    async function getCompany(slug) {
-        try {
-            const res = await xano_individual_pages.get("/company", {
-                slug,
-            });
-            const company = res.getBody();
-            qs("title").textContent = company.name;
-            console.log("company", company);
-            const location = companyCard.querySelector(`[dev-target="location-wrapper"]`);
-            const companySize = companyCard.querySelector(`[dev-target="company-size-wrapper"]`);
-            const businessEntity = companyCard.querySelector(`[dev-target="business-entity-wrapper"]`);
-            const companyType = companyCard.querySelector(`[dev-target="company-type-wrapper"]`);
-            const companyRevenue = companyCard.querySelector(`[dev-target="company-revenue-wrapper"]`);
-            const fiscalYear = companyCard.querySelector(`[dev-target="fiscal-year-wrapper"]`);
-            const aboutRichText = qs(`[dev-target="about-rich-text"]`);
-            if (company.location) {
-                location.querySelector("p").textContent = company.location;
+                pageItemWrapper.appendChild(pageNumItem);
             }
-            else {
-                location?.classList.add("hide");
-            }
-            if (company["company-size"]) {
-                companySize.querySelector("p").textContent = company["company-size"];
-            }
-            else {
-                companySize?.classList.add("hide");
-            }
-            if (company["company-revenue"]) {
-                companyRevenue.querySelector("p").textContent =
-                    company["company-revenue"];
-            }
-            else {
-                companyRevenue?.classList.add("hide");
-            }
-            if (company["fiscal-year"]) {
-                fiscalYear.querySelector("p").textContent = company["fiscal-year"];
-            }
-            else {
-                fiscalYear?.classList.add("hide");
-            }
-            if (company.business_entity_details) {
-                businessEntity.querySelector("p").textContent =
-                    company.business_entity_details.name;
-            }
-            else {
-                businessEntity?.classList.add("hide");
-            }
-            if (company.company_type_details) {
-                companyType.querySelector("p").textContent =
-                    company.company_type_details.name;
-            }
-            else {
-                companyType?.classList.add("hide");
-            }
-            const companyName = companyCard.querySelector(`[dev-target=company-name]`);
-            const companyLink = companyCard.querySelector(`[dev-target=company-website]`);
-            const companyLinkedinLink = companyCard.querySelector(`[dev-target=linkedin-link]`);
-            const companyImageWrapper = companyCard.querySelector(`[dev-target=company-image-wrapper]`);
-            const companyImageLink = companyImageWrapper?.querySelector(`[dev-target=company-picture-link]`);
-            const companyImage = companyImageWrapper?.querySelector(`[dev-target=company-image]`);
-            const companyInput = companyImageWrapper?.querySelector(`[dev-target=company-input]`);
-            aboutRichText.innerHTML = company.about;
-            companyLinkedinLink.href = company["company-linkedin-profile-link"];
-            companyName.textContent = company.name;
-            companyLink.textContent = company["company-website"];
-            companyLink.href = company["company-website"];
-            companyImage.src = `https://logo.clearbit.com/${company["company-website"]}`;
-            fetch("https://logo.clearbit.com/" + company["company-website"]).catch(() => (companyImage.src =
-                "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
-            cardSkeleton.remove();
-            companyCard.classList.remove("dev-hide");
-            fakeCheckboxToggle(companyInput);
-            companyInput?.setAttribute("dev-input-type", "company_id");
-            companyInput?.setAttribute("dev-input-id", company.id.toString());
-            companyInput && followFavouriteLogic(companyInput);
-            companyInput &&
-                setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id));
-            if (company["related-business-entities"].length === 0) {
-                relatedBusinessCard
-                    .querySelector(`[dev-target=related-business-empty-state]`)
-                    ?.classList.remove("hide");
-            }
-            company["related-business-entities"].forEach((item) => {
-                const relatedBusinessItem = relatedBusinessItemTemplate.cloneNode(true);
-                const name = relatedBusinessItem.querySelector(`[dev-target=name]`);
-                const description = relatedBusinessItem.querySelector(`[dev-target=description]`);
-                const companyLink = relatedBusinessItem.querySelector(`[dev-target=company-link]`);
-                name.textContent = item.name;
-                description.textContent = item["description-small"];
-                companyLink.href = "/company/" + item.slug;
-                relatedBusinessCard
-                    .querySelector(`[dev-target=related-business-wrapper]`)
-                    ?.appendChild(relatedBusinessItem);
-                window.Webflow.require("ix2").init();
-            });
-            companyDetails.forEach((item) => item.classList.remove("opacity-hide"));
-            return company;
         }
-        catch (error) {
-            console.log("getCompany_error", error);
-            return null;
+        else {
+            const firstPageNumItem = pageItem.cloneNode(true);
+            firstPageNumItem.textContent = "1";
+            firstPageNumItem.classList[curPage === 1 ? "add" : "remove"]("active");
+            firstPageNumItem.addEventListener("click", () => {
+                paginationWrapper?.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                });
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                });
+                getTechnologyCatInsights(technologySlug, { page: 1 });
+                // getInsights(endPoint, { page: 1 }, tagTarget);
+            });
+            pageItemWrapper.appendChild(firstPageNumItem);
+            if (curPage > 3) {
+                const pagItemDots = pageItem.cloneNode(true);
+                pagItemDots.textContent = "...";
+                pagItemDots.classList["add"]("not-allowed");
+                pageItemWrapper.appendChild(pagItemDots);
+            }
+            for (let i = Math.max(2, curPage - 1); i <= Math.min(curPage + 1, pageTotal - 1); i++) {
+                const pageNumItem = pageItem.cloneNode(true);
+                pageNumItem.classList[curPage === i ? "add" : "remove"]("active");
+                pageNumItem.textContent = i.toString();
+                pageNumItem.addEventListener("click", () => {
+                    paginationWrapper?.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                    });
+                    window.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                    });
+                    getTechnologyCatInsights(technologySlug, { page: i });
+                    //   getInsights(endPoint, { page: i }, tagTarget);
+                });
+                pageItemWrapper.appendChild(pageNumItem);
+            }
+            if (curPage < pageTotal - 2) {
+                const pagItemDots = pageItem.cloneNode(true);
+                pagItemDots.textContent = "...";
+                pagItemDots.classList["add"]("not-allowed");
+                pageItemWrapper.appendChild(pagItemDots);
+            }
+            const pageNumItem = pageItem.cloneNode(true);
+            pageNumItem.textContent = pageTotal.toString();
+            pageNumItem.classList[curPage === pageTotal ? "add" : "remove"]("active");
+            pageNumItem.addEventListener("click", () => {
+                paginationWrapper?.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                });
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                });
+                getTechnologyCatInsights(technologySlug, { page: 1 });
+            });
+            pageItemWrapper.appendChild(pageNumItem);
         }
+        prevBtn.classList[prevPage ? "remove" : "add"]("disabled");
+        nextBtn.classList[nextPage ? "remove" : "add"]("disabled");
+        nextPage &&
+            nextBtn.addEventListener("click", () => {
+                paginationWrapper?.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                });
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                });
+                getTechnologyCatInsights(technologySlug, { page: curPage + 1 });
+            });
+        prevPage &&
+            prevBtn.addEventListener("click", () => {
+                paginationWrapper?.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                });
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                });
+                getTechnologyCatInsights(technologySlug, { page: curPage - 1 });
+                // getInsights(endPoint, { page: curPage - 1 }, tagTarget);
+            });
+        pagination.style.display = pageTotal === 1 ? "none" : "flex";
+        paginationTarget.appendChild(pagination);
     }
     function initInsights(insights, target, userFollowingAndFavourite) {
         insights.items.forEach((insight) => {
@@ -354,145 +361,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             target.appendChild(newInsight);
         });
     }
-    function paginationLogic(insight, companySlug) {
-        const paginationTarget = qs(`[dev-target="all-tab-pagination_wrapper"]`);
-        const { curPage, nextPage, prevPage, pageTotal, itemsReceived } = insight;
-        const paginationWrapper = paginationTarget.closest(`[dev-target="insight-pagination-wrapper"]`);
-        const pagination = paginationTemplate.cloneNode(true);
-        const prevBtn = pagination.querySelector(`[dev-target=pagination-previous]`);
-        const nextBtn = pagination.querySelector(`[dev-target=pagination-next]`);
-        const pageItemWrapper = pagination.querySelector(`[dev-target=pagination-number-wrapper]`);
-        const pageItem = pagination
-            .querySelector(`[dev-target=page-number-temp]`)
-            ?.cloneNode(true);
-        paginationTarget.innerHTML = "";
-        pageItemWrapper.innerHTML = "";
-        if (itemsReceived === 0) {
-            paginationTarget?.classList.add("hide");
-            paginationWrapper
-                ?.querySelector(`[dev-tab-empty-state]`)
-                ?.classList.remove("hide");
-        }
-        else {
-            paginationTarget?.classList.remove("hide");
-            paginationWrapper
-                ?.querySelector(`[dev-tab-empty-state]`)
-                ?.classList.add("hide");
-        }
-        if (pageTotal <= 6) {
-            for (let i = 1; i <= pageTotal; i++) {
-                const pageNumItem = pageItem.cloneNode(true);
-                pageNumItem.textContent = i.toString();
-                pageNumItem.classList[curPage === i ? "add" : "remove"]("active");
-                pageNumItem.addEventListener("click", () => {
-                    paginationWrapper?.scrollTo({
-                        top: 0,
-                        behavior: "smooth",
-                    });
-                    window.scrollTo({
-                        top: 0,
-                        behavior: "smooth",
-                    });
-                    getCompanyInsights(companySlug, { page: i });
-                    //   getInsights(endPoint, { page: i }, tagTarget);
-                });
-                pageItemWrapper.appendChild(pageNumItem);
-            }
-        }
-        else {
-            const firstPageNumItem = pageItem.cloneNode(true);
-            firstPageNumItem.textContent = "1";
-            firstPageNumItem.classList[curPage === 1 ? "add" : "remove"]("active");
-            firstPageNumItem.addEventListener("click", () => {
-                paginationWrapper?.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
-                getCompanyInsights(companySlug, { page: 1 });
-                // getInsights(endPoint, { page: 1 }, tagTarget);
-            });
-            pageItemWrapper.appendChild(firstPageNumItem);
-            if (curPage > 3) {
-                const pagItemDots = pageItem.cloneNode(true);
-                pagItemDots.textContent = "...";
-                pagItemDots.classList["add"]("not-allowed");
-                pageItemWrapper.appendChild(pagItemDots);
-            }
-            for (let i = Math.max(2, curPage - 1); i <= Math.min(curPage + 1, pageTotal - 1); i++) {
-                const pageNumItem = pageItem.cloneNode(true);
-                pageNumItem.classList[curPage === i ? "add" : "remove"]("active");
-                pageNumItem.textContent = i.toString();
-                pageNumItem.addEventListener("click", () => {
-                    paginationWrapper?.scrollTo({
-                        top: 0,
-                        behavior: "smooth",
-                    });
-                    window.scrollTo({
-                        top: 0,
-                        behavior: "smooth",
-                    });
-                    getCompanyInsights(companySlug, { page: i });
-                    //   getInsights(endPoint, { page: i }, tagTarget);
-                });
-                pageItemWrapper.appendChild(pageNumItem);
-            }
-            if (curPage < pageTotal - 2) {
-                const pagItemDots = pageItem.cloneNode(true);
-                pagItemDots.textContent = "...";
-                pagItemDots.classList["add"]("not-allowed");
-                pageItemWrapper.appendChild(pagItemDots);
-            }
-            const pageNumItem = pageItem.cloneNode(true);
-            pageNumItem.textContent = pageTotal.toString();
-            pageNumItem.classList[curPage === pageTotal ? "add" : "remove"]("active");
-            pageNumItem.addEventListener("click", () => {
-                paginationWrapper?.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
-                getCompanyInsights(companySlug, { page: 1 });
-                // getInsights(endPoint, { page: pageTotal }, tagTarget);
-            });
-            pageItemWrapper.appendChild(pageNumItem);
-        }
-        prevBtn.classList[prevPage ? "remove" : "add"]("disabled");
-        nextBtn.classList[nextPage ? "remove" : "add"]("disabled");
-        nextPage &&
-            nextBtn.addEventListener("click", () => {
-                paginationWrapper?.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
-                getCompanyInsights(companySlug, { page: curPage + 1 });
-                // getInsights(endPoint, { page: curPage + 1 }, tagTarget);
-            });
-        prevPage &&
-            prevBtn.addEventListener("click", () => {
-                paginationWrapper?.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
-                getCompanyInsights(companySlug, { page: curPage - 1 });
-                // getInsights(endPoint, { page: curPage - 1 }, tagTarget);
-            });
-        pagination.style.display = pageTotal === 1 ? "none" : "flex";
-        paginationTarget.appendChild(pagination);
+    const searchDebounce = debounce(insightSearch, 500);
+    function insightSearch(technologySlug) {
+        getTechnologyCatInsights(technologySlug, {
+            orderBy: sortObject.orderBy,
+            sortBy: sortObject.sortBy,
+        });
     }
     function followFavouriteLogic(input) {
         input.addEventListener("change", async () => followFavouriteDebounce(input));
@@ -518,7 +392,27 @@ document.addEventListener("DOMContentLoaded", async () => {
             return null;
         }
     }
-    async function getFilters(endPoint, payload, type, targetWrapper, companySlug) {
+    function sortLogicInit(technologySlug) {
+        const sortItems = qsa(`[dev-target="sort"]`);
+        sortItems.forEach((item) => {
+            item.addEventListener("click", () => {
+                sortItems.forEach((sortItem) => {
+                    sortItem.classList.remove("active");
+                });
+                item.classList.add("active");
+                const value = item.textContent;
+                qs(`[dev-target=sorted-item-name]`).textContent = value;
+                const orderBy = item.getAttribute("dev-orderby");
+                const sortBy = item.getAttribute("dev-sortby");
+                if (sortBy && orderBy) {
+                    sortObject.sortBy = sortBy;
+                    sortObject.orderBy = orderBy;
+                }
+                getTechnologyCatInsights(technologySlug, {});
+            });
+        });
+    }
+    async function getFilters(endPoint, payload, type, targetWrapper, technologySlug) {
         const { page = 0, perPage = 0, offset = 0 } = payload;
         try {
             const res = await xano_individual_pages.get(endPoint, {
@@ -526,8 +420,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 perPage,
                 offset,
                 type: {
-                    company: {
-                        slug: companySlug,
+                    technology: {
+                        slug: technologySlug,
                         value: true,
                     },
                 },
@@ -544,7 +438,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     else {
                         searchObject.checkboxes[type] = searchObject.checkboxes[type].filter((item) => item != filter.id);
                     }
-                    searchDebounce(companySlug);
+                    searchDebounce(technologySlug);
                 });
                 newFilter.querySelector("[dev-target=name]").textContent = filter.name;
                 targetWrapper.appendChild(newFilter);
@@ -567,6 +461,38 @@ document.addEventListener("DOMContentLoaded", async () => {
         tagInputs?.forEach((tag) => {
             setCheckboxesInitialState(tag, convertArrayOfObjToNumber(userFollowingAndFavourite?.user_following.technology_category_id));
         });
+    }
+    async function getTechnologyCat(slug) {
+        try {
+            const res = await xano_individual_pages.get("/technology_category_item", {
+                slug,
+            });
+            const event = res.getBody();
+            qs("title").textContent = event.name;
+            console.log("event", event);
+            const techCatName = techCatCard.querySelector(`[dev-target=event-name]`);
+            const eventImageWrapper = techCatCard.querySelector(`[dev-target=event-image-wrapper]`);
+            const eventImageLink = eventImageWrapper?.querySelector(`[dev-target=event-picture-link]`);
+            const eventImage = eventImageWrapper?.querySelector(`[dev-target=event-image]`);
+            const eventInput = eventImageWrapper?.querySelector(`[dev-target=event-input]`);
+            techCatName.textContent = event.name;
+            cardSkeleton.remove();
+            techCatCard.classList.remove("dev-hide");
+            fakeCheckboxToggle(eventInput);
+            eventInput?.setAttribute("dev-input-type", "technology_category_id");
+            eventInput?.setAttribute("dev-input-id", event.id.toString());
+            eventInput && followFavouriteLogic(eventInput);
+            eventInput &&
+                setCheckboxesInitialState(eventInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.technology_category_id));
+            eventDetails.forEach((item) => {
+                item.classList.remove("opacity-hide");
+            });
+            return event;
+        }
+        catch (error) {
+            console.log("getTechnologyCat_error", error);
+            return null;
+        }
     }
     function setCheckboxesInitialState(input, slugArray) {
         const inputId = input.getAttribute("dev-input-id");

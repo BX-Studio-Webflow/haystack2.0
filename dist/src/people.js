@@ -393,9 +393,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 newTag.querySelector(`[dev-target=tag-name]`).textContent =
                     item?.name;
                 if (showCheckbox) {
+                    const tagSpan = newTag.querySelector(`[dev-target="tag-name"]`);
                     newTag.style.cursor = "pointer";
                     newTag.querySelector(`[dev-fake-checkbox-wrapper]`).style.cursor = "pointer";
-                    newTag.querySelector(`[dev-target="tag-name"]`).style.cursor = "pointer";
+                    const anchor = document.createElement('a');
+                    anchor.href = `/technology/${item.slug}`;
+                    anchor.textContent = tagSpan.textContent;
+                    anchor.style.cursor = "pointer";
+                    anchor.classList.add("tag-span-name");
+                    tagSpan?.replaceWith(anchor);
                 }
                 if (tagCheckbox && !showCheckbox) {
                     tagCheckbox.style.display = "none";

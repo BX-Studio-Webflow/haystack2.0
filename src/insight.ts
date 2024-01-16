@@ -371,9 +371,15 @@ document.addEventListener("DOMContentLoaded", async () => {
           item?.name!;
 
         if(showCheckbox){
+          const tagSpan = newTag.querySelector<HTMLSpanElement>(`[dev-target="tag-name"]`)
           newTag.style.cursor = "pointer"
           newTag.querySelector<HTMLLabelElement>(`[dev-fake-checkbox-wrapper]`)!.style.cursor = "pointer"
-          newTag.querySelector<HTMLSpanElement>(`[dev-target="tag-name"]`)!.style.cursor = "pointer"
+          const anchor = document.createElement('a');
+          anchor.href = `/technology/${item.slug}`
+          anchor.textContent = tagSpan!.textContent
+          anchor.style.cursor = "pointer"
+          anchor.classList.add("tag-span-name")
+          tagSpan?.replaceWith(anchor)
         }
 
         if (tagCheckbox && !showCheckbox) {
