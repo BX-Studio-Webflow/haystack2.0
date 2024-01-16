@@ -123,6 +123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             insights.forEach((insight) => {
                 const insightItem = insightSearchItem.cloneNode(true);
                 const name = insightItem.querySelector(`[dev-target=name]`);
+                const moreContentIndicator = insightItem.querySelector(`[dev-target=more-content-indicator]`);
                 const source = insightItem.querySelector(`[dev-target=source]`);
                 const insightDetails = insightItem.querySelector(`[dev-target=insight-detail]`);
                 const description = insightItem.querySelector(`[dev-target=description]`);
@@ -132,19 +133,42 @@ document.addEventListener("DOMContentLoaded", async () => {
                 description.textContent = insight.description;
                 source.textContent = insight.source;
                 name.innerHTML = highlightSearchQuery(name.innerHTML, searchQuery);
-                insightDetails.innerHTML = highlightSearchQuery(insightDetails.innerHTML, searchQuery);
+                // insightDetails!.innerHTML = highlightSearchQuery(
+                //   insightDetails!.innerHTML,
+                //   searchQuery
+                // );
                 source.innerHTML = highlightSearchQuery(source.innerHTML, searchQuery);
-                description.innerHTML = highlightSearchQuery(description.innerHTML, searchQuery);
-                insightDetails?.classList[insightDetails.textContent
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase())
-                    ? "remove"
-                    : "add"]("hide");
-                description?.classList[description.textContent
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase())
-                    ? "remove"
-                    : "add"]("hide");
+                // description!.innerHTML = highlightSearchQuery(
+                //   description!.innerHTML,
+                //   searchQuery
+                // );
+                insightDetails?.classList.add("hide");
+                description?.classList.add("hide");
+                if (insightDetails.textContent
+                    .toLocaleLowerCase()
+                    .includes(searchQuery.toLowerCase()) ||
+                    insightDetails.textContent
+                        .toLocaleLowerCase()
+                        .includes(searchQuery.toLowerCase())) {
+                    moreContentIndicator?.classList.remove("hide");
+                }
+                else {
+                    moreContentIndicator?.classList.add("hide");
+                }
+                // insightDetails?.classList[
+                //   insightDetails!.textContent
+                //     .toLowerCase()
+                //     .includes(searchQuery.toLowerCase())
+                //     ? "remove"
+                //     : "add"
+                // ]("hide");
+                // description?.classList[
+                //   description!.textContent
+                //     .toLowerCase()
+                //     .includes(searchQuery.toLowerCase())
+                //     ? "remove"
+                //     : "add"
+                // ]("hide");
                 source?.classList[source.textContent.toLowerCase().includes(searchQuery.toLowerCase())
                     ? "remove"
                     : "add"]("hide");
