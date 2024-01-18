@@ -83,12 +83,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                 setCheckboxesInitialState(favouriteInput, userFollowingAndFavourite.user_favourite.insight_id);
             companyInput &&
                 setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id));
-            companyImage.src =
-                "https://logo.clearbit.com/" +
-                    insight.company_details["company-website"];
-            fetch("https://logo.clearbit.com/" +
-                insight.company_details["company-website"]).catch(() => (companyImage.src =
-                "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
+            if (insight.company_details.company_logo) {
+                companyImage.src = insight.company_details.company_logo.url;
+            }
+            else {
+                companyImage.src =
+                    "https://logo.clearbit.com/" +
+                        insight.company_details["company-website"];
+                fetch("https://logo.clearbit.com/" +
+                    insight.company_details["company-website"]).catch(() => (companyImage.src =
+                    "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
+            }
             curatedDateTargetWrapper?.classList[curatedDate ? "remove" : "add"]("hide");
             curatedDateTarget.textContent = curatedDate ?? "";
             publishedDateTarget.textContent = publishedDate ?? "";
@@ -116,12 +121,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const companyLink = companyItem.querySelector(`[dev-target="company-link"]`);
                     const companyInput = companyItem.querySelector(`[dev-target="company-input"]`);
                     const companyImage = companyItem.querySelector(`[dev-target="company-image"]`);
-                    companyImage.src =
-                        "https://logo.clearbit.com/" +
-                            item["company-website"];
-                    fetch("https://logo.clearbit.com/" +
-                        item["company-website"]).catch(() => (companyImage.src =
-                        "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
+                    if (item.company_logo) {
+                        companyImage.src = item.company_logo.url;
+                    }
+                    else {
+                        companyImage.src =
+                            "https://logo.clearbit.com/" +
+                                item["company-website"];
+                        fetch("https://logo.clearbit.com/" +
+                            item["company-website"]).catch(() => (companyImage.src =
+                            "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
+                    }
                     companyPictureLink.href = "/company/" + item.slug;
                     companyLink.href = "/company/" + item.slug;
                     companyLink.textContent = item.name;

@@ -343,12 +343,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       companyName!.textContent = company.name;
       companyLink!.textContent = company["company-website"];
       companyLink!.href = company["company-website"];
-      companyImage!.src = `https://logo.clearbit.com/${company["company-website"]}`;
-      fetch("https://logo.clearbit.com/" + company["company-website"]).catch(
-        () =>
-          (companyImage!.src =
-            "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
-      );
+      if(company.company_logo){
+        companyImage!.src = company.company_logo.url
+      }else{
+        companyImage!.src = `https://logo.clearbit.com/${company["company-website"]}`;
+        fetch("https://logo.clearbit.com/" + company["company-website"]).catch(
+          () =>
+            (companyImage!.src =
+              "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
+        );
+      }
 
       cardSkeleton.remove()
       companyCard.classList.remove("dev-hide")
@@ -496,17 +500,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         "technology_category_id"
       );
 
-      companyImage!.src =
-        "https://logo.clearbit.com/" +
-        insight.company_details["company-website"];
-      fetch(
-        "https://logo.clearbit.com/" +
-          insight.company_details["company-website"]
-      ).catch(
-        () =>
-          (companyImage!.src =
-            "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
-      );
+      if(insight.company_details.company_logo){
+        companyImage!.src = insight.company_details.company_logo.url
+      }else{
+        companyImage!.src =
+          "https://logo.clearbit.com/" +
+          insight.company_details["company-website"];
+        fetch(
+          "https://logo.clearbit.com/" +
+            insight.company_details["company-website"]
+        ).catch(
+          () =>
+            (companyImage!.src =
+              "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
+        );
+      }
       insightNameTarget!.textContent = insight.name;
       curatedDateTargetWrapper?.classList[curatedDate ? "remove":"add"]("hide")
       curatedDateTarget!.textContent = curatedDate ?? "";
@@ -961,5 +969,5 @@ interface Company {
     slug: string;
     "description-small": string;
   }[];
-  company_logo: null;
+  company_logo: null | {url:string};
 }

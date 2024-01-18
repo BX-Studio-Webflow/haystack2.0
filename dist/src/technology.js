@@ -340,12 +340,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             addTagsToInsight(insightClassArray, tagsWrapperTarget, false);
             // addTagsToInsight(lineOfBusArray, tagsWrapperTarget!, false);
             addTagsToInsight(techCatArray, tagsWrapperTarget, true, "technology_category_id");
-            companyImage.src =
-                "https://logo.clearbit.com/" +
-                    insight.company_details["company-website"];
-            fetch("https://logo.clearbit.com/" +
-                insight.company_details["company-website"]).catch(() => (companyImage.src =
-                "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
+            if (insight.company_details.company_logo) {
+                companyImage.src = insight.company_details.company_logo.url;
+            }
+            else {
+                companyImage.src =
+                    "https://logo.clearbit.com/" +
+                        insight.company_details["company-website"];
+                fetch("https://logo.clearbit.com/" +
+                    insight.company_details["company-website"]).catch(() => (companyImage.src =
+                    "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
+            }
             insightNameTarget.textContent = insight.name;
             curatedDateTargetWrapper?.classList[curatedDate ? "remove" : "add"]("hide");
             curatedDateTarget.textContent = curatedDate ?? "";
