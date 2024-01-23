@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const cardSkeleton = qs("[dev-target=card-skeleton]");
   const insightsSkeleton = qs("[dev-target=skeleton-insights]");
   const companyDetails = qsa("[dev-target=company-details]");
+  const keyDocumentsCard = qs(`[dev-target="key-documents-card"]`);
 
   const insightSearchInput = qs<HTMLInputElement>("[dev-search-target]");
   const insightFilterForm = qs<HTMLFormElement>("[dev-target=filter-form]");
@@ -373,6 +374,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         relatedBusinessCard
           .querySelector(`[dev-target=related-business-empty-state]`)
           ?.classList.remove("hide");
+      }
+      const keyDocumentsItemTemplate = keyDocumentsCard.querySelector<HTMLDivElement>(
+        `[dev-target="key-documents-template"]`
+      ) as HTMLDivElement;
+      const keyDocumentsWrapper = keyDocumentsCard.querySelector(
+        `[dev-target="key-documents-wrapper"]`
+      );
+      if(company.key_documents.length > 0){
+        company.key_documents.forEach((keyDocument)=>{
+          const keyDocumentItem = keyDocumentsItemTemplate.cloneNode(
+            true
+          ) as HTMLDivElement;
+          const keyDocumentItemLink = keyDocumentItem.querySelector<HTMLLinkElement>(
+            `[dev-target="key-documents-link"]`
+          );
+          keyDocumentItemLink!.textContent = keyDocument.name;
+          keyDocumentItemLink!.href = keyDocument.document.url ? keyDocument.document.url : keyDocument.document_url;
+
+          keyDocumentsWrapper?.appendChild(keyDocumentItem);
+        })
+        keyDocumentsCard
+          .querySelector(`[dev-target="empty-state"]`)
+          ?.classList.add("hide");
+      }else{
+        keyDocumentsCard
+          .querySelector(`[dev-target="empty-state"]`)
+          ?.classList.remove("hide");
+          keyDocumentsWrapper?.classList.add("hide");
       }
 
       company["related-business-entities"].forEach((item) => {
@@ -968,6 +997,13 @@ interface Company {
     name: string;
     slug: string;
     "description-small": string;
+  }[];
+  key_documents: {
+    id: number;
+    name: string;
+    slug: string;
+    document_url: string;
+    document: {url:string};
   }[];
   company_logo: null | {url:string};
 }

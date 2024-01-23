@@ -193,6 +193,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const personName = personCard.querySelector<HTMLHeadingElement>(
         `[dev-target=person-name]`
       );
+      const personEmail = personCard.querySelector<HTMLLinkElement>(
+        `[dev-target=email-link]`
+      );
       const personTitle = personCard.querySelector<HTMLParagraphElement>(
         `[dev-target=person-title]`
       );
@@ -226,6 +229,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       personCompanyLink!.href = "company/" + person.company_details.slug;
       personLinkedinLink!.href = person.linkedin;
       personLinkedinLink?.classList[person.linkedin ? "remove":"add"]("hide")
+      personEmail!.href = person.email ? "mailto:" + person.email : "#";
+      personEmail?.classList[person.email ? "remove":"add"]("hide")
 
       cardSkeleton.remove()
       personCard.classList.remove("dev-hide")
@@ -868,6 +873,7 @@ interface Person {
   title: string;
   bio: string;
   company_id: number;
+  email: string;
   linkedin: string;
   picture: null;
   company_details: {

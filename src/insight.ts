@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const companyCard = qs(`[dev-target="company-card"]`);
   const peopleCard = qs(`[dev-target="people-card"]`);
   const eventCard = qs(`[dev-target="event-card"]`);
+  const sourceDocumentCard = qs(`[dev-target="source-document-card"]`);
 
   const searchParams = new URLSearchParams(window.location.search);
   const insightSlug = searchParams.get("name");
@@ -65,9 +66,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       const peopleItemTemplate = peopleCard.querySelector<HTMLDivElement>(
         `[dev-target="people-template"]`
       ) as HTMLDivElement;
+      const sourceDocumentItemTemplate = sourceDocumentCard.querySelector<HTMLDivElement>(
+        `[dev-target="source-document-template"]`
+      ) as HTMLDivElement;
       const eventItemTemplate = eventCard.querySelector<HTMLDivElement>(
         `[dev-target="event-link"]`
       ) as HTMLDivElement;
+      // const eventItemTemplate = sourceDocumentCard.querySelector<HTMLDivElement>(
+      //   `[dev-target="event-link"]`
+      // ) as HTMLDivElement;
       const tagsWrapperTarget = insightTemplate.querySelector<HTMLDivElement>(
         `[dev-target=tags-container]`
       );
@@ -254,6 +261,33 @@ document.addEventListener("DOMContentLoaded", async () => {
       const peopleWrapper = peopleCard.querySelector(
         `[dev-target="people-wrapper"]`
       );
+      const sourceDocumentWrapper = sourceDocumentCard.querySelector(
+        `[dev-target="source-document-wrapper"]`
+      );
+      if(insight.source_document_id.length > 0){
+        insight.source_document_id.forEach((sourceDocument)=>{
+          const sourceDocumentItem = sourceDocumentItemTemplate.cloneNode(
+            true
+          ) as HTMLDivElement;
+          const sourceDocumentItemLink = sourceDocumentItem.querySelector<HTMLLinkElement>(
+            `[dev-target="source-document-link"]`
+          );
+
+          sourceDocumentItemLink!.textContent = sourceDocument.name;
+          sourceDocumentItemLink!.href = sourceDocument.document.url ? sourceDocument.document.url : sourceDocument.document_url;
+
+          sourceDocumentWrapper?.appendChild(sourceDocumentItem);
+
+        })
+        sourceDocumentCard
+          .querySelector(`[dev-target="empty-state"]`)
+          ?.classList.add("hide");
+      }else{
+        sourceDocumentCard
+          .querySelector(`[dev-target="empty-state"]`)
+          ?.classList.remove("hide");
+          sourceDocumentWrapper?.classList.add("hide");
+      }
       if (insight.people_id.length > 0) {
         insight.people_id.forEach((person) => {
           const peopleItem = peopleItemTemplate.cloneNode(
@@ -262,16 +296,28 @@ document.addEventListener("DOMContentLoaded", async () => {
           const personItemLink = peopleItem.querySelector<HTMLLinkElement>(
             `[dev-target="people-link"]`
           );
+          const personTitle = peopleItem.querySelector<HTMLLinkElement>(
+            `[dev-target="people-title"]`
+          );
           const companyItemLink = peopleItem.querySelector<HTMLLinkElement>(
             `[dev-target="company-link"]`
           );
+          // const personTitle = peopleItem.querySelector<HTMLLinkElement>(
+          //   `[dev-target="people-title"]`
+          // );
+          // const companyItemLink = peopleItem.querySelector<HTMLLinkElement>(
+          //   `[dev-target="company-link"]`
+          // );
           const personName = person.name;
+          const personTitleName = person.title;
           const personLink = "/person/" + person.slug;
           const companyName = person._company.name;
           const companyLink = "/company/" + person._company.slug;
 
           personItemLink!.textContent = personName;
           personItemLink!.href = personLink;
+          personTitle!.href = personLink;
+          personTitle!.textContent = truncateText(personTitleName,30);
           companyItemLink!.textContent = companyName;
           companyItemLink!.href = companyLink;
 
@@ -345,6 +391,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       ) as HTMLDivElement;
       inputWrapper.classList[input.checked ? "add" : "remove"]("checked");
     });
+  }
+
+  function truncateText(input:string, maxLength:number) {
+    return input.length > maxLength ? input.slice(0, maxLength) + '...' : input;
   }
 
   function addTagsToInsight(
@@ -553,6 +603,7 @@ interface InsightResponse {
   people_id: {
     id: number;
     name: string;
+    title: string;
     slug: string;
     company_id: number;
     _company: {
@@ -562,6 +613,13 @@ interface InsightResponse {
     };
   }[];
   event_id: number;
+  source_document_id: {
+    id: number;
+    name: string;
+    slug: string;
+    document_url: string;
+    document: {url:string};
+  }[];
   published: boolean;
   company_details: {
     id: number;

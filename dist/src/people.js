@@ -143,6 +143,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             qs("title").textContent = person.name;
             console.log("person", person);
             const personName = personCard.querySelector(`[dev-target=person-name]`);
+            const personEmail = personCard.querySelector(`[dev-target=email-link]`);
             const personTitle = personCard.querySelector(`[dev-target=person-title]`);
             const personBio = personCard.querySelector(`[dev-target=person-bio]`);
             const personCompanyLink = personCard.querySelector(`[dev-target=person-company-link]`);
@@ -158,6 +159,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             personCompanyLink.href = "company/" + person.company_details.slug;
             personLinkedinLink.href = person.linkedin;
             personLinkedinLink?.classList[person.linkedin ? "remove" : "add"]("hide");
+            personEmail.href = person.email ? "mailto:" + person.email : "#";
+            personEmail?.classList[person.email ? "remove" : "add"]("hide");
             cardSkeleton.remove();
             personCard.classList.remove("dev-hide");
             fakeCheckboxToggle(personInput);

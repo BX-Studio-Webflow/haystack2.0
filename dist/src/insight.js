@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const companyCard = qs(`[dev-target="company-card"]`);
     const peopleCard = qs(`[dev-target="people-card"]`);
     const eventCard = qs(`[dev-target="event-card"]`);
+    const sourceDocumentCard = qs(`[dev-target="source-document-card"]`);
     const searchParams = new URLSearchParams(window.location.search);
     const insightSlug = searchParams.get("name");
     const lsUserFollowingFavourite = localStorage.getItem("user-following-favourite");
@@ -52,7 +53,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (insight) {
             const companyItemTemplate = companyCard.querySelector(`[dev-target="company-template"]`);
             const peopleItemTemplate = peopleCard.querySelector(`[dev-target="people-template"]`);
+            const sourceDocumentItemTemplate = sourceDocumentCard.querySelector(`[dev-target="source-document-template"]`);
             const eventItemTemplate = eventCard.querySelector(`[dev-target="event-link"]`);
+            // const eventItemTemplate = sourceDocumentCard.querySelector<HTMLDivElement>(
+            //   `[dev-target="event-link"]`
+            // ) as HTMLDivElement;
             const tagsWrapperTarget = insightTemplate.querySelector(`[dev-target=tags-container]`);
             const insightName = insightTemplate.querySelector(`[dev-target="insight-name"]`);
             const insightRichtext = insightTemplate.querySelector(`[dev-target="rich-text"]`);
@@ -154,17 +159,46 @@ document.addEventListener("DOMContentLoaded", async () => {
                 companyWrapper?.classList.add("hide");
             }
             const peopleWrapper = peopleCard.querySelector(`[dev-target="people-wrapper"]`);
+            const sourceDocumentWrapper = sourceDocumentCard.querySelector(`[dev-target="source-document-wrapper"]`);
+            if (insight.source_document_id.length > 0) {
+                insight.source_document_id.forEach((sourceDocument) => {
+                    const sourceDocumentItem = sourceDocumentItemTemplate.cloneNode(true);
+                    const sourceDocumentItemLink = sourceDocumentItem.querySelector(`[dev-target="source-document-link"]`);
+                    sourceDocumentItemLink.textContent = sourceDocument.name;
+                    sourceDocumentItemLink.href = sourceDocument.document.url ? sourceDocument.document.url : sourceDocument.document_url;
+                    sourceDocumentWrapper?.appendChild(sourceDocumentItem);
+                });
+                sourceDocumentCard
+                    .querySelector(`[dev-target="empty-state"]`)
+                    ?.classList.add("hide");
+            }
+            else {
+                sourceDocumentCard
+                    .querySelector(`[dev-target="empty-state"]`)
+                    ?.classList.remove("hide");
+                sourceDocumentWrapper?.classList.add("hide");
+            }
             if (insight.people_id.length > 0) {
                 insight.people_id.forEach((person) => {
                     const peopleItem = peopleItemTemplate.cloneNode(true);
                     const personItemLink = peopleItem.querySelector(`[dev-target="people-link"]`);
+                    const personTitle = peopleItem.querySelector(`[dev-target="people-title"]`);
                     const companyItemLink = peopleItem.querySelector(`[dev-target="company-link"]`);
+                    // const personTitle = peopleItem.querySelector<HTMLLinkElement>(
+                    //   `[dev-target="people-title"]`
+                    // );
+                    // const companyItemLink = peopleItem.querySelector<HTMLLinkElement>(
+                    //   `[dev-target="company-link"]`
+                    // );
                     const personName = person.name;
+                    const personTitleName = person.title;
                     const personLink = "/person/" + person.slug;
                     const companyName = person._company.name;
                     const companyLink = "/company/" + person._company.slug;
                     personItemLink.textContent = personName;
                     personItemLink.href = personLink;
+                    personTitle.href = personLink;
+                    personTitle.textContent = truncateText(personTitleName, 30);
                     companyItemLink.textContent = companyName;
                     companyItemLink.href = companyLink;
                     peopleWrapper?.appendChild(peopleItem);
@@ -230,6 +264,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             const inputWrapper = input.closest("[dev-fake-checkbox-wrapper]");
             inputWrapper.classList[input.checked ? "add" : "remove"]("checked");
         });
+    }
+    function truncateText(input, maxLength) {
+        return input.length > maxLength ? input.slice(0, maxLength) + '...' : input;
     }
     function addTagsToInsight(tagArray, targetWrapper, showCheckbox, type) {
         tagArray.forEach((item) => {
