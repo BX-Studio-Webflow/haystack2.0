@@ -296,28 +296,17 @@ document.addEventListener("DOMContentLoaded", async () => {
           const personItemLink = peopleItem.querySelector<HTMLLinkElement>(
             `[dev-target="people-link"]`
           );
-          const personTitle = peopleItem.querySelector<HTMLLinkElement>(
-            `[dev-target="people-title"]`
-          );
           const companyItemLink = peopleItem.querySelector<HTMLLinkElement>(
             `[dev-target="company-link"]`
           );
-          // const personTitle = peopleItem.querySelector<HTMLLinkElement>(
-          //   `[dev-target="people-title"]`
-          // );
-          // const companyItemLink = peopleItem.querySelector<HTMLLinkElement>(
-          //   `[dev-target="company-link"]`
-          // );
-          const personName = person.name;
           const personTitleName = person.title;
+          const personName = `${person.name}${personTitleName && (", "+truncateText(personTitleName,30))}`;
           const personLink = "/person/" + person.slug;
           const companyName = person._company.name;
           const companyLink = "/company/" + person._company.slug;
 
           personItemLink!.textContent = personName;
           personItemLink!.href = personLink;
-          personTitle!.href = personLink;
-          personTitle!.textContent = truncateText(personTitleName,30);
           companyItemLink!.textContent = companyName;
           companyItemLink!.href = companyLink;
 
