@@ -170,11 +170,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     payload: InsightPayload,
     target: HTMLDivElement
   ) {
-    const {
-      page = 0,
-      perPage = 0,
-      offset = 0,
-    } = payload;
+    const { page = 0, perPage = 0, offset = 0 } = payload;
     try {
       const res = await xano_userFeed.get(endPoint, {
         page,
@@ -182,7 +178,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         offset,
         sortBy: sortObject.sortBy,
         orderBy: sortObject.orderBy,
-        filtering:searchObject,
+        filtering: searchObject,
       });
       const insights = res.getBody() as Insight;
       target.innerHTML = "";
@@ -274,8 +270,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         perPage,
         offset,
       });
-      const filters = res.getBody() as FilterResponse;
-      filters.items.forEach((filter) => {
+      const filters = res.getBody() as FilterResponse[];
+      filters.forEach((filter) => {
         const newFilter = checkboxItemTemplate.cloneNode(
           true
         ) as HTMLDivElement;
@@ -395,8 +391,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         `[dev-target=company-input]`
       );
 
-      const curatedDate = insight.curated ? formatCuratedDate(insight.curated):"";
-      const publishedDate = insight["source-publication-date"]?formatPublishedDate(insight["source-publication-date"]):"";
+      const curatedDate = insight.curated
+        ? formatCuratedDate(insight.curated)
+        : "";
+      const publishedDate = insight["source-publication-date"]
+        ? formatPublishedDate(insight["source-publication-date"])
+        : "";
       const sourceCatArray = insight.source_category_id;
       const companyTypeArray = insight.company_type_id;
       const insightClassArray = insight.insight_classification_id;
@@ -438,9 +438,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         "technology_category_id"
       );
 
-      if(insight.company_details.company_logo){
-        companyImage!.src = insight.company_details.company_logo.url
-      }else{
+      if (insight.company_details.company_logo) {
+        companyImage!.src = insight.company_details.company_logo.url;
+      } else {
         companyImage!.src =
           "https://logo.clearbit.com/" +
           insight.company_details["company-website"];
@@ -455,19 +455,27 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       insightNameTarget!.textContent = insight.name;
-      curatedDateTargetWrapper?.classList[curatedDate ? "remove":"add"]("hide")
+      curatedDateTargetWrapper?.classList[curatedDate ? "remove" : "add"](
+        "hide"
+      );
       curatedDateTarget!.textContent = curatedDate ?? "";
       publishedDateTarget!.textContent = publishedDate ?? "";
-      publishedDateTargetWrapper.forEach((item)=>item.classList[publishedDate ? "remove":"add"]("hide"))
+      publishedDateTargetWrapper.forEach((item) =>
+        item.classList[publishedDate ? "remove" : "add"]("hide")
+      );
       insightLink!.setAttribute("href", "/insight/" + insight.slug);
       sourceTarget!.setAttribute("href", insight["source-url"]);
-      sourceTargetWrapper?.classList[insight["source-url"] ? "remove":"add"]("hide")
+      sourceTargetWrapper?.classList[insight["source-url"] ? "remove" : "add"](
+        "hide"
+      );
       companyLink!.setAttribute(
         "href",
         "/company/" + insight.company_details.slug
       );
       sourceTarget!.textContent = insight.source;
-      sourceAuthorTargetWrapper.forEach((item)=>item.classList[insight.source_author ? "remove":"add"]("hide"))
+      sourceAuthorTargetWrapper.forEach((item) =>
+        item.classList[insight.source_author ? "remove" : "add"]("hide")
+      );
       sourceAuthorTarget!.textContent = insight.source_author;
       target.appendChild(newInsight);
     });
@@ -477,12 +485,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const sortItems = qsa<HTMLLinkElement>(`[dev-target="sort"]`);
     sortItems.forEach((item) => {
       item.addEventListener("click", () => {
-        sortItems.forEach((sortItem)=>{
-          sortItem.classList.remove("active")
-        })
-        item.classList.add("active")
+        sortItems.forEach((sortItem) => {
+          sortItem.classList.remove("active");
+        });
+        item.classList.add("active");
         const value = item.textContent;
-        qs(`[dev-target=sorted-item-name]`).textContent = value
+        qs(`[dev-target=sorted-item-name]`).textContent = value;
         const orderBy = item.getAttribute("dev-orderby");
         const sortBy = item.getAttribute("dev-sortby");
 
@@ -529,14 +537,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  function formatCuratedDate(inputDate:Date) {
+  function formatCuratedDate(inputDate: Date) {
     const date = new Date(inputDate);
-    return `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
+    return `${date.toLocaleString("default", {
+      month: "short",
+    })} ${date.getFullYear()}`;
   }
 
-  function formatPublishedDate(inputDate:Date) {
+  function formatPublishedDate(inputDate: Date) {
     const date = new Date(inputDate);
-    return `${date.toLocaleString('default', { month: 'long' })} ${date.getDate()}, ${date.getFullYear()}`;
+    return `${date.toLocaleString("default", {
+      month: "long",
+    })} ${date.getDate()}, ${date.getFullYear()}`;
   }
 
   function followFavouriteLogic(input: HTMLInputElement) {
@@ -632,22 +644,31 @@ document.addEventListener("DOMContentLoaded", async () => {
           `[dev-target=tag-input]`
         );
         showCheckbox && tagInput && fakeCheckboxToggle(tagInput);
-        showCheckbox && type && tagInput && tagInput.setAttribute("dev-input-type", type);
-        showCheckbox && tagInput && tagInput.setAttribute("dev-input-id", item.id.toString());
+        showCheckbox &&
+          type &&
+          tagInput &&
+          tagInput.setAttribute("dev-input-type", type);
+        showCheckbox &&
+          tagInput &&
+          tagInput.setAttribute("dev-input-id", item.id.toString());
         showCheckbox && tagInput && followFavouriteLogic(tagInput);
         newTag.querySelector(`[dev-target=tag-name]`)!.textContent =
           item?.name!;
 
-        if(showCheckbox){
-          const tagSpan = newTag.querySelector<HTMLSpanElement>(`[dev-target="tag-name"]`)
-          newTag.style.cursor = "pointer"
-          newTag.querySelector<HTMLLabelElement>(`[dev-fake-checkbox-wrapper]`)!.style.cursor = "pointer"
-          const anchor = document.createElement('a');
-          anchor.href = `/technology/${item.slug}`
-          anchor.textContent = tagSpan!.textContent
-          anchor.style.cursor = "pointer"
-          anchor.classList.add("tag-span-name")
-          tagSpan?.replaceWith(anchor)
+        if (showCheckbox) {
+          const tagSpan = newTag.querySelector<HTMLSpanElement>(
+            `[dev-target="tag-name"]`
+          );
+          newTag.style.cursor = "pointer";
+          newTag.querySelector<HTMLLabelElement>(
+            `[dev-fake-checkbox-wrapper]`
+          )!.style.cursor = "pointer";
+          const anchor = document.createElement("a");
+          anchor.href = `/technology/${item.slug}`;
+          anchor.textContent = tagSpan!.textContent;
+          anchor.style.cursor = "pointer";
+          anchor.classList.add("tag-span-name");
+          tagSpan?.replaceWith(anchor);
         }
         if (tagCheckbox && !showCheckbox) {
           tagCheckbox.style.display = "none";
@@ -886,43 +907,49 @@ document.addEventListener("DOMContentLoaded", async () => {
     followingTarget: HTMLDivElement
   ) {
     followingTarget.innerHTML = "";
-    userFollowing.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })).forEach((item) => {
-      const newFollowingItem = followingItemTemplate.cloneNode(
-        true
-      ) as HTMLDivElement;
-      if(inputType ==="company_id"){
-        newFollowingItem
-          .querySelector("[dev-target=link]")
-          ?.setAttribute("href", "/company/"+item.slug);
-      }
-      if(inputType ==="event_id"){
-        newFollowingItem
-          .querySelector("[dev-target=link]")
-          ?.setAttribute("href", "/event/"+item.slug);
-      }
-      if(inputType ==="people_id"){
-        newFollowingItem
-          .querySelector("[dev-target=link]")
-          ?.setAttribute("href", "/person/"+item.slug);
-      }
-      if(inputType ==="technology_category_id"){
-        newFollowingItem
-          .querySelector("[dev-target=link]")
-          ?.setAttribute("href", "/technology/"+item.slug);
-      }
-      newFollowingItem.querySelector("[dev-target=name]")!.textContent =
-        item.name;
-      const newFollowingItemInput =
-        newFollowingItem.querySelector<HTMLInputElement>("[dev-target=input]");
-      newFollowingItemInput?.setAttribute("dev-input-type", inputType);
-      newFollowingItemInput?.setAttribute("dev-input-id", item.id.toString());
-      newFollowingItemInput && followFavouriteLogic(newFollowingItemInput);
-      newFollowingItemInput &&
-        userFollowingAndFavourite &&
-        setCheckboxesInitialState(newFollowingItemInput, slugArray);
-      newFollowingItemInput && fakeCheckboxToggle(newFollowingItemInput);
-      followingTarget.appendChild(newFollowingItem);
-    });
+    userFollowing
+      .sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+      )
+      .forEach((item) => {
+        const newFollowingItem = followingItemTemplate.cloneNode(
+          true
+        ) as HTMLDivElement;
+        if (inputType === "company_id") {
+          newFollowingItem
+            .querySelector("[dev-target=link]")
+            ?.setAttribute("href", "/company/" + item.slug);
+        }
+        if (inputType === "event_id") {
+          newFollowingItem
+            .querySelector("[dev-target=link]")
+            ?.setAttribute("href", "/event/" + item.slug);
+        }
+        if (inputType === "people_id") {
+          newFollowingItem
+            .querySelector("[dev-target=link]")
+            ?.setAttribute("href", "/person/" + item.slug);
+        }
+        if (inputType === "technology_category_id") {
+          newFollowingItem
+            .querySelector("[dev-target=link]")
+            ?.setAttribute("href", "/technology/" + item.slug);
+        }
+        newFollowingItem.querySelector("[dev-target=name]")!.textContent =
+          item.name;
+        const newFollowingItemInput =
+          newFollowingItem.querySelector<HTMLInputElement>(
+            "[dev-target=input]"
+          );
+        newFollowingItemInput?.setAttribute("dev-input-type", inputType);
+        newFollowingItemInput?.setAttribute("dev-input-id", item.id.toString());
+        newFollowingItemInput && followFavouriteLogic(newFollowingItemInput);
+        newFollowingItemInput &&
+          userFollowingAndFavourite &&
+          setCheckboxesInitialState(newFollowingItemInput, slugArray);
+        newFollowingItemInput && fakeCheckboxToggle(newFollowingItemInput);
+        followingTarget.appendChild(newFollowingItem);
+      });
   }
   // Function to debounce a given function
   function debounce(func: (...args: any[]) => void, delay: number) {
@@ -1019,7 +1046,7 @@ interface Insight {
       name: string;
       slug: string;
       "company-website": string;
-      company_logo: null|{url:string};
+      company_logo: null | { url: string };
     };
     published: boolean;
   }[];
@@ -1059,20 +1086,11 @@ interface UserFollowingAndFavourite {
 }
 
 interface FilterResponse {
-  itemsReceived: number;
-  curPage: number;
-  nextPage: number | null;
-  prevPage: number | null;
-  offset: number;
-  itemsTotal: number;
-  pageTotal: number;
-  items: {
-    id: number;
-    created_at: number;
-    name: string;
-    slug: string;
-    published: boolean;
-  }[];
+  id: number;
+  created_at: number;
+  name: string;
+  slug: string;
+  published: boolean;
 }
 
 interface SearchObject {

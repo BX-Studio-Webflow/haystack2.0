@@ -128,7 +128,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
     async function getInsights(endPoint, payload, target) {
-        const { page = 0, perPage = 0, offset = 0, } = payload;
+        const { page = 0, perPage = 0, offset = 0 } = payload;
         try {
             const res = await xano_userFeed.get(endPoint, {
                 page,
@@ -205,7 +205,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 offset,
             });
             const filters = res.getBody();
-            filters.items.forEach((filter) => {
+            filters.forEach((filter) => {
                 const newFilter = checkboxItemTemplate.cloneNode(true);
                 const input = newFilter.querySelector("[dev-target=input]");
                 input && fakeCheckboxToggle(input);
@@ -264,8 +264,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             const sourceAuthorTarget = newInsight.querySelector(`[dev-target="source-author"]`);
             const favouriteInput = newInsight.querySelector(`[dev-target=favourite-input]`);
             const companyInput = newInsight.querySelector(`[dev-target=company-input]`);
-            const curatedDate = insight.curated ? formatCuratedDate(insight.curated) : "";
-            const publishedDate = insight["source-publication-date"] ? formatPublishedDate(insight["source-publication-date"]) : "";
+            const curatedDate = insight.curated
+                ? formatCuratedDate(insight.curated)
+                : "";
+            const publishedDate = insight["source-publication-date"]
+                ? formatPublishedDate(insight["source-publication-date"])
+                : "";
             const sourceCatArray = insight.source_category_id;
             const companyTypeArray = insight.company_type_id;
             const insightClassArray = insight.insight_classification_id;
@@ -365,11 +369,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     function formatCuratedDate(inputDate) {
         const date = new Date(inputDate);
-        return `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
+        return `${date.toLocaleString("default", {
+            month: "short",
+        })} ${date.getFullYear()}`;
     }
     function formatPublishedDate(inputDate) {
         const date = new Date(inputDate);
-        return `${date.toLocaleString('default', { month: 'long' })} ${date.getDate()}, ${date.getFullYear()}`;
+        return `${date.toLocaleString("default", {
+            month: "long",
+        })} ${date.getDate()}, ${date.getFullYear()}`;
     }
     function followFavouriteLogic(input) {
         input.addEventListener("change", async () => followFavouriteDebounce(input));
@@ -415,8 +423,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const tagCheckbox = newTag.querySelector(`[dev-target=fake-checkbox]`);
                 const tagInput = newTag.querySelector(`[dev-target=tag-input]`);
                 showCheckbox && tagInput && fakeCheckboxToggle(tagInput);
-                showCheckbox && type && tagInput && tagInput.setAttribute("dev-input-type", type);
-                showCheckbox && tagInput && tagInput.setAttribute("dev-input-id", item.id.toString());
+                showCheckbox &&
+                    type &&
+                    tagInput &&
+                    tagInput.setAttribute("dev-input-type", type);
+                showCheckbox &&
+                    tagInput &&
+                    tagInput.setAttribute("dev-input-id", item.id.toString());
                 showCheckbox && tagInput && followFavouriteLogic(tagInput);
                 newTag.querySelector(`[dev-target=tag-name]`).textContent =
                     item?.name;
@@ -424,7 +437,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const tagSpan = newTag.querySelector(`[dev-target="tag-name"]`);
                     newTag.style.cursor = "pointer";
                     newTag.querySelector(`[dev-fake-checkbox-wrapper]`).style.cursor = "pointer";
-                    const anchor = document.createElement('a');
+                    const anchor = document.createElement("a");
                     anchor.href = `/technology/${item.slug}`;
                     anchor.textContent = tagSpan.textContent;
                     anchor.style.cursor = "pointer";
@@ -609,7 +622,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const searchDebounce = debounce(insightSearch, 500);
     function followingSectionInit(userFollowing, inputType, slugArray, followingTarget) {
         followingTarget.innerHTML = "";
-        userFollowing.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })).forEach((item) => {
+        userFollowing
+            .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
+            .forEach((item) => {
             const newFollowingItem = followingItemTemplate.cloneNode(true);
             if (inputType === "company_id") {
                 newFollowingItem
