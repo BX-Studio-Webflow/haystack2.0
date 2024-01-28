@@ -596,8 +596,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           },
         },
       });
-      const filters = res.getBody() as FilterResponse;
-      filters.items.forEach((filter) => {
+      const filters = res.getBody() as FilterResponse[];
+      filters.forEach((filter) => {
         const newFilter = checkboxItemTemplate.cloneNode(
           true
         ) as HTMLDivElement;

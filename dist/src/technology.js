@@ -432,7 +432,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 },
             });
             const filters = res.getBody();
-            filters.items.forEach((filter) => {
+            filters.forEach((filter) => {
                 const newFilter = checkboxItemTemplate.cloneNode(true);
                 const input = newFilter.querySelector("[dev-target=input]");
                 input && fakeCheckboxToggle(input);
