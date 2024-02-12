@@ -186,11 +186,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const personTitleName = person.title;
                     const personName = `${person.name}${personTitleName && (", " + truncateText(personTitleName, 30))}`;
                     const personLink = "/person/" + person.slug;
-                    const companyName = person._company.name;
-                    const companyLink = "/company/" + person._company.slug;
+                    const companyName = person._company?.name;
+                    const companyLink = "/company/" + person._company?.slug;
                     personItemLink.textContent = personName;
                     personItemLink.href = personLink;
-                    companyItemLink.textContent = companyName;
+                    if (companyName) {
+                        companyItemLink.textContent = companyName;
+                    }
                     companyItemLink.href = companyLink;
                     peopleWrapper?.appendChild(peopleItem);
                 });
