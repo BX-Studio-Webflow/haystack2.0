@@ -34,10 +34,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const allTabsTarget = qs(`[dev-target="insight-all"]`);
     const followingTabsTarget = qs(`[dev-target="insight-following"]`);
     const favouriteTabsTarget = qs(`[dev-target="insight-favourite"]`);
-    const followingCompanyTarget = qs(`[dev-target="following-companies"]`);
-    const followingTechCatTarget = qs(`[dev-target="following-tech-cat"]`);
-    const followingPeopleTarget = qs(`[dev-target="following-people"]`);
-    const followingEventsTarget = qs(`[dev-target="following-events"]`);
+    const followingCompanyTarget = qsa(`[dev-target="following-companies"]`);
+    const followingTechCatTarget = qsa(`[dev-target="following-tech-cat"]`);
+    const followingPeopleTarget = qsa(`[dev-target="following-people"]`);
+    const followingEventsTarget = qsa(`[dev-target="following-events"]`);
     const filterCompanyTypeTarget = qs(`[dev-target="filter-company-type"]`);
     const filterSourceCatTarget = qs(`[dev-target="filter-source-cat"]`);
     const filterTechCatTarget = qs(`[dev-target="filter-tech-cat"]`);
@@ -623,43 +623,45 @@ document.addEventListener("DOMContentLoaded", async () => {
         }, favouriteTabsTarget);
     }
     const searchDebounce = debounce(insightSearch, 500);
-    function followingSectionInit(userFollowing, inputType, slugArray, followingTarget) {
-        followingTarget.innerHTML = "";
-        userFollowing
-            .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
-            .forEach((item) => {
-            const newFollowingItem = followingItemTemplate.cloneNode(true);
-            if (inputType === "company_id") {
-                newFollowingItem
-                    .querySelector("[dev-target=link]")
-                    ?.setAttribute("href", "/company/" + item.slug);
-            }
-            if (inputType === "event_id") {
-                newFollowingItem
-                    .querySelector("[dev-target=link]")
-                    ?.setAttribute("href", "/event/" + item.slug);
-            }
-            if (inputType === "people_id") {
-                newFollowingItem
-                    .querySelector("[dev-target=link]")
-                    ?.setAttribute("href", "/person/" + item.slug);
-            }
-            if (inputType === "technology_category_id") {
-                newFollowingItem
-                    .querySelector("[dev-target=link]")
-                    ?.setAttribute("href", "/technology/" + item.slug);
-            }
-            newFollowingItem.querySelector("[dev-target=name]").textContent =
-                item.name;
-            const newFollowingItemInput = newFollowingItem.querySelector("[dev-target=input]");
-            newFollowingItemInput?.setAttribute("dev-input-type", inputType);
-            newFollowingItemInput?.setAttribute("dev-input-id", item.id.toString());
-            newFollowingItemInput && followFavouriteLogic(newFollowingItemInput);
-            newFollowingItemInput &&
-                userFollowingAndFavourite &&
-                setCheckboxesInitialState(newFollowingItemInput, slugArray);
-            newFollowingItemInput && fakeCheckboxToggle(newFollowingItemInput);
-            followingTarget.appendChild(newFollowingItem);
+    function followingSectionInit(userFollowing, inputType, slugArray, followingTargets) {
+        followingTargets.forEach((followingTarget) => {
+            followingTarget.innerHTML = "";
+            userFollowing
+                .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
+                .forEach((item) => {
+                const newFollowingItem = followingItemTemplate.cloneNode(true);
+                if (inputType === "company_id") {
+                    newFollowingItem
+                        .querySelector("[dev-target=link]")
+                        ?.setAttribute("href", "/company/" + item.slug);
+                }
+                if (inputType === "event_id") {
+                    newFollowingItem
+                        .querySelector("[dev-target=link]")
+                        ?.setAttribute("href", "/event/" + item.slug);
+                }
+                if (inputType === "people_id") {
+                    newFollowingItem
+                        .querySelector("[dev-target=link]")
+                        ?.setAttribute("href", "/person/" + item.slug);
+                }
+                if (inputType === "technology_category_id") {
+                    newFollowingItem
+                        .querySelector("[dev-target=link]")
+                        ?.setAttribute("href", "/technology/" + item.slug);
+                }
+                newFollowingItem.querySelector("[dev-target=name]").textContent =
+                    item.name;
+                const newFollowingItemInput = newFollowingItem.querySelector("[dev-target=input]");
+                newFollowingItemInput?.setAttribute("dev-input-type", inputType);
+                newFollowingItemInput?.setAttribute("dev-input-id", item.id.toString());
+                newFollowingItemInput && followFavouriteLogic(newFollowingItemInput);
+                newFollowingItemInput &&
+                    userFollowingAndFavourite &&
+                    setCheckboxesInitialState(newFollowingItemInput, slugArray);
+                newFollowingItemInput && fakeCheckboxToggle(newFollowingItemInput);
+                followingTarget.appendChild(newFollowingItem);
+            });
         });
     }
     // Function to debounce a given function

@@ -29,8 +29,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     let userFollowingAndFavourite = null;
     let xanoToken = null;
     const relatedBusinessCard = qs("[dev-target=related-business-card]");
-    const companyCard = qs("[dev-target=company-card]");
-    const cardSkeleton = qs("[dev-target=card-skeleton]");
+    const companyCards = qsa("[dev-target=company-card]");
+    const cardSkeleton = qsa("[dev-target=card-skeleton]");
     const insightsSkeleton = qs("[dev-target=skeleton-insights]");
     const companyDetails = qsa("[dev-target=company-details]");
     const keyDocumentsCard = qs(`[dev-target="key-documents-card"]`);
@@ -197,80 +197,82 @@ document.addEventListener("DOMContentLoaded", async () => {
             const company = res.getBody();
             qs("title").textContent = company.name;
             console.log("company", company);
-            const location = companyCard.querySelector(`[dev-target="location-wrapper"]`);
-            const companySize = companyCard.querySelector(`[dev-target="company-size-wrapper"]`);
-            const businessEntity = companyCard.querySelector(`[dev-target="business-entity-wrapper"]`);
-            const companyType = companyCard.querySelector(`[dev-target="company-type-wrapper"]`);
-            const companyRevenue = companyCard.querySelector(`[dev-target="company-revenue-wrapper"]`);
-            const fiscalYear = companyCard.querySelector(`[dev-target="fiscal-year-wrapper"]`);
             const aboutRichText = qs(`[dev-target="about-rich-text"]`);
-            if (company.location) {
-                location.querySelector("p").textContent = company.location;
-            }
-            else {
-                location?.classList.add("hide");
-            }
-            if (company["company-size"]) {
-                companySize.querySelector("p").textContent = company["company-size"];
-            }
-            else {
-                companySize?.classList.add("hide");
-            }
-            if (company["company-revenue"]) {
-                companyRevenue.querySelector("p").textContent =
-                    company["company-revenue"];
-            }
-            else {
-                companyRevenue?.classList.add("hide");
-            }
-            if (company["fiscal-year"]) {
-                fiscalYear.querySelector("p").textContent = company["fiscal-year"];
-            }
-            else {
-                fiscalYear?.classList.add("hide");
-            }
-            if (company.business_entity_details) {
-                businessEntity.querySelector("p").textContent =
-                    company.business_entity_details.name;
-            }
-            else {
-                businessEntity?.classList.add("hide");
-            }
-            if (company.company_type_details) {
-                companyType.querySelector("p").textContent =
-                    company.company_type_details.name;
-            }
-            else {
-                companyType?.classList.add("hide");
-            }
-            const companyName = companyCard.querySelector(`[dev-target=company-name]`);
-            const companyLink = companyCard.querySelector(`[dev-target=company-website]`);
-            const companyLinkedinLink = companyCard.querySelector(`[dev-target=linkedin-link]`);
-            const companyImageWrapper = companyCard.querySelector(`[dev-target=company-image-wrapper]`);
-            const companyImageLink = companyImageWrapper?.querySelector(`[dev-target=company-picture-link]`);
-            const companyImage = companyImageWrapper?.querySelector(`[dev-target=company-image]`);
-            const companyInput = companyImageWrapper?.querySelector(`[dev-target=company-input]`);
             aboutRichText.innerHTML = company.about;
-            companyLinkedinLink.href = company["company-linkedin-profile-link"];
-            companyName.textContent = company.name;
-            companyLink.textContent = company["company-website"];
-            companyLink.href = company["company-website"];
-            if (company.company_logo) {
-                companyImage.src = company.company_logo.url;
-            }
-            else {
-                companyImage.src = `https://logo.clearbit.com/${company["company-website"]}`;
-                fetch("https://logo.clearbit.com/" + company["company-website"]).catch(() => (companyImage.src =
-                    "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
-            }
-            cardSkeleton.remove();
-            companyCard.classList.remove("dev-hide");
-            fakeCheckboxToggle(companyInput);
-            companyInput?.setAttribute("dev-input-type", "company_id");
-            companyInput?.setAttribute("dev-input-id", company.id.toString());
-            companyInput && followFavouriteLogic(companyInput);
-            companyInput &&
-                setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id));
+            companyCards.forEach((companyCard) => {
+                const location = companyCard.querySelector(`[dev-target="location-wrapper"]`);
+                const companySize = companyCard.querySelector(`[dev-target="company-size-wrapper"]`);
+                const businessEntity = companyCard.querySelector(`[dev-target="business-entity-wrapper"]`);
+                const companyType = companyCard.querySelector(`[dev-target="company-type-wrapper"]`);
+                const companyRevenue = companyCard.querySelector(`[dev-target="company-revenue-wrapper"]`);
+                const fiscalYear = companyCard.querySelector(`[dev-target="fiscal-year-wrapper"]`);
+                if (company.location) {
+                    location.querySelector("p").textContent = company.location;
+                }
+                else {
+                    location?.classList.add("hide");
+                }
+                if (company["company-size"]) {
+                    companySize.querySelector("p").textContent = company["company-size"];
+                }
+                else {
+                    companySize?.classList.add("hide");
+                }
+                if (company["company-revenue"]) {
+                    companyRevenue.querySelector("p").textContent =
+                        company["company-revenue"];
+                }
+                else {
+                    companyRevenue?.classList.add("hide");
+                }
+                if (company["fiscal-year"]) {
+                    fiscalYear.querySelector("p").textContent = company["fiscal-year"];
+                }
+                else {
+                    fiscalYear?.classList.add("hide");
+                }
+                if (company.business_entity_details) {
+                    businessEntity.querySelector("p").textContent =
+                        company.business_entity_details.name;
+                }
+                else {
+                    businessEntity?.classList.add("hide");
+                }
+                if (company.company_type_details) {
+                    companyType.querySelector("p").textContent =
+                        company.company_type_details.name;
+                }
+                else {
+                    companyType?.classList.add("hide");
+                }
+                const companyName = companyCard.querySelector(`[dev-target=company-name]`);
+                const companyLink = companyCard.querySelector(`[dev-target=company-website]`);
+                const companyLinkedinLink = companyCard.querySelector(`[dev-target=linkedin-link]`);
+                const companyImageWrapper = companyCard.querySelector(`[dev-target=company-image-wrapper]`);
+                const companyImageLink = companyImageWrapper?.querySelector(`[dev-target=company-picture-link]`);
+                const companyImage = companyImageWrapper?.querySelector(`[dev-target=company-image]`);
+                const companyInput = companyImageWrapper?.querySelector(`[dev-target=company-input]`);
+                companyLinkedinLink.href = company["company-linkedin-profile-link"];
+                companyName.textContent = company.name;
+                companyLink.textContent = company["company-website"];
+                companyLink.href = company["company-website"];
+                if (company.company_logo) {
+                    companyImage.src = company.company_logo.url;
+                }
+                else {
+                    companyImage.src = `https://logo.clearbit.com/${company["company-website"]}`;
+                    fetch("https://logo.clearbit.com/" + company["company-website"]).catch(() => (companyImage.src =
+                        "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
+                }
+                companyCard.classList.remove("dev-hide");
+                cardSkeleton.forEach((item) => item.remove());
+                fakeCheckboxToggle(companyInput);
+                companyInput?.setAttribute("dev-input-type", "company_id");
+                companyInput?.setAttribute("dev-input-id", company.id.toString());
+                companyInput && followFavouriteLogic(companyInput);
+                companyInput &&
+                    setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id));
+            });
             if (company["related-business-entities"].length === 0) {
                 relatedBusinessCard
                     .querySelector(`[dev-target=related-business-empty-state]`)
