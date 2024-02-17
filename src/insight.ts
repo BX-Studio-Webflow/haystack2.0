@@ -17,9 +17,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   let xanoToken: string | null = null;
 
   const insightTemplate = qs(`[dev-target="insight-template"]`);
-  const companyCard = qs(`[dev-target="company-card"]`);
-  const peopleCard = qs(`[dev-target="people-card"]`);
-  const eventCard = qs(`[dev-target="event-card"]`);
+  const companyCards = qsa(`[dev-target="company-card"]`);
+  const peopleCards = qsa(`[dev-target="people-card"]`);
+  const eventCards = qsa(`[dev-target="event-card"]`);
   const sourceDocumentCard = qs(`[dev-target="source-document-card"]`);
 
   const searchParams = new URLSearchParams(window.location.search);
@@ -60,16 +60,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function insightPageInit(insightSlug: string) {
     const insight = await getInsight(insightSlug);
     if (insight) {
-      const companyItemTemplate = companyCard.querySelector<HTMLDivElement>(
+      const companyItemTemplate = companyCards.item(0).querySelector<HTMLDivElement>(
         `[dev-target="company-template"]`
       ) as HTMLDivElement;
-      const peopleItemTemplate = peopleCard.querySelector<HTMLDivElement>(
+      const peopleItemTemplate = peopleCards.item(0).querySelector<HTMLDivElement>(
         `[dev-target="people-template"]`
       ) as HTMLDivElement;
       const sourceDocumentItemTemplate = sourceDocumentCard.querySelector<HTMLDivElement>(
         `[dev-target="source-document-template"]`
       ) as HTMLDivElement;
-      const eventItemTemplate = eventCard.querySelector<HTMLDivElement>(
+      const eventItemTemplate = eventCards.item(0).querySelector<HTMLDivElement>(
         `[dev-target="event-link"]`
       ) as HTMLDivElement;
       // const eventItemTemplate = sourceDocumentCard.querySelector<HTMLDivElement>(
@@ -195,72 +195,72 @@ document.addEventListener("DOMContentLoaded", async () => {
         "technology_category_id"
       );
 
-      const companyWrapper = companyCard.querySelector(
+      const companyWrappers = Array.from(companyCards).map((companyCard)=>companyCard.querySelector(
         `[dev-target="company-wrapper"]`
-      );
-      if (insight["companies-mentioned"].length > 0) {
-        insight["companies-mentioned"].forEach((item) => {
-          const companyItem = companyItemTemplate.cloneNode(
-            true
-          ) as HTMLDivElement;
-          const companyPictureLink = companyItem.querySelector<HTMLLinkElement>(
-            `[dev-target="company-picture-link"]`
-          );
-          const companyLink = companyItem.querySelector<HTMLLinkElement>(
-            `[dev-target="company-link"]`
-          );
-          const companyInput = companyItem.querySelector<HTMLInputElement>(
-            `[dev-target="company-input"]`
-          );
-          const companyImage = companyItem.querySelector<HTMLImageElement>(
-            `[dev-target="company-image"]`
-          );
-          if(item.company_logo){
-            companyImage!.src = item.company_logo.url
-          }else{
-            companyImage!.src =
-              "https://logo.clearbit.com/" +
-              item["company-website"];
-            fetch(
-              "https://logo.clearbit.com/" +
-              item["company-website"]
-            ).catch(
-              () =>
-                (companyImage!.src =
-                  "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
+      ))
+      companyWrappers.forEach((companyWrapper)=>{
+
+        if (insight["companies-mentioned"].length > 0) {
+          insight["companies-mentioned"].forEach((item) => {
+            const companyItem = companyItemTemplate.cloneNode(
+              true
+            ) as HTMLDivElement;
+            const companyPictureLink = companyItem.querySelector<HTMLLinkElement>(
+              `[dev-target="company-picture-link"]`
             );
-          }
-          companyPictureLink!.href = "/company/" + item.slug;
-          companyLink!.href = "/company/" + item.slug;
-          companyLink!.textContent = item.name;
-          fakeCheckboxToggle(companyInput!);
-          companyInput?.setAttribute("dev-input-type", "company_id");
-          companyInput?.setAttribute("dev-input-id", item.id.toString());
-          companyInput && followFavouriteLogic(companyInput);
-          companyInput &&
-            setCheckboxesInitialState(
-              companyInput,
-              convertArrayOfObjToNumber(
-                userFollowingAndFavourite!.user_following.company_id
-              )
+            const companyLink = companyItem.querySelector<HTMLLinkElement>(
+              `[dev-target="company-link"]`
             );
+            const companyInput = companyItem.querySelector<HTMLInputElement>(
+              `[dev-target="company-input"]`
+            );
+            const companyImage = companyItem.querySelector<HTMLImageElement>(
+              `[dev-target="company-image"]`
+            );
+            if(item.company_logo){
+              companyImage!.src = item.company_logo.url
+            }else{
+              companyImage!.src =
+                "https://logo.clearbit.com/" +
+                item["company-website"];
+              fetch(
+                "https://logo.clearbit.com/" +
+                item["company-website"]
+              ).catch(
+                () =>
+                  (companyImage!.src =
+                    "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
+              );
+            }
+            companyPictureLink!.href = "/company/" + item.slug;
+            companyLink!.href = "/company/" + item.slug;
+            companyLink!.textContent = item.name;
+            fakeCheckboxToggle(companyInput!);
+            companyInput?.setAttribute("dev-input-type", "company_id");
+            companyInput?.setAttribute("dev-input-id", item.id.toString());
+            companyInput && followFavouriteLogic(companyInput);
+            companyInput &&
+              setCheckboxesInitialState(
+                companyInput,
+                convertArrayOfObjToNumber(
+                  userFollowingAndFavourite!.user_following.company_id
+                )
+              );
 
-          companyWrapper?.appendChild(companyItem);
-        });
+            companyWrapper?.appendChild(companyItem);
+          });
 
-        companyCard
+          companyCards.forEach((companyCard)=>companyCard
           .querySelector(`[dev-target="empty-state"]`)
-          ?.classList.add("hide");
-      } else {
-        companyCard
+          ?.classList.add("hide"));
+        } else {
+          companyCards.forEach((companyCard)=>companyCard
           .querySelector(`[dev-target="empty-state"]`)
-          ?.classList.remove("hide");
-        companyWrapper?.classList.add("hide");
-      }
+          ?.classList.remove("hide"))
+          companyWrapper?.classList.add("hide");
+        }
+      })
 
-      const peopleWrapper = peopleCard.querySelector(
-        `[dev-target="people-wrapper"]`
-      );
       const sourceDocumentWrapper = sourceDocumentCard.querySelector(
         `[dev-target="source-document-wrapper"]`
       );
@@ -288,57 +288,68 @@ document.addEventListener("DOMContentLoaded", async () => {
           ?.classList.remove("hide");
           sourceDocumentWrapper?.classList.add("hide");
       }
-      if (insight.people_id.length > 0) {
-        insight.people_id.forEach((person) => {
-          const peopleItem = peopleItemTemplate.cloneNode(
-            true
-          ) as HTMLDivElement;
-          const personItemLink = peopleItem.querySelector<HTMLLinkElement>(
-            `[dev-target="people-link"]`
-          );
-          const companyItemLink = peopleItem.querySelector<HTMLLinkElement>(
-            `[dev-target="company-link"]`
-          );
-          const personTitleName = person.title;
-          const personName = `${person.name}${personTitleName && (", "+truncateText(personTitleName,30))}`;
-          const personLink = "/person/" + person.slug;
-          const companyName = person._company?.name;
-          const companyLink = "/company/" + person._company?.slug;
 
-          personItemLink!.textContent = personName;
-          personItemLink!.href = personLink;
-          if(companyName){
-            companyItemLink!.textContent = companyName;
-          }
-          companyItemLink!.href = companyLink;
+      const peopleWrappers = Array.from(peopleCards).map((peopleCard)=>peopleCard.querySelector(
+        `[dev-target="people-wrapper"]`
+      )!)
+      peopleWrappers.forEach((peopleWrapper)=>{
+        if (insight.people_id.length > 0) {
+          insight.people_id.forEach((person) => {
+            const peopleItem = peopleItemTemplate.cloneNode(
+              true
+            ) as HTMLDivElement;
+            const personItemLink = peopleItem.querySelector<HTMLLinkElement>(
+              `[dev-target="people-link"]`
+            );
+            const companyItemLink = peopleItem.querySelector<HTMLLinkElement>(
+              `[dev-target="company-link"]`
+            );
+            const personTitleName = person.title;
+            const personName = `${person.name}${personTitleName && (", "+truncateText(personTitleName,30))}`;
+            const personLink = "/person/" + person.slug;
+            const companyName = person._company?.name;
+            const companyLink = "/company/" + person._company?.slug;
 
-          peopleWrapper?.appendChild(peopleItem);
-        });
-        peopleCard
+            personItemLink!.textContent = personName;
+            personItemLink!.href = personLink;
+            if(companyName){
+              companyItemLink!.textContent = companyName;
+            }
+            companyItemLink!.href = companyLink;
+
+            peopleWrapper?.appendChild(peopleItem);
+          });
+          peopleCards.forEach((peopleCard)=>peopleCard
           .querySelector(`[dev-target="empty-state"]`)
-          ?.classList.add("hide");
-      } else {
-        peopleCard
+          ?.classList.add("hide"))
+        } else {
+          peopleCards.forEach((peopleCard)=>peopleCard
           .querySelector(`[dev-target="empty-state"]`)
-          ?.classList.remove("hide");
-        peopleWrapper?.classList.add("hide");
-      }
+          ?.classList.remove("hide"))
+          peopleWrapper?.classList.add("hide");
+        }
+      })
 
-      const eventWrapper = eventCard.querySelector(
+      const eventWrappers = Array.from(eventCards).map((eventCard)=>eventCard.querySelector(
         `[dev-target="event-wrapper"]`
-      );
-      if (insight.event_details) {
-        const eventItem = eventItemTemplate.cloneNode(true) as HTMLLinkElement;
-        eventItem.textContent = insight.event_details.name;
-        eventItem.href = "/event/" + insight.event_details.slug;
+      )!)
+      eventWrappers.forEach((eventWrapper)=>{
+        if (insight.event_details) {
+          const eventItem = eventItemTemplate.cloneNode(true) as HTMLLinkElement;
+          eventItem.textContent = insight.event_details.name;
+          eventItem.href = "/event/" + insight.event_details.slug;
 
-        eventWrapper?.append(eventItem);
-      } else {
-        eventCard
+          eventWrapper?.append(eventItem);
+          eventCards.forEach((eventCard)=>eventCard
           .querySelector(`[dev-target="empty-state"]`)
-          ?.classList.remove("hide");
-        eventWrapper?.classList.add("hide");
-      }
+          ?.classList.add("hide"))
+        } else {
+          eventCards.forEach((eventCard)=>eventCard
+          .querySelector(`[dev-target="empty-state"]`)
+          ?.classList.remove("hide"))
+          eventWrapper?.classList.add("hide");
+        }
+      })
 
       insightTemplate.classList.remove("hide-template");
     }

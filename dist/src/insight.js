@@ -15,9 +15,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     let userFollowingAndFavourite = null;
     let xanoToken = null;
     const insightTemplate = qs(`[dev-target="insight-template"]`);
-    const companyCard = qs(`[dev-target="company-card"]`);
-    const peopleCard = qs(`[dev-target="people-card"]`);
-    const eventCard = qs(`[dev-target="event-card"]`);
+    const companyCards = qsa(`[dev-target="company-card"]`);
+    const peopleCards = qsa(`[dev-target="people-card"]`);
+    const eventCards = qsa(`[dev-target="event-card"]`);
     const sourceDocumentCard = qs(`[dev-target="source-document-card"]`);
     const searchParams = new URLSearchParams(window.location.search);
     const insightSlug = searchParams.get("name");
@@ -51,10 +51,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function insightPageInit(insightSlug) {
         const insight = await getInsight(insightSlug);
         if (insight) {
-            const companyItemTemplate = companyCard.querySelector(`[dev-target="company-template"]`);
-            const peopleItemTemplate = peopleCard.querySelector(`[dev-target="people-template"]`);
+            const companyItemTemplate = companyCards.item(0).querySelector(`[dev-target="company-template"]`);
+            const peopleItemTemplate = peopleCards.item(0).querySelector(`[dev-target="people-template"]`);
             const sourceDocumentItemTemplate = sourceDocumentCard.querySelector(`[dev-target="source-document-template"]`);
-            const eventItemTemplate = eventCard.querySelector(`[dev-target="event-link"]`);
+            const eventItemTemplate = eventCards.item(0).querySelector(`[dev-target="event-link"]`);
             // const eventItemTemplate = sourceDocumentCard.querySelector<HTMLDivElement>(
             //   `[dev-target="event-link"]`
             // ) as HTMLDivElement;
@@ -118,47 +118,48 @@ document.addEventListener("DOMContentLoaded", async () => {
             // addTagsToInsight(insight.line_of_business_id, tagsWrapperTarget!, false);
             addTagsToInsight(insight.insight_classification_id, tagsWrapperTarget, false);
             addTagsToInsight(insight.technology_category_id, tagsWrapperTarget, true, "technology_category_id");
-            const companyWrapper = companyCard.querySelector(`[dev-target="company-wrapper"]`);
-            if (insight["companies-mentioned"].length > 0) {
-                insight["companies-mentioned"].forEach((item) => {
-                    const companyItem = companyItemTemplate.cloneNode(true);
-                    const companyPictureLink = companyItem.querySelector(`[dev-target="company-picture-link"]`);
-                    const companyLink = companyItem.querySelector(`[dev-target="company-link"]`);
-                    const companyInput = companyItem.querySelector(`[dev-target="company-input"]`);
-                    const companyImage = companyItem.querySelector(`[dev-target="company-image"]`);
-                    if (item.company_logo) {
-                        companyImage.src = item.company_logo.url;
-                    }
-                    else {
-                        companyImage.src =
-                            "https://logo.clearbit.com/" +
-                                item["company-website"];
-                        fetch("https://logo.clearbit.com/" +
-                            item["company-website"]).catch(() => (companyImage.src =
-                            "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
-                    }
-                    companyPictureLink.href = "/company/" + item.slug;
-                    companyLink.href = "/company/" + item.slug;
-                    companyLink.textContent = item.name;
-                    fakeCheckboxToggle(companyInput);
-                    companyInput?.setAttribute("dev-input-type", "company_id");
-                    companyInput?.setAttribute("dev-input-id", item.id.toString());
-                    companyInput && followFavouriteLogic(companyInput);
-                    companyInput &&
-                        setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id));
-                    companyWrapper?.appendChild(companyItem);
-                });
-                companyCard
-                    .querySelector(`[dev-target="empty-state"]`)
-                    ?.classList.add("hide");
-            }
-            else {
-                companyCard
-                    .querySelector(`[dev-target="empty-state"]`)
-                    ?.classList.remove("hide");
-                companyWrapper?.classList.add("hide");
-            }
-            const peopleWrapper = peopleCard.querySelector(`[dev-target="people-wrapper"]`);
+            const companyWrappers = Array.from(companyCards).map((companyCard) => companyCard.querySelector(`[dev-target="company-wrapper"]`));
+            companyWrappers.forEach((companyWrapper) => {
+                if (insight["companies-mentioned"].length > 0) {
+                    insight["companies-mentioned"].forEach((item) => {
+                        const companyItem = companyItemTemplate.cloneNode(true);
+                        const companyPictureLink = companyItem.querySelector(`[dev-target="company-picture-link"]`);
+                        const companyLink = companyItem.querySelector(`[dev-target="company-link"]`);
+                        const companyInput = companyItem.querySelector(`[dev-target="company-input"]`);
+                        const companyImage = companyItem.querySelector(`[dev-target="company-image"]`);
+                        if (item.company_logo) {
+                            companyImage.src = item.company_logo.url;
+                        }
+                        else {
+                            companyImage.src =
+                                "https://logo.clearbit.com/" +
+                                    item["company-website"];
+                            fetch("https://logo.clearbit.com/" +
+                                item["company-website"]).catch(() => (companyImage.src =
+                                "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
+                        }
+                        companyPictureLink.href = "/company/" + item.slug;
+                        companyLink.href = "/company/" + item.slug;
+                        companyLink.textContent = item.name;
+                        fakeCheckboxToggle(companyInput);
+                        companyInput?.setAttribute("dev-input-type", "company_id");
+                        companyInput?.setAttribute("dev-input-id", item.id.toString());
+                        companyInput && followFavouriteLogic(companyInput);
+                        companyInput &&
+                            setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id));
+                        companyWrapper?.appendChild(companyItem);
+                    });
+                    companyCards.forEach((companyCard) => companyCard
+                        .querySelector(`[dev-target="empty-state"]`)
+                        ?.classList.add("hide"));
+                }
+                else {
+                    companyCards.forEach((companyCard) => companyCard
+                        .querySelector(`[dev-target="empty-state"]`)
+                        ?.classList.remove("hide"));
+                    companyWrapper?.classList.add("hide");
+                }
+            });
             const sourceDocumentWrapper = sourceDocumentCard.querySelector(`[dev-target="source-document-wrapper"]`);
             if (insight.source_document_id.length > 0) {
                 insight.source_document_id.forEach((sourceDocument) => {
@@ -178,47 +179,55 @@ document.addEventListener("DOMContentLoaded", async () => {
                     ?.classList.remove("hide");
                 sourceDocumentWrapper?.classList.add("hide");
             }
-            if (insight.people_id.length > 0) {
-                insight.people_id.forEach((person) => {
-                    const peopleItem = peopleItemTemplate.cloneNode(true);
-                    const personItemLink = peopleItem.querySelector(`[dev-target="people-link"]`);
-                    const companyItemLink = peopleItem.querySelector(`[dev-target="company-link"]`);
-                    const personTitleName = person.title;
-                    const personName = `${person.name}${personTitleName && (", " + truncateText(personTitleName, 30))}`;
-                    const personLink = "/person/" + person.slug;
-                    const companyName = person._company?.name;
-                    const companyLink = "/company/" + person._company?.slug;
-                    personItemLink.textContent = personName;
-                    personItemLink.href = personLink;
-                    if (companyName) {
-                        companyItemLink.textContent = companyName;
-                    }
-                    companyItemLink.href = companyLink;
-                    peopleWrapper?.appendChild(peopleItem);
-                });
-                peopleCard
-                    .querySelector(`[dev-target="empty-state"]`)
-                    ?.classList.add("hide");
-            }
-            else {
-                peopleCard
-                    .querySelector(`[dev-target="empty-state"]`)
-                    ?.classList.remove("hide");
-                peopleWrapper?.classList.add("hide");
-            }
-            const eventWrapper = eventCard.querySelector(`[dev-target="event-wrapper"]`);
-            if (insight.event_details) {
-                const eventItem = eventItemTemplate.cloneNode(true);
-                eventItem.textContent = insight.event_details.name;
-                eventItem.href = "/event/" + insight.event_details.slug;
-                eventWrapper?.append(eventItem);
-            }
-            else {
-                eventCard
-                    .querySelector(`[dev-target="empty-state"]`)
-                    ?.classList.remove("hide");
-                eventWrapper?.classList.add("hide");
-            }
+            const peopleWrappers = Array.from(peopleCards).map((peopleCard) => peopleCard.querySelector(`[dev-target="people-wrapper"]`));
+            peopleWrappers.forEach((peopleWrapper) => {
+                if (insight.people_id.length > 0) {
+                    insight.people_id.forEach((person) => {
+                        const peopleItem = peopleItemTemplate.cloneNode(true);
+                        const personItemLink = peopleItem.querySelector(`[dev-target="people-link"]`);
+                        const companyItemLink = peopleItem.querySelector(`[dev-target="company-link"]`);
+                        const personTitleName = person.title;
+                        const personName = `${person.name}${personTitleName && (", " + truncateText(personTitleName, 30))}`;
+                        const personLink = "/person/" + person.slug;
+                        const companyName = person._company?.name;
+                        const companyLink = "/company/" + person._company?.slug;
+                        personItemLink.textContent = personName;
+                        personItemLink.href = personLink;
+                        if (companyName) {
+                            companyItemLink.textContent = companyName;
+                        }
+                        companyItemLink.href = companyLink;
+                        peopleWrapper?.appendChild(peopleItem);
+                    });
+                    peopleCards.forEach((peopleCard) => peopleCard
+                        .querySelector(`[dev-target="empty-state"]`)
+                        ?.classList.add("hide"));
+                }
+                else {
+                    peopleCards.forEach((peopleCard) => peopleCard
+                        .querySelector(`[dev-target="empty-state"]`)
+                        ?.classList.remove("hide"));
+                    peopleWrapper?.classList.add("hide");
+                }
+            });
+            const eventWrappers = Array.from(eventCards).map((eventCard) => eventCard.querySelector(`[dev-target="event-wrapper"]`));
+            eventWrappers.forEach((eventWrapper) => {
+                if (insight.event_details) {
+                    const eventItem = eventItemTemplate.cloneNode(true);
+                    eventItem.textContent = insight.event_details.name;
+                    eventItem.href = "/event/" + insight.event_details.slug;
+                    eventWrapper?.append(eventItem);
+                    eventCards.forEach((eventCard) => eventCard
+                        .querySelector(`[dev-target="empty-state"]`)
+                        ?.classList.add("hide"));
+                }
+                else {
+                    eventCards.forEach((eventCard) => eventCard
+                        .querySelector(`[dev-target="empty-state"]`)
+                        ?.classList.remove("hide"));
+                    eventWrapper?.classList.add("hide");
+                }
+            });
             insightTemplate.classList.remove("hide-template");
         }
     }
