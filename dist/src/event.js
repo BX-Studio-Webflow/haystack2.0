@@ -28,8 +28,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const eventSlug = searchParams.get("name");
     let userFollowingAndFavourite = null;
     let xanoToken = null;
-    const eventCard = qs("[dev-target=event-card]");
-    const cardSkeleton = qs("[dev-target=card-skeleton]");
+    const eventCards = qsa("[dev-target=event-card]");
+    const cardSkeletons = qsa("[dev-target=card-skeleton]");
     const insightsSkeleton = qs("[dev-target=skeleton-insights]");
     const eventDetails = qsa("[dev-event-details]");
     const insightSearchInput = qs("[dev-search-target]");
@@ -163,6 +163,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     function paginationLogic(insight, eventSlug) {
         const paginationTarget = qs(`[dev-target="all-tab-pagination_wrapper"]`);
         const { curPage, nextPage, prevPage, pageTotal, itemsReceived } = insight;
+        if (!nextPage)
+            return;
         const paginationWrapper = paginationTarget.closest(`[dev-target="insight-pagination-wrapper"]`);
         const pagination = paginationTemplate.cloneNode(true);
         const prevBtn = pagination.querySelector(`[dev-target=pagination-previous]`);
@@ -478,59 +480,61 @@ document.addEventListener("DOMContentLoaded", async () => {
             const event = res.getBody();
             qs("title").textContent = event.name;
             console.log("event", event);
-            const eventName = eventCard.querySelector(`[dev-target=event-name]`);
-            const eventDatesWrapper = eventCard.querySelector(`[dev-target=dates-wrapper]`);
-            const eventVenueWrapper = eventCard.querySelector(`[dev-target=venue-wrapper]`);
-            const eventCityWrapper = eventCard.querySelector(`[dev-target=city-wrapper]`);
-            const eventDesc = eventCard.querySelector(`[dev-target=richtext]`);
-            const eventImageWrapper = eventCard.querySelector(`[dev-target=event-image-wrapper]`);
-            const eventImageLink = eventImageWrapper?.querySelector(`[dev-target=event-picture-link]`);
-            const eventImage = eventImageWrapper?.querySelector(`[dev-target=event-image]`);
-            const eventInput = eventImageWrapper?.querySelector(`[dev-target=event-input]`);
-            eventName.textContent = event.name;
-            eventDesc.innerHTML = event["event-description"];
-            if (event["event-start-date"]) {
-                const eventStartDate = new Date(event["event-start-date"]);
-                const month = eventStartDate.toLocaleDateString("en-US", { month: "short" });
-                const day = eventStartDate.toLocaleDateString("en-US", { day: "2-digit" });
-                eventDatesWrapper.querySelector("[dev-start-month]").textContent = month;
-                eventDatesWrapper.querySelector("[dev-start-day]").textContent = day;
-            }
-            else {
-                eventVenueWrapper?.classList.add("hide");
-            }
-            if (event["event-end-date"]) {
-                const eventEndDate = new Date(event["event-end-date"]);
-                const month = eventEndDate.toLocaleDateString("en-US", { month: "short" });
-                const day = eventEndDate.toLocaleDateString("en-US", { day: "2-digit" });
-                const year = eventEndDate.toLocaleDateString("en-US", { year: "numeric" });
-                eventDatesWrapper.querySelector("[dev-end-month]").textContent = month;
-                eventDatesWrapper.querySelector("[dev-end-day]").textContent = day;
-                eventDatesWrapper.querySelector("[dev-end-year]").textContent = year;
-            }
-            else {
-                // eventVenueWrapper?.classList.add("hide")
-            }
-            if (event["event-venue-name"]) {
-                eventVenueWrapper.querySelector(`[dev-target=venue-name]`).textContent = event["event-venue-name"];
-            }
-            else {
-                eventVenueWrapper?.classList.add("hide");
-            }
-            if (event["event-city-state"]) {
-                eventCityWrapper.querySelector(`[dev-target=city-name]`).textContent = event["event-city-state"];
-            }
-            else {
-                eventCityWrapper?.classList.add("hide");
-            }
-            cardSkeleton.remove();
-            eventCard.classList.remove("dev-hide");
-            fakeCheckboxToggle(eventInput);
-            eventInput?.setAttribute("dev-input-type", "event_id");
-            eventInput?.setAttribute("dev-input-id", event.id.toString());
-            eventInput && followFavouriteLogic(eventInput);
-            eventInput &&
-                setCheckboxesInitialState(eventInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.event_id));
+            eventCards.forEach((eventCard) => {
+                const eventName = eventCard.querySelector(`[dev-target=event-name]`);
+                const eventDatesWrapper = eventCard.querySelector(`[dev-target=dates-wrapper]`);
+                const eventVenueWrapper = eventCard.querySelector(`[dev-target=venue-wrapper]`);
+                const eventCityWrapper = eventCard.querySelector(`[dev-target=city-wrapper]`);
+                const eventDesc = eventCard.querySelector(`[dev-target=richtext]`);
+                const eventImageWrapper = eventCard.querySelector(`[dev-target=event-image-wrapper]`);
+                const eventImageLink = eventImageWrapper?.querySelector(`[dev-target=event-picture-link]`);
+                const eventImage = eventImageWrapper?.querySelector(`[dev-target=event-image]`);
+                const eventInput = eventImageWrapper?.querySelector(`[dev-target=event-input]`);
+                eventName.textContent = event.name;
+                eventDesc.innerHTML = event["event-description"];
+                if (event["event-start-date"]) {
+                    const eventStartDate = new Date(event["event-start-date"]);
+                    const month = eventStartDate.toLocaleDateString("en-US", { month: "short" });
+                    const day = eventStartDate.toLocaleDateString("en-US", { day: "2-digit" });
+                    eventDatesWrapper.querySelector("[dev-start-month]").textContent = month;
+                    eventDatesWrapper.querySelector("[dev-start-day]").textContent = day;
+                }
+                else {
+                    eventVenueWrapper?.classList.add("hide");
+                }
+                if (event["event-end-date"]) {
+                    const eventEndDate = new Date(event["event-end-date"]);
+                    const month = eventEndDate.toLocaleDateString("en-US", { month: "short" });
+                    const day = eventEndDate.toLocaleDateString("en-US", { day: "2-digit" });
+                    const year = eventEndDate.toLocaleDateString("en-US", { year: "numeric" });
+                    eventDatesWrapper.querySelector("[dev-end-month]").textContent = month;
+                    eventDatesWrapper.querySelector("[dev-end-day]").textContent = day;
+                    eventDatesWrapper.querySelector("[dev-end-year]").textContent = year;
+                }
+                else {
+                    // eventVenueWrapper?.classList.add("hide")
+                }
+                if (event["event-venue-name"]) {
+                    eventVenueWrapper.querySelector(`[dev-target=venue-name]`).textContent = event["event-venue-name"];
+                }
+                else {
+                    eventVenueWrapper?.classList.add("hide");
+                }
+                if (event["event-city-state"]) {
+                    eventCityWrapper.querySelector(`[dev-target=city-name]`).textContent = event["event-city-state"];
+                }
+                else {
+                    eventCityWrapper?.classList.add("hide");
+                }
+                cardSkeletons.forEach((cardSkeleton) => cardSkeleton.remove());
+                eventCard.classList.remove("dev-hide");
+                fakeCheckboxToggle(eventInput);
+                eventInput?.setAttribute("dev-input-type", "event_id");
+                eventInput?.setAttribute("dev-input-id", event.id.toString());
+                eventInput && followFavouriteLogic(eventInput);
+                eventInput &&
+                    setCheckboxesInitialState(eventInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.event_id));
+            });
             eventDetails.forEach((item) => {
                 item.classList.remove("opacity-hide");
             });

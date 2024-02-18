@@ -28,8 +28,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const technologySlug = searchParams.get("name");
     let userFollowingAndFavourite = null;
     let xanoToken = null;
-    const techCatCard = qs("[dev-target=tech-cat-card]");
-    const cardSkeleton = qs("[dev-target=card-skeleton]");
+    const techCatCards = qsa("[dev-target=tech-cat-card]");
+    const cardSkeletons = qsa("[dev-target=card-skeleton]");
     const insightsSkeleton = qs("[dev-target=skeleton-insights]");
     const eventDetails = qsa("[dev-event-details]");
     const insightSearchInput = qs("[dev-search-target]");
@@ -163,6 +163,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     function paginationLogic(insight, technologySlug) {
         const paginationTarget = qs(`[dev-target="all-tab-pagination_wrapper"]`);
         const { curPage, nextPage, prevPage, pageTotal, itemsReceived } = insight;
+        if (!nextPage)
+            return;
         const paginationWrapper = paginationTarget.closest(`[dev-target="insight-pagination-wrapper"]`);
         const pagination = paginationTemplate.cloneNode(true);
         const prevBtn = pagination.querySelector(`[dev-target=pagination-previous]`);
@@ -478,20 +480,22 @@ document.addEventListener("DOMContentLoaded", async () => {
             const event = res.getBody();
             qs("title").textContent = event.name;
             console.log("event", event);
-            const techCatName = techCatCard.querySelector(`[dev-target=event-name]`);
-            const eventImageWrapper = techCatCard.querySelector(`[dev-target=event-image-wrapper]`);
-            const eventImageLink = eventImageWrapper?.querySelector(`[dev-target=event-picture-link]`);
-            const eventImage = eventImageWrapper?.querySelector(`[dev-target=event-image]`);
-            const eventInput = eventImageWrapper?.querySelector(`[dev-target=event-input]`);
-            techCatName.textContent = event.name;
-            cardSkeleton.remove();
-            techCatCard.classList.remove("dev-hide");
-            fakeCheckboxToggle(eventInput);
-            eventInput?.setAttribute("dev-input-type", "technology_category_id");
-            eventInput?.setAttribute("dev-input-id", event.id.toString());
-            eventInput && followFavouriteLogic(eventInput);
-            eventInput &&
-                setCheckboxesInitialState(eventInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.technology_category_id));
+            techCatCards.forEach((techCatCard) => {
+                const techCatName = techCatCard.querySelector(`[dev-target=event-name]`);
+                const eventImageWrapper = techCatCard.querySelector(`[dev-target=event-image-wrapper]`);
+                const eventImageLink = eventImageWrapper?.querySelector(`[dev-target=event-picture-link]`);
+                const eventImage = eventImageWrapper?.querySelector(`[dev-target=event-image]`);
+                const eventInput = eventImageWrapper?.querySelector(`[dev-target=event-input]`);
+                techCatName.textContent = event.name;
+                cardSkeletons.forEach((cardSkeleton) => cardSkeleton.remove());
+                techCatCard.classList.remove("dev-hide");
+                fakeCheckboxToggle(eventInput);
+                eventInput?.setAttribute("dev-input-type", "technology_category_id");
+                eventInput?.setAttribute("dev-input-id", event.id.toString());
+                eventInput && followFavouriteLogic(eventInput);
+                eventInput &&
+                    setCheckboxesInitialState(eventInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.technology_category_id));
+            });
             eventDetails.forEach((item) => {
                 item.classList.remove("opacity-hide");
             });

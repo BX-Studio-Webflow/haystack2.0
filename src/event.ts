@@ -32,8 +32,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   let userFollowingAndFavourite: UserFollowingAndFavourite | null = null;
   let xanoToken: string | null = null;
 
-  const eventCard = qs("[dev-target=event-card]");
-  const cardSkeleton = qs("[dev-target=card-skeleton]");
+  const eventCards = qsa("[dev-target=event-card]");
+  const cardSkeletons = qsa("[dev-target=card-skeleton]");
   const insightsSkeleton = qs("[dev-target=skeleton-insights]");
   const eventDetails = qsa("[dev-event-details]");
 
@@ -221,6 +221,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const paginationTarget = qs(`[dev-target="all-tab-pagination_wrapper"]`);
 
     const { curPage, nextPage, prevPage, pageTotal, itemsReceived } = insight;
+    if(!nextPage) return;
     const paginationWrapper = paginationTarget.closest(
       `[dev-target="insight-pagination-wrapper"]`
     );
@@ -667,6 +668,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       qs("title").textContent = event.name
       console.log("event", event);
 
+      eventCards.forEach((eventCard)=>{
       const eventName = eventCard.querySelector<HTMLHeadingElement>(
         `[dev-target=event-name]`
       );
@@ -729,7 +731,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         eventCityWrapper?.classList.add("hide")
       }
 
-      cardSkeleton.remove()
+      cardSkeletons.forEach((cardSkeleton)=>cardSkeleton.remove());
       eventCard.classList.remove("dev-hide")
 
       fakeCheckboxToggle(eventInput!);
@@ -743,7 +745,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             userFollowingAndFavourite!.user_following.event_id
           )
         );
-
+      })
       eventDetails.forEach((item) => {
         item.classList.remove("opacity-hide");
       });
