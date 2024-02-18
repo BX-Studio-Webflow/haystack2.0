@@ -724,7 +724,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     // pagination.style.display = pageTotal === 1 ? "none" : "flex";
 
-    if(nextPage === null){
+    if(nextPage === null && prevPage === null){
       paginationTarget?.classList.add("hide")
     };
     paginationTarget.appendChild(pagination);

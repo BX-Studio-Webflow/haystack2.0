@@ -564,7 +564,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 // getInsights(endPoint, { page: curPage - 1 }, tagTarget);
             });
         // pagination.style.display = pageTotal === 1 ? "none" : "flex";
-        if (nextPage === null) {
+        if (nextPage === null && prevPage === null) {
             paginationTarget?.classList.add("hide");
         }
         ;
