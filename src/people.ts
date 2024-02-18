@@ -32,10 +32,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   let userFollowingAndFavourite: UserFollowingAndFavourite | null = null;
   let xanoToken: string | null = null;
 
-  const personCard = qs("[dev-target=person-card]");
-  const cardSkeleton = qs("[dev-target=card-skeleton]");
+  const personCards = qsa("[dev-target=person-card]");
+  const cardSkeletons = qsa("[dev-target=card-skeleton]");
   const insightsSkeleton = qs("[dev-target=skeleton-insights]");
-  const personDetails = qs("[dev-target=person-details]");
+  const personDetails = qsa("[dev-target=person-details]");
 
   const insightSearchInput = qs<HTMLInputElement>("[dev-search-target]");
   const insightFilterForm = qs<HTMLFormElement>("[dev-target=filter-form]");
@@ -190,6 +190,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       qs("title").textContent = person.name
       console.log("person", person);
 
+      personCards.forEach((personCard)=>{
       const personName = personCard.querySelector<HTMLHeadingElement>(
         `[dev-target=person-name]`
       );
@@ -232,7 +233,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       personEmail!.href = person.email ? "mailto:" + person.email : "#";
       personEmail?.classList[person.email ? "remove":"add"]("hide")
 
-      cardSkeleton.remove()
+      cardSkeletons.forEach((cardSkeleton)=>cardSkeleton.remove());
       personCard.classList.remove("dev-hide")
 
       fakeCheckboxToggle(personInput!);
@@ -247,8 +248,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           )
         );
 
-      personDetails.classList.remove("opacity-hide");
-
+      })
+      personDetails.forEach((personDetail)=>personDetail.classList.remove("opacity-hide"))
       return person;
     } catch (error) {
       console.log("getPerson_error", error);
@@ -661,6 +662,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const paginationTarget = qs(`[dev-target="all-tab-pagination_wrapper"]`);
 
     const { curPage, nextPage, prevPage, pageTotal, itemsReceived } = insight;
+    if(!nextPage) return;
     const paginationWrapper = paginationTarget.closest(
       `[dev-target="insight-pagination-wrapper"]`
     );

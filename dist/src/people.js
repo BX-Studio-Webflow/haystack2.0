@@ -28,10 +28,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const personSlug = searchParams.get("name");
     let userFollowingAndFavourite = null;
     let xanoToken = null;
-    const personCard = qs("[dev-target=person-card]");
-    const cardSkeleton = qs("[dev-target=card-skeleton]");
+    const personCards = qsa("[dev-target=person-card]");
+    const cardSkeletons = qsa("[dev-target=card-skeleton]");
     const insightsSkeleton = qs("[dev-target=skeleton-insights]");
-    const personDetails = qs("[dev-target=person-details]");
+    const personDetails = qsa("[dev-target=person-details]");
     const insightSearchInput = qs("[dev-search-target]");
     const insightFilterForm = qs("[dev-target=filter-form]");
     const insightClearFilters = qs("[dev-target=clear-filters]");
@@ -142,34 +142,36 @@ document.addEventListener("DOMContentLoaded", async () => {
             const person = res.getBody();
             qs("title").textContent = person.name;
             console.log("person", person);
-            const personName = personCard.querySelector(`[dev-target=person-name]`);
-            const personEmail = personCard.querySelector(`[dev-target=email-link]`);
-            const personTitle = personCard.querySelector(`[dev-target=person-title]`);
-            const personBio = personCard.querySelector(`[dev-target=person-bio]`);
-            const personCompanyLink = personCard.querySelector(`[dev-target=person-company-link]`);
-            const personLinkedinLink = personCard.querySelector(`[dev-target=linkedin-link]`);
-            const personImageWrapper = personCard.querySelector(`[dev-target=person-image-wrapper]`);
-            const personImageLink = personImageWrapper?.querySelector(`[dev-target=person-picture-link]`);
-            const PersonImage = personImageWrapper?.querySelector(`[dev-target=person-image]`);
-            const personInput = personImageWrapper?.querySelector(`[dev-target=person-input]`);
-            personName.textContent = person.name;
-            personTitle.textContent = person.title;
-            personBio.textContent = person.bio;
-            personCompanyLink.textContent = person.company_details.name;
-            personCompanyLink.href = "company/" + person.company_details.slug;
-            personLinkedinLink.href = person.linkedin;
-            personLinkedinLink?.classList[person.linkedin ? "remove" : "add"]("hide");
-            personEmail.href = person.email ? "mailto:" + person.email : "#";
-            personEmail?.classList[person.email ? "remove" : "add"]("hide");
-            cardSkeleton.remove();
-            personCard.classList.remove("dev-hide");
-            fakeCheckboxToggle(personInput);
-            personInput?.setAttribute("dev-input-type", "people_id");
-            personInput?.setAttribute("dev-input-id", person.id.toString());
-            personInput && followFavouriteLogic(personInput);
-            personInput &&
-                setCheckboxesInitialState(personInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.people_id));
-            personDetails.classList.remove("opacity-hide");
+            personCards.forEach((personCard) => {
+                const personName = personCard.querySelector(`[dev-target=person-name]`);
+                const personEmail = personCard.querySelector(`[dev-target=email-link]`);
+                const personTitle = personCard.querySelector(`[dev-target=person-title]`);
+                const personBio = personCard.querySelector(`[dev-target=person-bio]`);
+                const personCompanyLink = personCard.querySelector(`[dev-target=person-company-link]`);
+                const personLinkedinLink = personCard.querySelector(`[dev-target=linkedin-link]`);
+                const personImageWrapper = personCard.querySelector(`[dev-target=person-image-wrapper]`);
+                const personImageLink = personImageWrapper?.querySelector(`[dev-target=person-picture-link]`);
+                const PersonImage = personImageWrapper?.querySelector(`[dev-target=person-image]`);
+                const personInput = personImageWrapper?.querySelector(`[dev-target=person-input]`);
+                personName.textContent = person.name;
+                personTitle.textContent = person.title;
+                personBio.textContent = person.bio;
+                personCompanyLink.textContent = person.company_details.name;
+                personCompanyLink.href = "company/" + person.company_details.slug;
+                personLinkedinLink.href = person.linkedin;
+                personLinkedinLink?.classList[person.linkedin ? "remove" : "add"]("hide");
+                personEmail.href = person.email ? "mailto:" + person.email : "#";
+                personEmail?.classList[person.email ? "remove" : "add"]("hide");
+                cardSkeletons.forEach((cardSkeleton) => cardSkeleton.remove());
+                personCard.classList.remove("dev-hide");
+                fakeCheckboxToggle(personInput);
+                personInput?.setAttribute("dev-input-type", "people_id");
+                personInput?.setAttribute("dev-input-id", person.id.toString());
+                personInput && followFavouriteLogic(personInput);
+                personInput &&
+                    setCheckboxesInitialState(personInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.people_id));
+            });
+            personDetails.forEach((personDetail) => personDetail.classList.remove("opacity-hide"));
             return person;
         }
         catch (error) {
@@ -424,6 +426,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     function paginationLogic(insight, personSlug) {
         const paginationTarget = qs(`[dev-target="all-tab-pagination_wrapper"]`);
         const { curPage, nextPage, prevPage, pageTotal, itemsReceived } = insight;
+        if (!nextPage)
+            return;
         const paginationWrapper = paginationTarget.closest(`[dev-target="insight-pagination-wrapper"]`);
         const pagination = paginationTemplate.cloneNode(true);
         const prevBtn = pagination.querySelector(`[dev-target=pagination-previous]`);
