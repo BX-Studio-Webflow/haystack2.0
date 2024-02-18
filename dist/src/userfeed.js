@@ -474,8 +474,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             tagTarget = favouriteTabsTarget;
         }
         const { curPage, nextPage, prevPage, pageTotal, itemsReceived } = insight;
-        if (!nextPage)
-            return;
         const paginationWrapper = paginationTarget.closest(`[dev-target="insight-pagination-wrapper"]`);
         const pagination = paginationTemplate.cloneNode(true);
         const prevBtn = pagination.querySelector(`[dev-target=pagination-previous]`);
@@ -608,6 +606,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 getInsights(endPoint, { page: curPage - 1 }, tagTarget);
             });
         // pagination.style.display = pageTotal === 1 ? "none" : "flex";
+        if (nextPage === null) {
+            paginationTarget?.classList.add("hide");
+        }
+        ;
         paginationTarget.appendChild(pagination);
     }
     function insightSearch() {
