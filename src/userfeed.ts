@@ -712,6 +712,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const { curPage, nextPage, prevPage, pageTotal, itemsReceived } = insight;
+    if(!nextPage) return;
     const paginationWrapper = paginationTarget.closest(
       `[dev-target="insight-pagination-wrapper"]`
     );
