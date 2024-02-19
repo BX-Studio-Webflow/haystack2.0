@@ -292,16 +292,28 @@ document.addEventListener("DOMContentLoaded", async () => {
             addTagsToInsight(insightClassArray, tagsWrapperTarget, false);
             // addTagsToInsight(lineOfBusArray, tagsWrapperTarget!, false);
             addTagsToInsight(techCatArray, tagsWrapperTarget, true, "technology_category_id");
-            if (insight.company_details.company_logo) {
+            if (insight.company_details?.company_logo) {
                 companyImage.src = insight.company_details.company_logo.url;
             }
             else {
-                companyImage.src =
-                    "https://logo.clearbit.com/" +
-                        insight.company_details["company-website"];
-                fetch("https://logo.clearbit.com/" +
-                    insight.company_details["company-website"]).catch(() => (companyImage.src =
-                    "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
+                if (insight.company_details && insight.company_details["company-website"]) {
+                    const imageUrl = "https://logo.clearbit.com/" + insight.company_details["company-website"];
+                    fetch(imageUrl)
+                        .then(response => {
+                        if (response.ok) {
+                            companyImage.src = imageUrl;
+                        }
+                        else {
+                            throw new Error("Failed to fetch company logo");
+                        }
+                    })
+                        .catch(() => {
+                        companyImage.src = "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp";
+                    });
+                }
+                else {
+                    companyImage.src = "";
+                }
             }
             insightNameTarget.textContent = insight.name;
             curatedDateTargetWrapper?.classList[curatedDate ? "remove" : "add"]("hide");
@@ -311,7 +323,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             insightLink.setAttribute("href", "/insight/" + insight.slug);
             sourceTarget.setAttribute("href", insight["source-url"]);
             sourceTargetWrapper?.classList[insight["source-url"] ? "remove" : "add"]("hide");
-            companyLink.setAttribute("href", "/company/" + insight.company_details.slug);
+            companyLink.setAttribute("href", "/company/" + insight.company_details?.slug);
             sourceTarget.textContent = insight.source;
             sourceAuthorTargetWrapper.forEach((item) => item.classList[insight.source_author ? "remove" : "add"]("hide"));
             sourceAuthorTarget.textContent = insight.source_author;
