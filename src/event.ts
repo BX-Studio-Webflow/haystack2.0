@@ -693,7 +693,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         eventImageWrapper?.querySelector<HTMLLinkElement>(
           `[dev-target=event-picture-link]`
         );
-      const eventImage = eventImageWrapper?.querySelector(
+      const eventImage = eventImageWrapper?.querySelector<HTMLImageElement>(
         `[dev-target=event-image]`
       );
       const eventInput = eventImageWrapper?.querySelector<HTMLInputElement>(
@@ -702,6 +702,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       eventName!.textContent = event.name;
       eventDesc!.innerHTML = event["event-description"]
+
+      if(event.image && event.image.url && eventImage){
+        eventImage.src = event.image.url
+      }
 
       if(event["event-start-date"]){
         const eventStartDate = new Date(event["event-start-date"])
@@ -897,5 +901,5 @@ interface Event {
   "event-venue-name": string;
   people_id: number[];
   "event-description": string;
-  image: null;
+  image: null | {url:string};
 }

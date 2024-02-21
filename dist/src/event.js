@@ -494,6 +494,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const eventInput = eventImageWrapper?.querySelector(`[dev-target=event-input]`);
                 eventName.textContent = event.name;
                 eventDesc.innerHTML = event["event-description"];
+                if (event.image && event.image.url && eventImage) {
+                    eventImage.src = event.image.url;
+                }
                 if (event["event-start-date"]) {
                     const eventStartDate = new Date(event["event-start-date"]);
                     const month = eventStartDate.toLocaleDateString("en-US", { month: "short" });
