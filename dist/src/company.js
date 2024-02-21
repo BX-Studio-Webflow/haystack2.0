@@ -298,19 +298,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                     ?.classList.remove("hide");
                 keyDocumentsWrapper?.classList.add("hide");
             }
-            company["related-business-entities"].forEach((item) => {
-                const relatedBusinessItem = relatedBusinessItemTemplate.cloneNode(true);
-                const name = relatedBusinessItem.querySelector(`[dev-target=name]`);
-                const description = relatedBusinessItem.querySelector(`[dev-target=description]`);
-                const companyLink = relatedBusinessItem.querySelector(`[dev-target=company-link]`);
-                name.textContent = item.name;
-                description.textContent = item["description-small"];
-                companyLink.href = "/company/" + item.slug;
-                relatedBusinessCard
-                    .querySelector(`[dev-target=related-business-wrapper]`)
-                    ?.appendChild(relatedBusinessItem);
-                window.Webflow.require("ix2").init();
-            });
+            if (company["related-business-entities"].length > 0 && company["related-business-entities"][0] !== null) {
+                company["related-business-entities"].forEach((item) => {
+                    const relatedBusinessItem = relatedBusinessItemTemplate.cloneNode(true);
+                    const name = relatedBusinessItem.querySelector(`[dev-target=name]`);
+                    const description = relatedBusinessItem.querySelector(`[dev-target=description]`);
+                    const companyLink = relatedBusinessItem.querySelector(`[dev-target=company-link]`);
+                    name.textContent = item.name;
+                    description.textContent = item["description-small"];
+                    companyLink.href = "/company/" + item.slug;
+                    relatedBusinessCard
+                        .querySelector(`[dev-target=related-business-wrapper]`)
+                        ?.appendChild(relatedBusinessItem);
+                    window.Webflow.require("ix2").init();
+                });
+            }
             companyDetails.forEach((item) => item.classList.remove("opacity-hide"));
             return company;
         }
