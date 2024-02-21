@@ -280,7 +280,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             const keyDocumentsItemTemplate = keyDocumentsCard.querySelector(`[dev-target="key-documents-template"]`);
             const keyDocumentsWrapper = keyDocumentsCard.querySelector(`[dev-target="key-documents-wrapper"]`);
-            if (company.key_documents.length > 0) {
+            if (company.key_documents.length > 0 && company.key_documents[0] !== null) {
                 company.key_documents.forEach((keyDocument) => {
                     const keyDocumentItem = keyDocumentsItemTemplate.cloneNode(true);
                     const keyDocumentItemLink = keyDocumentItem.querySelector(`[dev-target="key-documents-link"]`);

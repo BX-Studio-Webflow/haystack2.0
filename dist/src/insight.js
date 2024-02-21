@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             addTagsToInsight(insight.technology_category_id, tagsWrapperTarget, true, "technology_category_id");
             const companyWrappers = Array.from(companyCards).map((companyCard) => companyCard.querySelector(`[dev-target="company-wrapper"]`));
             companyWrappers.forEach((companyWrapper) => {
-                if (insight["companies-mentioned"].length > 0) {
+                if (insight["companies-mentioned"].length > 0 && insight["companies-mentioned"][0] !== null) {
                     insight["companies-mentioned"].forEach((item) => {
                         const companyItem = companyItemTemplate.cloneNode(true);
                         const companyPictureLink = companyItem.querySelector(`[dev-target="company-picture-link"]`);
@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
             const sourceDocumentWrapper = sourceDocumentCard.querySelector(`[dev-target="source-document-wrapper"]`);
-            if (insight.source_document_id.length > 0) {
+            if (insight.source_document_id.length > 0 && insight.source_document_id[0] !== null) {
                 insight.source_document_id.forEach((sourceDocument) => {
                     const sourceDocumentItem = sourceDocumentItemTemplate.cloneNode(true);
                     const sourceDocumentItemLink = sourceDocumentItem.querySelector(`[dev-target="source-document-link"]`);
@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             const peopleWrappers = Array.from(peopleCards).map((peopleCard) => peopleCard.querySelector(`[dev-target="people-wrapper"]`));
             peopleWrappers.forEach((peopleWrapper) => {
-                if (insight.people_id.length > 0) {
+                if (insight.people_id.length > 0 && insight.people_id[0] !== null) {
                     insight.people_id.forEach((person) => {
                         const peopleItem = peopleItemTemplate.cloneNode(true);
                         const personItemLink = peopleItem.querySelector(`[dev-target="people-link"]`);
