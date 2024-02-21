@@ -200,7 +200,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       ))
       companyWrappers.forEach((companyWrapper)=>{
 
-        if (insight["companies-mentioned"].length > 0 && insight["companies-mentioned"][0] !== null) {
+        if (insight["companies-mentioned"] && insight["companies-mentioned"].length > 0 && insight["companies-mentioned"][0] !== null) {
           insight["companies-mentioned"].forEach((item) => {
             const companyItem = companyItemTemplate.cloneNode(
               true
@@ -264,7 +264,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const sourceDocumentWrapper = sourceDocumentCard.querySelector(
         `[dev-target="source-document-wrapper"]`
       );
-      if(insight.source_document_id.length > 0 && insight.source_document_id[0] !== null){
+      if(insight.source_document_id && insight.source_document_id.length > 0 && insight.source_document_id[0] !== null){
         insight.source_document_id.forEach((sourceDocument)=>{
           const sourceDocumentItem = sourceDocumentItemTemplate.cloneNode(
             true
@@ -293,7 +293,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         `[dev-target="people-wrapper"]`
       )!)
       peopleWrappers.forEach((peopleWrapper)=>{
-        if (insight.people_id.length > 0 && insight.people_id[0] !== null) {
+        if (insight.people_id && insight.people_id.length > 0 && insight.people_id[0] !== null) {
           insight.people_id.forEach((person) => {
             const peopleItem = peopleItemTemplate.cloneNode(
               true

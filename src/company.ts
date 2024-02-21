@@ -372,7 +372,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           );
       })
 
-      if (company["related-business-entities"].length === 0) {
+      if (company["related-business-entities"] && company["related-business-entities"].length === 0) {
         relatedBusinessCard
           .querySelector(`[dev-target=related-business-empty-state]`)
           ?.classList.remove("hide");
@@ -383,7 +383,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const keyDocumentsWrapper = keyDocumentsCard.querySelector(
         `[dev-target="key-documents-wrapper"]`
       );
-      if(company.key_documents.length > 0 && company.key_documents[0] !== null){
+      if(company.key_documents && company.key_documents.length > 0 && company.key_documents[0] !== null){
         company.key_documents.forEach((keyDocument)=>{
           const keyDocumentItem = keyDocumentsItemTemplate.cloneNode(
             true
@@ -406,7 +406,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           keyDocumentsWrapper?.classList.add("hide");
       }
 
-      if(company["related-business-entities"].length > 0 && company["related-business-entities"][0] !== null){
+      if(company["related-business-entities"] && company["related-business-entities"].length > 0 && company["related-business-entities"][0] !== null){
         company["related-business-entities"].forEach((item) => {
           const relatedBusinessItem = relatedBusinessItemTemplate.cloneNode(
             true
