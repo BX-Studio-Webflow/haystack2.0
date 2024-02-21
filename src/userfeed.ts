@@ -979,7 +979,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function convertArrayOfObjToNumber(data: { id: number }[]) {
-    return data.map((item) => item.id);
+    return data.map((item) => item?.id);
   }
 
   // Function for querying multiple elements by selector

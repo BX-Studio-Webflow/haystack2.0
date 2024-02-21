@@ -694,7 +694,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return document.querySelector(selector);
     }
     function convertArrayOfObjToNumber(data) {
-        return data.map((item) => item.id);
+        return data.map((item) => item?.id);
     }
     // Function for querying multiple elements by selector
     function qsa(selector) {
