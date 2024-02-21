@@ -602,6 +602,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const companyInput = insight.querySelector(`[dev-input-type="company_id"]`);
         const favourite = insight.querySelector(`[dev-input="fav-insight"]`);
         const tagInputs = insight.querySelectorAll(`[dev-input-type="technology_category_id"]`);
+        companyCards.forEach((companyCard) => {
+            const pageCompanyInput = companyCard.querySelector(`[dev-input-type="company_id"]`);
+            pageCompanyInput &&
+                setCheckboxesInitialState(pageCompanyInput, convertArrayOfObjToNumber(userFollowingAndFavourite?.user_following.company_id));
+        });
         companyInput &&
             setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite?.user_following.company_id));
         favourite &&

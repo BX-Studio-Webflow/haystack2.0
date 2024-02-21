@@ -831,6 +831,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       `[dev-input-type="technology_category_id"]`
     );
 
+    companyCards.forEach((companyCard)=>{
+      const pageCompanyInput = companyCard.querySelector<HTMLInputElement>(
+        `[dev-input-type="company_id"]`
+      );
+      pageCompanyInput &&
+      setCheckboxesInitialState(
+        pageCompanyInput,
+        convertArrayOfObjToNumber(
+          userFollowingAndFavourite?.user_following.company_id!
+        )
+      );
+    })
+
     companyInput &&
       setCheckboxesInitialState(
         companyInput,
