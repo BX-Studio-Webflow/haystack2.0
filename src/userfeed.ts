@@ -640,7 +640,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     showCheckbox: boolean,
     type?: "technology_category_id"
   ) {
-    tagArray.forEach((item) => {
+    tagArray?.forEach((item) => {
       if (typeof item === "object" && item !== null) {
         const newTag = insightTagTemplate.cloneNode(true) as HTMLDivElement;
         const tagCheckbox = newTag.querySelector<HTMLDivElement>(

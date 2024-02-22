@@ -429,7 +429,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
     function addTagsToInsight(tagArray, targetWrapper, showCheckbox, type) {
-        tagArray.forEach((item) => {
+        tagArray?.forEach((item) => {
             if (typeof item === "object" && item !== null) {
                 const newTag = insightTagTemplate.cloneNode(true);
                 const tagCheckbox = newTag.querySelector(`[dev-target=fake-checkbox]`);
