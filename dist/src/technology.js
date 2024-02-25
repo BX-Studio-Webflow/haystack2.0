@@ -466,6 +466,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const companyInput = insight.querySelector(`[dev-input-type="company_id"]`);
         const favourite = insight.querySelector(`[dev-input="fav-insight"]`);
         const tagInputs = insight.querySelectorAll(`[dev-input-type="technology_category_id"]`);
+        techCatCards.forEach((techCatCard) => {
+            const pageTechCatInput = techCatCard.querySelector(`[dev-input-type="technology_category_id"]`);
+            pageTechCatInput &&
+                setCheckboxesInitialState(pageTechCatInput, convertArrayOfObjToNumber(userFollowingAndFavourite?.user_following.technology_category_id));
+        });
         companyInput &&
             setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite?.user_following.company_id));
         favourite &&

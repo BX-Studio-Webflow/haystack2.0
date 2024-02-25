@@ -639,6 +639,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       `[dev-input-type="technology_category_id"]`
     );
 
+    techCatCards.forEach((techCatCard)=>{
+      const pageTechCatInput = techCatCard.querySelector<HTMLInputElement>(
+        `[dev-input-type="technology_category_id"]`
+      );
+      pageTechCatInput &&
+      setCheckboxesInitialState(
+        pageTechCatInput,
+        convertArrayOfObjToNumber(
+          userFollowingAndFavourite?.user_following.technology_category_id!
+        )
+      );
+    });
+
     companyInput &&
       setCheckboxesInitialState(
         companyInput,

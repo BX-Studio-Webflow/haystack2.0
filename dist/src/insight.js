@@ -330,6 +330,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             await getUserFollowingAndFavourite();
             // run function to updated all-tab inputs
             console.log("userFollowingAndFavourite-2", userFollowingAndFavourite);
+            // update company checkboxes
+            const companyInputs = qsa(`[dev-input-type="company_id"]`);
+            companyInputs.forEach((companyInput) => {
+                companyInput &&
+                    setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite?.user_following.company_id));
+            });
         }
         catch (error) {
             console.error(`followFavouriteLogic${endPoint}_error`, error);
