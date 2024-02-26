@@ -424,13 +424,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const sourceAuthorTarget = newInsight.querySelector(
         `[dev-target="source-author"]`
       );
-      const favouriteInput = newInsight.querySelector<HTMLInputElement>(
-        `[dev-target=favourite-input]`
-      );
-      const companyInput = newInsight.querySelector<HTMLInputElement>(
-        `[dev-target=company-input]`
-      );
-
+      
       const curatedDate = insight.curated ? formatCuratedDate(insight.curated):"";
       const publishedDate = insight["source-publication-date"]?formatPublishedDate(insight["source-publication-date"]):"";
       const sourceCatArray = insight.source_category_id;
@@ -438,30 +432,40 @@ document.addEventListener("DOMContentLoaded", async () => {
       const insightClassArray = insight.insight_classification_id;
       const lineOfBusArray = insight.line_of_business_id;
       const techCatArray = insight.technology_category_id;
-
-      fakeCheckboxToggle(companyInput!);
-      fakeCheckboxToggle(favouriteInput!);
-
-      favouriteInput?.setAttribute("dev-input-type", "favourite");
-      favouriteInput?.setAttribute("dev-input-id", insight.id.toString());
-      companyInput?.setAttribute("dev-input-type", "company_id");
-      companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
-
-      favouriteInput && followFavouriteLogic(favouriteInput);
-      companyInput && followFavouriteLogic(companyInput);
-
-      favouriteInput &&
-        setCheckboxesInitialState(
-          favouriteInput,
-          userFollowingAndFavourite.user_favourite.insight_id
+      
+      const companyInputs = newInsight.querySelectorAll<HTMLInputElement>(
+        `[dev-target=company-input]`
         );
-      companyInput &&
+      companyInputs.forEach((companyInput)=>{
+        fakeCheckboxToggle(companyInput!);
+        companyInput?.setAttribute("dev-input-type", "company_id");
+        companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
+        companyInput && followFavouriteLogic(companyInput);
+        companyInput &&
         setCheckboxesInitialState(
           companyInput,
           convertArrayOfObjToNumber(
             userFollowingAndFavourite.user_following.company_id
-          )
-        );
+            )
+            );
+          })
+      const favouriteInputs = newInsight.querySelectorAll<HTMLInputElement>(
+        `[dev-target=favourite-input]`
+      );
+      favouriteInputs.forEach((favouriteInput)=>{
+        fakeCheckboxToggle(favouriteInput!);
+  
+        favouriteInput?.setAttribute("dev-input-type", "favourite");
+        favouriteInput?.setAttribute("dev-input-id", insight.id.toString());
+  
+        favouriteInput && followFavouriteLogic(favouriteInput);
+  
+        favouriteInput &&
+          setCheckboxesInitialState(
+            favouriteInput,
+            userFollowingAndFavourite.user_favourite.insight_id
+          );
+      })
 
       addTagsToInsight(sourceCatArray, tagsWrapperTarget!, false);
       addTagsToInsight(companyTypeArray, tagsWrapperTarget!, false);
@@ -629,28 +633,31 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function updateInsightsInputs(insight: HTMLDivElement) {
-    const companyInput = insight.querySelector<HTMLInputElement>(
+    const companyInputs = insight.querySelectorAll<HTMLInputElement>(
       `[dev-input-type="company_id"]`
-    );
-    const favourite = insight.querySelector<HTMLInputElement>(
-      `[dev-input="fav-insight"]`
-    );
-    const tagInputs = insight.querySelectorAll<HTMLInputElement>(
-      `[dev-input-type="technology_category_id"]`
-    );
-
-    companyInput &&
+      );
+    companyInputs.forEach((companyInput)=>{
+      companyInput &&
       setCheckboxesInitialState(
         companyInput,
         convertArrayOfObjToNumber(
           userFollowingAndFavourite?.user_following.company_id!
-        )
+          )
+          );
+        });
+    const favorites = insight.querySelectorAll<HTMLInputElement>(
+      `[dev-input="fav-insight"]`
       );
-    favourite &&
-      setCheckboxesInitialState(
-        favourite,
-        userFollowingAndFavourite?.user_favourite.insight_id!
-      );
+      favorites.forEach((favourite)=>{
+        favourite &&
+          setCheckboxesInitialState(
+            favourite,
+            userFollowingAndFavourite?.user_favourite.insight_id!
+          );
+      })
+    const tagInputs = insight.querySelectorAll<HTMLInputElement>(
+      `[dev-input-type="technology_category_id"]`
+    );
 
     tagInputs?.forEach((tag) => {
       setCheckboxesInitialState(
