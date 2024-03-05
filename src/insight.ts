@@ -84,12 +84,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       const insightRichtext = insightTemplate.querySelector(
         `[dev-target="rich-text"]`
       );
-      const favouriteInput = insightTemplate.querySelector<HTMLInputElement>(
-        `[dev-target=favourite-input]`
-      );
-      const companyInput = insightTemplate.querySelector<HTMLInputElement>(
-        `[dev-target=company-input]`
-      );
       const companyImage = insightTemplate.querySelector<HTMLImageElement>(
         `[dev-target=company-image]`
       );
@@ -126,30 +120,40 @@ document.addEventListener("DOMContentLoaded", async () => {
       const curatedDate = insight.curated ? formatCuratedDate(insight.curated):"";
       const publishedDate = insight["source-publication-date"]?formatPublishedDate(insight["source-publication-date"]):"";
 
+      const favouriteInputs = insightTemplate.querySelectorAll<HTMLInputElement>(
+        `[dev-target=favourite-input]`
+      );
+      const companyInputs = insightTemplate.querySelectorAll<HTMLInputElement>(
+        `[dev-target=company-input]`
+      );
+      companyInputs.forEach((companyInput)=>{
+        fakeCheckboxToggle(companyInput!);
+        companyInput?.setAttribute("dev-input-type", "company_id");
+        companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
+        companyInput && followFavouriteLogic(companyInput);
+        companyInput &&
+          setCheckboxesInitialState(
+            companyInput,
+            convertArrayOfObjToNumber(
+              userFollowingAndFavourite!.user_following.company_id
+            )
+          );
 
-      fakeCheckboxToggle(companyInput!);
-      fakeCheckboxToggle(favouriteInput!);
-
-      favouriteInput?.setAttribute("dev-input-type", "favourite");
-      favouriteInput?.setAttribute("dev-input-id", insight.id.toString());
-      companyInput?.setAttribute("dev-input-type", "company_id");
-      companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
-
-      favouriteInput && followFavouriteLogic(favouriteInput);
-      companyInput && followFavouriteLogic(companyInput);
-
-      favouriteInput &&
-        setCheckboxesInitialState(
-          favouriteInput,
-          userFollowingAndFavourite!.user_favourite.insight_id
-        );
-      companyInput &&
-        setCheckboxesInitialState(
-          companyInput,
-          convertArrayOfObjToNumber(
-            userFollowingAndFavourite!.user_following.company_id
-          )
-        );
+      });
+      favouriteInputs.forEach((favouriteInput)=>{
+        fakeCheckboxToggle(favouriteInput!);
+  
+        favouriteInput?.setAttribute("dev-input-type", "favourite");
+        favouriteInput?.setAttribute("dev-input-id", insight.id.toString());
+  
+        favouriteInput && followFavouriteLogic(favouriteInput);
+  
+        favouriteInput &&
+          setCheckboxesInitialState(
+            favouriteInput,
+            userFollowingAndFavourite!.user_favourite.insight_id
+          );
+      })
 
       if(insight.company_details.company_logo){
         companyImage!.src = insight.company_details.company_logo.url

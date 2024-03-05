@@ -61,8 +61,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const tagsWrapperTarget = insightTemplate.querySelector(`[dev-target=tags-container]`);
             const insightName = insightTemplate.querySelector(`[dev-target="insight-name"]`);
             const insightRichtext = insightTemplate.querySelector(`[dev-target="rich-text"]`);
-            const favouriteInput = insightTemplate.querySelector(`[dev-target=favourite-input]`);
-            const companyInput = insightTemplate.querySelector(`[dev-target=company-input]`);
             const companyImage = insightTemplate.querySelector(`[dev-target=company-image]`);
             const companyLink = insightTemplate.querySelector(`[dev-target=company-link]`);
             const companyPictureLink = insightTemplate.querySelector(`[dev-target=company-picture-link]`);
@@ -76,18 +74,24 @@ document.addEventListener("DOMContentLoaded", async () => {
             const sourceAuthorTarget = insightTemplate.querySelector(`[dev-target="source-author"]`);
             const curatedDate = insight.curated ? formatCuratedDate(insight.curated) : "";
             const publishedDate = insight["source-publication-date"] ? formatPublishedDate(insight["source-publication-date"]) : "";
-            fakeCheckboxToggle(companyInput);
-            fakeCheckboxToggle(favouriteInput);
-            favouriteInput?.setAttribute("dev-input-type", "favourite");
-            favouriteInput?.setAttribute("dev-input-id", insight.id.toString());
-            companyInput?.setAttribute("dev-input-type", "company_id");
-            companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
-            favouriteInput && followFavouriteLogic(favouriteInput);
-            companyInput && followFavouriteLogic(companyInput);
-            favouriteInput &&
-                setCheckboxesInitialState(favouriteInput, userFollowingAndFavourite.user_favourite.insight_id);
-            companyInput &&
-                setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id));
+            const favouriteInputs = insightTemplate.querySelectorAll(`[dev-target=favourite-input]`);
+            const companyInputs = insightTemplate.querySelectorAll(`[dev-target=company-input]`);
+            companyInputs.forEach((companyInput) => {
+                fakeCheckboxToggle(companyInput);
+                companyInput?.setAttribute("dev-input-type", "company_id");
+                companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
+                companyInput && followFavouriteLogic(companyInput);
+                companyInput &&
+                    setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id));
+            });
+            favouriteInputs.forEach((favouriteInput) => {
+                fakeCheckboxToggle(favouriteInput);
+                favouriteInput?.setAttribute("dev-input-type", "favourite");
+                favouriteInput?.setAttribute("dev-input-id", insight.id.toString());
+                favouriteInput && followFavouriteLogic(favouriteInput);
+                favouriteInput &&
+                    setCheckboxesInitialState(favouriteInput, userFollowingAndFavourite.user_favourite.insight_id);
+            });
             if (insight.company_details.company_logo) {
                 companyImage.src = insight.company_details.company_logo.url;
             }
