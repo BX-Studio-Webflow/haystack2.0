@@ -1059,6 +1059,7 @@ interface Insight {
       | 0
     )[];
     "companies-mentioned": number[];
+    companies_mentioned: number[];
     people_id: number[];
     event_id: number;
     company_details: {

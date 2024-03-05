@@ -280,8 +280,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             const keyDocumentsItemTemplate = keyDocumentsCard.querySelector(`[dev-target="key-documents-template"]`);
             const keyDocumentsWrapper = keyDocumentsCard.querySelector(`[dev-target="key-documents-wrapper"]`);
-            if (company.key_documents && company.key_documents.length > 0 && company.key_documents[0] !== null) {
+            if (company.key_documents && company.key_documents.length > 0) {
                 company.key_documents.forEach((keyDocument) => {
+                    if (keyDocument === null)
+                        return;
                     const keyDocumentItem = keyDocumentsItemTemplate.cloneNode(true);
                     const keyDocumentItemLink = keyDocumentItem.querySelector(`[dev-target="key-documents-link"]`);
                     keyDocumentItemLink.textContent = keyDocument.name;
@@ -300,6 +302,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             if (company["related-business-entities"] && company["related-business-entities"].length > 0 && company["related-business-entities"][0] !== null) {
                 company["related-business-entities"].forEach((item) => {
+                    if (item === null)
+                        return;
                     const relatedBusinessItem = relatedBusinessItemTemplate.cloneNode(true);
                     const name = relatedBusinessItem.querySelector(`[dev-target=name]`);
                     const description = relatedBusinessItem.querySelector(`[dev-target=description]`);

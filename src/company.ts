@@ -383,8 +383,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const keyDocumentsWrapper = keyDocumentsCard.querySelector(
         `[dev-target="key-documents-wrapper"]`
       );
-      if(company.key_documents && company.key_documents.length > 0 && company.key_documents[0] !== null){
+      if(company.key_documents && company.key_documents.length > 0 ){
         company.key_documents.forEach((keyDocument)=>{
+          if(keyDocument === null) return;
           const keyDocumentItem = keyDocumentsItemTemplate.cloneNode(
             true
           ) as HTMLDivElement;
@@ -408,6 +409,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if(company["related-business-entities"] && company["related-business-entities"].length > 0 && company["related-business-entities"][0] !== null){
         company["related-business-entities"].forEach((item) => {
+          if(item === null) return;
           const relatedBusinessItem = relatedBusinessItemTemplate.cloneNode(
             true
           ) as HTMLDivElement;
@@ -1017,21 +1019,21 @@ interface Company {
   "fiscal-year": string;
   "description-small": string;
   about: string;
-  people_id: { id: number; name: string; slug: string }[];
+  people_id: ({ id: number; name: string; slug: string }|null)[];
   event_id: { id: number; name: string; slug: string };
   state_local_regulator_id: [];
-  "related-business-entities": {
+  "related-business-entities": ({
     id: number;
     name: string;
     slug: string;
     "description-small": string;
-  }[];
-  key_documents: {
+  }|null)[];
+  key_documents: ({
     id: number;
     name: string;
     slug: string;
     document_url: string;
     document: {url:string};
-  }[];
+  }|null)[];
   company_logo: null | {url:string};
 }

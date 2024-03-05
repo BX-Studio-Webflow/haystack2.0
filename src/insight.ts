@@ -200,8 +200,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       ))
       companyWrappers.forEach((companyWrapper)=>{
 
-        if (insight["companies-mentioned"] && insight["companies-mentioned"].length > 0 && insight["companies-mentioned"][0] !== null) {
-          insight["companies-mentioned"].forEach((item) => {
+        if (insight.companies_mentioned && insight.companies_mentioned.length > 0) {
+          insight.companies_mentioned.forEach((item) => {
+            if (item === null) return;
             const companyItem = companyItemTemplate.cloneNode(
               true
             ) as HTMLDivElement;
@@ -264,8 +265,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const sourceDocumentWrapper = sourceDocumentCard.querySelector(
         `[dev-target="source-document-wrapper"]`
       );
-      if(insight.source_document_id && insight.source_document_id.length > 0 && insight.source_document_id[0] !== null){
+      if(insight.source_document_id && insight.source_document_id.length > 0 ){
         insight.source_document_id.forEach((sourceDocument)=>{
+          if(sourceDocument === null) return;
           const sourceDocumentItem = sourceDocumentItemTemplate.cloneNode(
             true
           ) as HTMLDivElement;
@@ -293,8 +295,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         `[dev-target="people-wrapper"]`
       )!)
       peopleWrappers.forEach((peopleWrapper)=>{
-        if (insight.people_id && insight.people_id.length > 0 && insight.people_id[0] !== null) {
+        if (insight.people_id && insight.people_id.length > 0) {
           insight.people_id.forEach((person) => {
+            if(person === null) return;
             const peopleItem = peopleItemTemplate.cloneNode(
               true
             ) as HTMLDivElement;
@@ -617,7 +620,14 @@ interface InsightResponse {
     "company-website": string;
     company_logo: null | {url:string}
   }[];
-  people_id: {
+  companies_mentioned: ({
+    id: number;
+    name: string;
+    slug: string;
+    "company-website": string;
+    company_logo: null | {url:string}
+  }| null) [];
+  people_id: ({
     id: number;
     name: string;
     title: string;
@@ -628,15 +638,15 @@ interface InsightResponse {
       name: string;
       slug: string;
     };
-  }[];
+  }|null)[];
   event_id: number;
-  source_document_id: {
+  source_document_id: ({
     id: number;
     name: string;
     slug: string;
     document_url: string;
     document: {url:string};
-  }[];
+  }|null)[];
   published: boolean;
   company_details: {
     id: number;
