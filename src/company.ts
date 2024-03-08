@@ -372,7 +372,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           );
       })
 
-      if (company["related-business-entities"] && company["related-business-entities"].length === 0) {
+      if ((company["related-business-entities"] && company["related-business-entities"].length === 0) || company["related-business-entities"] === null) {
         relatedBusinessCard
           .querySelector(`[dev-target=related-business-empty-state]`)
           ?.classList.remove("hide");
@@ -383,6 +383,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       const keyDocumentsWrapper = keyDocumentsCard.querySelector(
         `[dev-target="key-documents-wrapper"]`
       );
+      if(company.key_documents && !company.key_documents.some((item)=>item !== null)){
+        keyDocumentsCard
+          .querySelector(`[dev-target="empty-state"]`)
+          ?.classList.remove("hide");
+          keyDocumentsWrapper?.classList.add("hide");
+      }
       if(company.key_documents && company.key_documents.length > 0 ){
         company.key_documents.forEach((keyDocument)=>{
           if(keyDocument === null) return;
@@ -1027,7 +1033,7 @@ interface Company {
     name: string;
     slug: string;
     "description-small": string;
-  }|null)[];
+  }|null)[] |  null;
   key_documents: ({
     id: number;
     name: string;
