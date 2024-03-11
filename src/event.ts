@@ -856,7 +856,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function formatPublishedDate(inputDate:Date) {
     const date = new Date(inputDate);
-    return `${date.toLocaleString('default', { month: 'long' })} ${date.getDate()}, ${date.getFullYear()}`;
+    return `${date.toLocaleString('default', { month: 'long' })} ${date.getUTCDate()}, ${date.getFullYear()}`;
   }
 
 

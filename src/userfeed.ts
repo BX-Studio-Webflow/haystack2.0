@@ -558,7 +558,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const date = new Date(inputDate);
     return `${date.toLocaleString("default", {
       month: "long",
-    })} ${date.getDate()}, ${date.getFullYear()}`;
+    })} ${date.getUTCDate()}, ${date.getFullYear()}`;
   }
 
   function followFavouriteLogic(input: HTMLInputElement) {
