@@ -717,7 +717,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if(event["event-start-date"]){
         const eventStartDate = new Date(event["event-start-date"])
         const month = eventStartDate.toLocaleDateString("en-US",{month:"short"})
-        const day = eventStartDate.toLocaleDateString("en-US",{day:"2-digit"})
+        const day = eventStartDate.getUTCDate().toString()
         eventDatesWrapper!.querySelector("[dev-start-month]")!.textContent = month
         eventDatesWrapper!.querySelector("[dev-start-day]")!.textContent = day
       }else{
@@ -726,7 +726,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if(event["event-end-date"]){
         const eventEndDate = new Date(event["event-end-date"])
         const month = eventEndDate.toLocaleDateString("en-US",{month:"short"})
-        const day = eventEndDate.toLocaleDateString("en-US",{day:"2-digit"})
+        const day = eventEndDate.getUTCDate().toString()
         const year = eventEndDate.toLocaleDateString("en-US",{year:"numeric"})
         eventDatesWrapper!.querySelector("[dev-end-month]")!.textContent = month
         eventDatesWrapper!.querySelector("[dev-end-day]")!.textContent = day
