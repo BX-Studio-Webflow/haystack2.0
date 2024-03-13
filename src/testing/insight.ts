@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const searchParams = new URLSearchParams(window.location.search);
   const insightSlug = searchParams.get("name");
   const lsUserFollowingFavourite = localStorage.getItem(
-    "user-following-favourite"
+    "pft_user-following-favourite"
   );
   const lsXanoAuthToken = localStorage.getItem("AuthToken");
   if (lsXanoAuthToken) {
@@ -471,7 +471,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const followingAndFavourite = res.getBody() as UserFollowingAndFavourite;
       userFollowingAndFavourite = followingAndFavourite;
       localStorage.setItem(
-        "user-following-favourite",
+        "pft_user-following-favourite",
         JSON.stringify(followingAndFavourite)
       );
 

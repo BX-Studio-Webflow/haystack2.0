@@ -403,7 +403,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         companyInputs.forEach((companyInput)=>{
           fakeCheckboxToggle(companyInput!);
           companyInput?.setAttribute("dev-input-type", "company_id");
-          companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
+          insight.company_id && companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
           companyInput && followFavouriteLogic(companyInput);
           companyInput &&
           setCheckboxesInitialState(
@@ -1029,7 +1029,7 @@ interface Insight {
     created_at: number;
     name: string;
     slug: string;
-    company_id: number;
+    company_id: number | null;
     description: string;
     "insight-detail": string;
     curated: Date | null;

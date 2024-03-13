@@ -277,7 +277,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             companyInputs.forEach((companyInput) => {
                 fakeCheckboxToggle(companyInput);
                 companyInput?.setAttribute("dev-input-type", "company_id");
-                companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
+                insight.company_id && companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
                 companyInput && followFavouriteLogic(companyInput);
                 companyInput &&
                     setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id));

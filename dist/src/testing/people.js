@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!memberStackUserToken) {
         return console.error("No memberstack token");
     }
-    const lsUserFollowingFavourite = localStorage.getItem("user-following-favourite");
+    const lsUserFollowingFavourite = localStorage.getItem("pft_user-following-favourite");
     const lsXanoAuthToken = localStorage.getItem("AuthToken");
     if (lsXanoAuthToken) {
         xanoToken = lsXanoAuthToken;
@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const followingAndFavourite = res.getBody();
             const { user_following } = followingAndFavourite;
             userFollowingAndFavourite = followingAndFavourite;
-            localStorage.setItem("user-following-favourite", JSON.stringify(followingAndFavourite));
+            localStorage.setItem("pft_user-following-favourite", JSON.stringify(followingAndFavourite));
             return followingAndFavourite;
         }
         catch (error) {

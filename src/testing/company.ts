@@ -1,14 +1,14 @@
 // import { XanoClient } from "@xano/js-sdk";
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const xano_individual_pages = new XanoClient({
-    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:CvEH0ZFk",
+  const xano_pft_individual_pages = new XanoClient({
+    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:etaCI8bN",
   });
   const xano_wmx = new XanoClient({
     apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140",
   });
-  const xano_userFeed = new XanoClient({
-    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU",
+  const xano_pft_userFeed = new XanoClient({
+    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:BplCmtFs",
   });
 
   const searchObject: SearchObject = {
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const lsUserFollowingFavourite = localStorage.getItem(
-    "user-following-favourite"
+    "pft_user-following-favourite"
   );
   const lsXanoAuthToken = localStorage.getItem("AuthToken");
   if (lsUserFollowingFavourite) {
@@ -82,8 +82,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   if (xanoToken) {
-    xano_userFeed.setAuthToken(xanoToken);
-    xano_individual_pages.setAuthToken(xanoToken);
+    xano_pft_userFeed.setAuthToken(xanoToken);
+    xano_pft_individual_pages.setAuthToken(xanoToken);
     getXanoAccessToken(memberStackUserToken);
   } else {
     await getXanoAccessToken(memberStackUserToken);
@@ -99,8 +99,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         memberstack_token: memberstackToken,
       });
       const xanoAuthToken = res.getBody().authToken as string;
-      xano_userFeed.setAuthToken(xanoAuthToken);
-      xano_individual_pages.setAuthToken(xanoAuthToken);
+      xano_pft_userFeed.setAuthToken(xanoAuthToken);
+      xano_pft_individual_pages.setAuthToken(xanoAuthToken);
       return xanoAuthToken;
     } catch (error) {
       console.log("getXanoAccessToken_error", error);
@@ -110,11 +110,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function getUserFollowingAndFavourite() {
     try {
-      const res = await xano_userFeed.get("/user-following-and-favourite");
+      const res = await xano_pft_userFeed.get("/user-following-and-favourite");
       const followingAndFavourite = res.getBody() as UserFollowingAndFavourite;
       userFollowingAndFavourite = followingAndFavourite;
       localStorage.setItem(
-        "user-following-favourite",
+        "pft_user-following-favourite",
         JSON.stringify(followingAndFavourite)
       );
 
@@ -192,7 +192,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       offset = 0,
     } = payload;
     try {
-      const res = await xano_individual_pages.get("/company_insights", {
+      const res = await xano_pft_individual_pages.get("/company_insights", {
         slug,
         page,
         perPage,
@@ -255,7 +255,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function getCompany(slug: string) {
     try {
-      const res = await xano_individual_pages.get("/company", {
+      const res = await xano_pft_individual_pages.get("/company", {
         slug,
       });
       const company = res.getBody() as Company;
@@ -423,7 +423,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   
           name!.textContent = item.name;
           description!.textContent = item["description-small"];
-          companyLink!.href = "/company/" + item.slug;
+          companyLink!.href = "/pft/company_pft/" + item.slug;
   
           relatedBusinessCard
             .querySelector(`[dev-target=related-business-wrapper]`)
@@ -559,12 +559,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       curatedDateTarget!.textContent = curatedDate ?? "";
       publishedDateTarget!.textContent = publishedDate ?? "";
       publishedDateTargetWrapper.forEach((item)=>item.classList[publishedDate ? "remove":"add"]("hide"))
-      insightLink!.setAttribute("href", "/insight/" + insight.slug);
+      insightLink!.setAttribute("href", "/pft/insight_pft/" + insight.slug);
       sourceTarget!.setAttribute("href", insight["source-url"]);
       sourceTargetWrapper?.classList[insight["source-url"] ? "remove":"add"]("hide")
       companyLink!.setAttribute(
         "href",
-        "/company/" + insight.company_details.slug
+        "/pft/company_pft/" + insight.company_details.slug
       );
       sourceTarget!.textContent = insight.source;
       sourceAuthorTargetWrapper.forEach((item)=>item.classList[insight.source_author ? "remove":"add"]("hide"))
@@ -752,7 +752,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const endPoint =
       type === "favourite" ? "/toggle-favourite" : "/toggle-follow";
     try {
-      const res = await xano_userFeed.get(endPoint, {
+      const res = await xano_pft_userFeed.get(endPoint, {
         id: Number(id),
         target: type,
       });
@@ -787,7 +787,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   ) {
     const { page = 0, perPage = 0, offset = 0 } = payload;
     try {
-      const res = await xano_individual_pages.get(endPoint, {
+      const res = await xano_pft_individual_pages.get(endPoint, {
         page,
         perPage,
         offset,
@@ -930,7 +930,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           newTag.style.cursor = "pointer"
           newTag.querySelector<HTMLLabelElement>(`[dev-fake-checkbox-wrapper]`)!.style.cursor = "pointer"
           const anchor = document.createElement('a');
-          anchor.href = `/technology/${item.slug}`
+          anchor.href = `/pft/technology_pft/${item.slug}`
           anchor.textContent = tagSpan!.textContent
           anchor.style.cursor = "pointer"
           anchor.classList.add("tag-span-name")

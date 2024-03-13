@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const name = companyItem.querySelector(`[dev-target=name]`);
                 const about = companyItem.querySelector(`[dev-target=about]`);
                 const smallDesc = companyItem.querySelector(`[dev-target=small-desc]`);
-                companyItem.href = "/company/" + company.slug;
+                companyItem.href = "/pft/company_pft/" + company.slug;
                 name.textContent = company.name;
                 about.textContent = removeHTMLTags(company.about);
                 smallDesc.textContent = company["description-small"];
@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const source = insightItem.querySelector(`[dev-target=source]`);
                 const insightDetails = insightItem.querySelector(`[dev-target=insight-detail]`);
                 const description = insightItem.querySelector(`[dev-target=description]`);
-                insightItem.href = "/insight/" + insight.slug;
+                insightItem.href = "/pft/insight_pft/" + insight.slug;
                 name.textContent = insight.name;
                 insightDetails.textContent = removeHTMLTags(insight["insight-detail"]);
                 description.textContent = insight.description;
@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const name = personItem.querySelector(`[dev-target=name]`);
                 const title = personItem.querySelector(`[dev-target=title]`);
                 const bio = personItem.querySelector(`[dev-target=bio]`);
-                personItem.href = "/person/" + person.slug;
+                personItem.href = "/pft/person_pft/" + person.slug;
                 name.textContent = person.name;
                 title.textContent = person.title;
                 bio.textContent = person.bio;
@@ -238,7 +238,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const city = eventItem.querySelector(`[dev-target=city]`);
                 const venue = eventItem.querySelector(`[dev-target=venue]`);
                 const description = eventItem.querySelector(`[dev-target=description]`);
-                eventItem.href = "/event/" + event.slug;
+                eventItem.href = "/pft/event_pft/" + event.slug;
                 name.textContent = event.name;
                 city.textContent = event["event-city-state"];
                 venue.textContent = event["event-venue-name"];

@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const lsUserFollowingFavourite = localStorage.getItem(
-    "user-following-favourite"
+    "pft_user-following-favourite"
   );
   const lsXanoAuthToken = localStorage.getItem("AuthToken");
   if (lsXanoAuthToken) {
@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const { user_following } = followingAndFavourite;
       userFollowingAndFavourite = followingAndFavourite;
       localStorage.setItem(
-        "user-following-favourite",
+        "pft_user-following-favourite",
         JSON.stringify(followingAndFavourite)
       );
 

@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const sourceDocumentCard = qs(`[dev-target="source-document-card"]`);
     const searchParams = new URLSearchParams(window.location.search);
     const insightSlug = searchParams.get("name");
-    const lsUserFollowingFavourite = localStorage.getItem("user-following-favourite");
+    const lsUserFollowingFavourite = localStorage.getItem("pft_user-following-favourite");
     const lsXanoAuthToken = localStorage.getItem("AuthToken");
     if (lsXanoAuthToken) {
         xanoToken = lsXanoAuthToken;
@@ -318,7 +318,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const res = await xano_pft_userFeed.get("/user-following-and-favourite");
             const followingAndFavourite = res.getBody();
             userFollowingAndFavourite = followingAndFavourite;
-            localStorage.setItem("user-following-favourite", JSON.stringify(followingAndFavourite));
+            localStorage.setItem("pft_user-following-favourite", JSON.stringify(followingAndFavourite));
             return followingAndFavourite;
         }
         catch (error) {
