@@ -32,12 +32,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   let userFollowingAndFavourite: UserFollowingAndFavourite | null = null;
   let xanoToken: string | null = null;
 
-  const relatedBusinessCard = qs("[dev-target=related-business-card]");
+  const relatedBusinessCards = qsa("[dev-target=related-business-card]");
   const companyCards = qsa("[dev-target=company-card]");
   const cardSkeleton = qsa("[dev-target=card-skeleton]");
   const insightsSkeleton = qs("[dev-target=skeleton-insights]");
   const companyDetails = qsa("[dev-target=company-details]");
-  const keyDocumentsCard = qs(`[dev-target="key-documents-card"]`);
+  const keyDocumentsCards = qsa(`[dev-target="key-documents-card"]`);
 
   const insightSearchInput = qs<HTMLInputElement>("[dev-search-target]");
   const insightFilterForm = qs<HTMLFormElement>("[dev-target=filter-form]");
@@ -372,65 +372,70 @@ document.addEventListener("DOMContentLoaded", async () => {
           );
       })
 
-      if ((company["related-business-entities"] && company["related-business-entities"].length === 0) || company["related-business-entities"] === null) {
-        relatedBusinessCard
-          .querySelector(`[dev-target=related-business-empty-state]`)
-          ?.classList.remove("hide");
-      }
-      const keyDocumentsItemTemplate = keyDocumentsCard.querySelector<HTMLDivElement>(
-        `[dev-target="key-documents-template"]`
-      ) as HTMLDivElement;
-      const keyDocumentsWrapper = keyDocumentsCard.querySelector(
-        `[dev-target="key-documents-wrapper"]`
-      );
-      if(company.key_documents && company.key_documents.length > 0 && company.key_documents.some((item)=>item !== null)){
-        company.key_documents.forEach((keyDocument)=>{
-          if(keyDocument === null) return;
-          const keyDocumentItem = keyDocumentsItemTemplate.cloneNode(
-            true
-          ) as HTMLDivElement;
-          const keyDocumentItemLink = keyDocumentItem.querySelector<HTMLLinkElement>(
-            `[dev-target="key-documents-link"]`
-          );
-          keyDocumentItemLink!.textContent = keyDocument.name;
-          keyDocumentItemLink!.href = keyDocument.document.url ? keyDocument.document.url : keyDocument.document_url;
-
-          keyDocumentsWrapper?.appendChild(keyDocumentItem);
-        })
-        keyDocumentsCard
-          .querySelector(`[dev-target="empty-state"]`)
-          ?.classList.add("hide");
-      }else{
-        keyDocumentsCard
-          .querySelector(`[dev-target="empty-state"]`)
-          ?.classList.remove("hide");
-          keyDocumentsWrapper?.classList.add("hide");
-      }
-
-      if(company["related-business-entities"] && company["related-business-entities"].length > 0 && company["related-business-entities"][0] !== null){
-        company["related-business-entities"].forEach((item) => {
-          if(item === null) return;
-          const relatedBusinessItem = relatedBusinessItemTemplate.cloneNode(
-            true
-          ) as HTMLDivElement;
-          const name = relatedBusinessItem.querySelector(`[dev-target=name]`);
-          const description = relatedBusinessItem.querySelector(
-            `[dev-target=description]`
-          );
-          const companyLink = relatedBusinessItem.querySelector<HTMLLinkElement>(
-            `[dev-target=company-link]`
-          );
+      keyDocumentsCards.forEach((keyDocumentsCard)=>{
+        const keyDocumentsItemTemplate = keyDocumentsCard.querySelector<HTMLDivElement>(
+          `[dev-target="key-documents-template"]`
+        ) as HTMLDivElement;
+        const keyDocumentsWrapper = keyDocumentsCard.querySelector(
+          `[dev-target="key-documents-wrapper"]`
+        );
+        if(company.key_documents && company.key_documents.length > 0 && company.key_documents.some((item)=>item !== null)){
+          company.key_documents.forEach((keyDocument)=>{
+            if(keyDocument === null) return;
+            const keyDocumentItem = keyDocumentsItemTemplate.cloneNode(
+              true
+            ) as HTMLDivElement;
+            const keyDocumentItemLink = keyDocumentItem.querySelector<HTMLLinkElement>(
+              `[dev-target="key-documents-link"]`
+            );
+            keyDocumentItemLink!.textContent = keyDocument.name;
+            keyDocumentItemLink!.href = keyDocument.document.url ? keyDocument.document.url : keyDocument.document_url;
   
-          name!.textContent = item.name;
-          description!.textContent = item["description-small"];
-          companyLink!.href = "/company/" + item.slug;
-  
+            keyDocumentsWrapper?.appendChild(keyDocumentItem);
+          })
+          keyDocumentsCard
+            .querySelector(`[dev-target="empty-state"]`)
+            ?.classList.add("hide");
+        }else{
+          keyDocumentsCard
+            .querySelector(`[dev-target="empty-state"]`)
+            ?.classList.remove("hide");
+            keyDocumentsWrapper?.classList.add("hide");
+        }
+      })
+
+      relatedBusinessCards.forEach((relatedBusinessCard)=>{
+        if ((company["related-business-entities"] && company["related-business-entities"].length === 0) || company["related-business-entities"] === null) {
           relatedBusinessCard
-            .querySelector(`[dev-target=related-business-wrapper]`)
-            ?.appendChild(relatedBusinessItem);
-          window.Webflow.require("ix2").init();
-        });
-      }
+            .querySelector(`[dev-target=related-business-empty-state]`)
+            ?.classList.remove("hide");
+        }
+  
+        if(company["related-business-entities"] && company["related-business-entities"].length > 0 && company["related-business-entities"][0] !== null){
+          company["related-business-entities"].forEach((item) => {
+            if(item === null) return;
+            const relatedBusinessItem = relatedBusinessItemTemplate.cloneNode(
+              true
+            ) as HTMLDivElement;
+            const name = relatedBusinessItem.querySelector(`[dev-target=name]`);
+            const description = relatedBusinessItem.querySelector(
+              `[dev-target=description]`
+            );
+            const companyLink = relatedBusinessItem.querySelector<HTMLLinkElement>(
+              `[dev-target=company-link]`
+            );
+    
+            name!.textContent = item.name;
+            description!.textContent = item["description-small"];
+            companyLink!.href = "/company/" + item.slug;
+    
+            relatedBusinessCard
+              .querySelector(`[dev-target=related-business-wrapper]`)
+              ?.appendChild(relatedBusinessItem);
+            window.Webflow.require("ix2").init();
+          });
+        }
+      })
 
       companyDetails.forEach((item) => item.classList.remove("opacity-hide"));
 
@@ -500,7 +505,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       companyInputs.forEach((companyInput)=>{
         fakeCheckboxToggle(companyInput!);
         companyInput?.setAttribute("dev-input-type", "company_id");
-        companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
+        insight.company_id && companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
         companyInput && followFavouriteLogic(companyInput);
         companyInput &&
         setCheckboxesInitialState(
