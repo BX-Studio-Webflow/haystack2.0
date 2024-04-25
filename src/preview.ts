@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const lsInsightEditorFormData = localStorage.getItem(
-    "insight_editor_form_data"
+    "editor_insight_richtext"
   );
   const richtextEditor = document.querySelector<HTMLElement>(
     "[dev-target=rich-text]"
@@ -8,13 +8,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (lsInsightEditorFormData) {
     const insightEditorFormData = JSON.parse(lsInsightEditorFormData);
-    console.log(
-      "insightEditorFormData.insightDetails",
-      insightEditorFormData.insightDetails
-    );
 
-    richtextEditor!.innerHTML = insightEditorFormData.insightDetails;
-
-    localStorage.removeItem("insight_editor_form_data");
+    richtextEditor!.innerHTML = insightEditorFormData;
   }
+  window.addEventListener("storage", function (event) {
+    if (
+      richtextEditor &&
+      event.newValue &&
+      event.storageArea === localStorage &&
+      event.key === "editor_insight_richtext"
+    ) {
+      richtextEditor.innerHTML = JSON.parse(event.newValue);
+    }
+  });
 });

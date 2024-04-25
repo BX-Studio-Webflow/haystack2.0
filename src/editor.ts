@@ -88,6 +88,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   const insightDetails = ClassicEditor.create(insightDetailsInput, {});
 
+  insightDetails.then((value)=>{
+    value.model.document.on("change:data",()=>{
+        const data = value.getData();
+        localStorage.setItem("editor_insight_richtext",JSON.stringify(data))
+    })
+  })
+
   nameInput.addEventListener("input", () => {
     slugInput.value = slugify(nameInput.value);
     slugInput.dispatchEvent(new Event("input"));
@@ -96,12 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
   slugInput.addEventListener("input", () => {
     console.log("logging");
     debounceSlugCheck(slugInput.value);
-  });
-
-  previewBtn.addEventListener("click", async () => {
-    const formData = await getFormData();
-    localStorage.setItem("insight_editor_form_data", JSON.stringify(formData));
-    // window.open('/content-upload/insight-preview', '_blank')
   });
 
   form.addEventListener("submit", async (e) => {
