@@ -1,5 +1,11 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const DATA_SOURCE = "dev";
+  const paginationNextBtn = document.querySelector<HTMLButtonElement>(
+    "[dev-target=next-btn]"
+  );
+  const paginationPreviousBtn = document.querySelector<HTMLButtonElement>(
+    "[dev-target=previous-btn]"
+  );
   const statusTab = document.querySelector<HTMLButtonElement>(
     "[dev-target=status-tab]"
   );
@@ -12,15 +18,45 @@ document.addEventListener("DOMContentLoaded", async () => {
   const editInsightNameInput = document.querySelector<HTMLInputElement>(
     "[dev-target=edit-insight-name]"
   );
+  const insightSortInput = document.querySelector<HTMLInputElement>(
+    "[dev-target=status-sort]"
+  );
   const adminTableBody = document.querySelector("[dev-target=table-body]");
   const adminTableRowTemplate = document.querySelector<HTMLElement>(
     "[dev-target=table-row-template]"
   );
   const editTableName = new Choices(editTableNameInput);
   const editInsightName = new Choices(editInsightNameInput);
-  const insights = await getEditorInsights();
-
+  const insightSort = new Choices(insightSortInput);
+  let currentPage = 1;
+  let perPage = 100;
+  let insightSortStatus: "Pending" | "Approved" | "Rejected" | "" = "";
   let editTableNameValue = "editor_insights";
+  const {
+    companiesMentioned,
+    company,
+    companyType,
+    curatedInput,
+    descriptionInput,
+    event,
+    insightClassification,
+    insightDetails,
+    nameInput,
+    idInput,
+    people,
+    publishedInput,
+    slugInput,
+    sourceAuthorInput,
+    sourceCategory,
+    sourceDocuments,
+    sourceInput,
+    sourcePublicationInput,
+    sourceUrlInput,
+    technologyCategory,
+    form: insightForm,
+  } = initForm();
+
+  getEditorInsights(currentPage, perPage, insightSortStatus);
 
   fetchDataFromEndpoint(
     "",
@@ -29,6 +65,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     editTableNameValue
   );
 
+  insightSort.passedElement.element.addEventListener(
+    "choice",
+    (event) => {
+      insightSortStatus = event.detail.choice.value;
+      getEditorInsights(currentPage, perPage, insightSortStatus);
+    },
+    false
+  );
   editTableName.passedElement.element.addEventListener(
     "choice",
     (event) => {
@@ -62,35 +106,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   editInsightName.passedElement.element.addEventListener(
     "choice",
     (event) => {
-        console.log("event",event)
-        addDataToForm(event.detail.choice.customProperties)
+      addDataToForm(event.detail.choice.customProperties);
     },
     false
   );
-
-  const {
-    companiesMentioned,
-    company,
-    companyType,
-    curatedInput,
-    descriptionInput,
-    event,
-    insightClassification,
-    insightDetails,
-    nameInput,
-    idInput,
-    people,
-    publishedInput,
-    slugInput,
-    sourceAuthorInput,
-    sourceCategory,
-    sourceDocuments,
-    sourceInput,
-    sourcePublicationInput,
-    sourceUrlInput,
-    technologyCategory,
-    form: insightForm,
-  } = initForm();
 
   insightForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -101,7 +120,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("transformedData", transformedData);
 
     fetch(
-      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/update_insight?table_name=${editTableNameValue}`,
+      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/update_insight?table_name=${editTableNameValue}&x-data-source=${DATA_SOURCE}`,
       {
         method: "POST",
         headers: {
@@ -119,42 +138,56 @@ document.addEventListener("DOMContentLoaded", async () => {
       })
       .catch((err) => console.log("err", err));
   });
-  if (adminTableBody) adminTableBody.innerHTML = "";
-  adminTableRowTemplate && displayRowsOnTable(insights, adminTableRowTemplate);
 
-  //   fetchChoicesOnKeystroke(
-  //     editInsightName,
-  //     "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights",
-  //     editTableNameValue
-  //   );
+  // adminTableRowTemplate && displayRowsOnTable(insights, adminTableRowTemplate);
 
   function displayRowsOnTable(
-    data: GetEditorInsightsResponse[],
+    data: GetEditorInsightsResponse,
     rowTemplate: HTMLElement
   ) {
-    data.forEach((insight) => {
+    if (adminTableBody) adminTableBody.innerHTML = "";
+    data.items.forEach((insight) => {
       const row = rowTemplate.cloneNode(true) as HTMLElement;
       const name = row.querySelector<HTMLElement>("[dev-target=name]");
       const status = row.querySelector<HTMLElement>("[dev-target=status]");
       const approve = row.querySelector<HTMLButtonElement>(
         "[dev-target=approve]"
-      );
+      )!;
       const reject = row.querySelector<HTMLButtonElement>(
         "[dev-target=reject]"
-      );
+      )!;
       const edit = row.querySelector<HTMLButtonElement>("[dev-target=edit]");
 
       if (name) name.textContent = insight.name;
       if (status) status.textContent = insight.status;
+      if (insight.status === "Approved") {
+        approve.textContent = "Approved";
+        approve.classList.add("btn-disabled");
+      } else if (insight.status === "Rejected") {
+        reject.textContent = "Rejected";
+        reject.classList.add("btn-disabled");
+      }
       approve?.addEventListener("click", () => {
-        adminAction("approve", insight.id);
-        row.remove();
-        console.log("approve");
+        adminAction("approve", insight.id)
+          .then(() => {
+            approve.textContent = "Approved";
+            approve.classList.add("btn-disabled");
+            reject.textContent = "Reject";
+            reject.classList.remove("btn-disabled");
+            status!.textContent = "Approved";
+          })
+          .catch((err) => console.log("error"));
       });
       reject?.addEventListener("click", () => {
-        adminAction("reject", insight.id);
-        row.remove();
-        console.log("reject");
+        adminAction("reject", insight.id)
+          .then(() => {
+            reject.textContent = "Rejected";
+            reject.classList.add("btn-disabled");
+            approve.textContent = "Approve";
+            approve.classList.remove("btn-disabled");
+            status!.textContent = "Rejected";
+          })
+          .catch((err) => console.log("error"));
       });
       edit?.addEventListener("click", () => {
         addDataToForm(insight);
@@ -166,13 +199,32 @@ document.addEventListener("DOMContentLoaded", async () => {
       adminTableBody?.appendChild(row);
     });
   }
-  async function getEditorInsights() {
+  async function getEditorInsights(
+    page: number,
+    perPage: number,
+    status: "Pending" | "Approved" | "Rejected" | ""
+  ) {
     const res = await fetch(
-      "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_editor_insights"
+      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_editor_insights?x-data-source=${DATA_SOURCE}&page=${page}&per_page=${perPage}&status=${status}`
     );
-    const data = (await res.json()) as GetEditorInsightsResponse[];
+    const data = (await res.json()) as GetEditorInsightsResponse;
+    paginationNextBtn?.classList[data.nextPage ? "remove" : "add"](
+      "btn-disabled"
+    );
+    paginationPreviousBtn?.classList[data.prevPage ? "remove" : "add"](
+      "btn-disabled"
+    );
+
+    currentPage = data.curPage;
+    adminTableRowTemplate && displayRowsOnTable(data, adminTableRowTemplate);
     return data;
   }
+  paginationPreviousBtn?.addEventListener("click", () => {
+    getEditorInsights(currentPage - 1, perPage, insightSortStatus);
+  });
+  paginationNextBtn?.addEventListener("click", () => {
+    getEditorInsights(currentPage + 1, perPage, insightSortStatus);
+  });
 
   function initForm() {
     const form = document.querySelector<HTMLFormElement>("[dev-target=form]")!;
@@ -351,7 +403,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       form,
     };
   }
-  function addDataToForm(insight: GetEditorInsightsResponse) {
+  function addDataToForm(insight: Insight) {
     clearForm();
     idInput.value = insight.id.toString();
     nameInput.value = insight.name;
@@ -519,7 +571,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const debounceSlugCheck = debounce(async (value: string) => {
     const res = await fetch(
-      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/insight_slug_checker?slug=${value}`
+      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/insight_slug_checker?slug=${value}&x-data-source=${DATA_SOURCE}`
     );
     const data = (await res.json()) as boolean;
 
@@ -545,7 +597,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function adminAction(action: "approve" | "reject", id: number) {
     const res = await fetch(
-      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/admin_action?action=${action}&insight_id=${id}`
+      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/admin_action?action=${action}&insight_id=${id}&x-data-source=${DATA_SOURCE}`
     );
     const data = await res.json();
 
@@ -561,7 +613,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       // Fetch data from the endpoint
       const response = await fetch(
-        `${endpoint}?table_name=${tableName}&search_query=${userInput}`
+        `${endpoint}?table_name=${tableName}&search_query=${userInput}&x-data-source=${DATA_SOURCE}`
       );
 
       if (!response.ok) {
@@ -596,6 +648,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 interface GetEditorInsightsResponse {
+  itemsReceived: number;
+  curPage: number;
+  nextPage: null;
+  prevPage: null;
+  offset: number;
+  items: Insight[];
+}
+
+interface Insight {
   id: number;
   created_at: number;
   name: string;
@@ -603,27 +664,48 @@ interface GetEditorInsightsResponse {
   company_id: number;
   description: string;
   "insight-detail": string;
-  curated: Date | null;
+  curated: Date;
   source_author: string;
   source: string;
   "source-url": string;
-  "source-publication-date": Date | null;
-  source_category_id: { name: string; id: number }[];
-  company_type_id: { name: string; id: number }[];
-  insight_classification_id: { name: string; id: number }[];
-  technology_category_id: { name: string; id: number }[];
-  companies_mentioned: { name: string; id: number }[];
-  people_id: { name: string; id: number }[];
+  "source-publication-date": Date;
+  source_category_id: {
+    id: number;
+    name: string;
+  }[];
+  company_type_id: {
+    id: number;
+    name: string;
+  }[];
+  insight_classification_id: {
+    id: number;
+    name: string;
+  }[];
+  technology_category_id: {
+    id: number;
+    name: string;
+  }[];
+  companies_mentioned: {
+    id: number;
+    name: string;
+  }[];
+  people_id: {
+    id: number;
+    name: string;
+  }[];
   event_id: number;
-  source_document_id: { name: string; id: number }[];
+  source_document_id: {
+    id: number;
+    name: string;
+  }[];
   published: boolean;
   status: string;
-  _company: {
-    name: string;
+  _company?: {
     id: number;
+    name: string;
   };
-  _event: {
-    name: string;
+  _event?: {
     id: number;
+    name: string;
   };
 }
