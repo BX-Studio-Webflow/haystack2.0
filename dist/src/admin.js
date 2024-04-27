@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const paginationPreviousBtn = document.querySelector("[dev-target=previous-btn]");
     const statusTab = document.querySelector("[dev-target=status-tab]");
     const editTab = document.querySelector("[dev-target=edit-tab]");
+    const moveToLiveBtn = document.querySelector("[dev-target=move-to-live]");
+    const deleteRejectedBtn = document.querySelector("[dev-target=delete-rejected]");
     const editTableNameInput = document.querySelector("[dev-target=edit-table-name]");
     const editInsightNameInput = document.querySelector("[dev-target=edit-insight-name]");
     const insightSortInput = document.querySelector("[dev-target=status-sort]");
@@ -20,9 +22,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     const { companiesMentioned, company, companyType, curatedInput, descriptionInput, event, insightClassification, insightDetails, nameInput, idInput, people, publishedInput, slugInput, sourceAuthorInput, sourceCategory, sourceDocuments, sourceInput, sourcePublicationInput, sourceUrlInput, technologyCategory, form: insightForm, } = initForm();
     getEditorInsights(currentPage, perPage, insightSortStatus);
     fetchDataFromEndpoint("", editInsightName, "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights", editTableNameValue);
-    insightSort.passedElement.element.addEventListener("choice", (event) => {
+    deleteRejectedBtn?.addEventListener("click", () => {
+        deleteAllRejectedInsights();
+    });
+    moveToLiveBtn?.addEventListener("click", () => {
+        moveApprovedToLive();
+    });
+    insightSort.passedElement.element.addEventListener("choice", async (event) => {
         insightSortStatus = event.detail.choice.value;
-        getEditorInsights(currentPage, perPage, insightSortStatus);
+        const { items } = await getEditorInsights(currentPage, perPage, insightSortStatus);
+        if (insightSortStatus === "Approved" && items.length > 0) {
+            moveToLiveBtn?.setAttribute("dev-display", "flex");
+            deleteRejectedBtn?.setAttribute("dev-display", "none");
+        }
+        else if (insightSortStatus === "Rejected" && items.length > 0) {
+            deleteRejectedBtn?.setAttribute("dev-display", "flex");
+            moveToLiveBtn?.setAttribute("dev-display", "none");
+        }
+        else {
+            deleteRejectedBtn?.setAttribute("dev-display", "none");
+            moveToLiveBtn?.setAttribute("dev-display", "none");
+        }
     }, false);
     editTableName.passedElement.element.addEventListener("choice", (event) => {
         editTableNameValue = event.detail.choice.value;
@@ -30,9 +50,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, false);
     editInsightName.passedElement.element.addEventListener("search", (event) => {
         debouncedFetch(event.detail.value, editInsightName, "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights", editTableNameValue);
-        console.log("search", event);
-        //   addDataToForm(event.detail.customProperties);
-        //   console.log("event", event);
     }, false);
     editInsightName.passedElement.element.addEventListener("choice", (event) => {
         addDataToForm(event.detail.choice.customProperties);
@@ -58,7 +75,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         })
             .catch((err) => console.log("err", err));
     });
-    // adminTableRowTemplate && displayRowsOnTable(insights, adminTableRowTemplate);
     function displayRowsOnTable(data, rowTemplate) {
         if (adminTableBody)
             adminTableBody.innerHTML = "";
@@ -404,6 +420,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         catch (error) {
             console.error("Error fetching or parsing data:", error);
         }
+    }
+    async function moveApprovedToLive() {
+        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/move_all_approved_insights_to_live?x-data-source=${DATA_SOURCE}`);
+        const data = await res.json();
+        if (adminTableBody) {
+            adminTableBody.innerHTML = "";
+        }
+        return data;
+    }
+    async function deleteAllRejectedInsights() {
+        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/delete_all_rejected_insights?x-data-source=${DATA_SOURCE}`, {
+            method: "DELETE",
+        });
+        const data = await res.json();
+        if (adminTableBody) {
+            adminTableBody.innerHTML = "";
+        }
+        return data;
     }
     function slugify(text) {
         return text

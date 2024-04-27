@@ -12,6 +12,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const editTab = document.querySelector<HTMLButtonElement>(
     "[dev-target=edit-tab]"
   );
+  const moveToLiveBtn = document.querySelector<HTMLButtonElement>(
+    "[dev-target=move-to-live]"
+  );
+  const deleteRejectedBtn = document.querySelector<HTMLButtonElement>(
+    "[dev-target=delete-rejected]"
+  );
   const editTableNameInput = document.querySelector<HTMLInputElement>(
     "[dev-target=edit-table-name]"
   );
@@ -65,11 +71,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     editTableNameValue
   );
 
+  deleteRejectedBtn?.addEventListener("click", () => {
+    deleteAllRejectedInsights();
+  });
+  moveToLiveBtn?.addEventListener("click", () => {
+    moveApprovedToLive();
+  });
+
   insightSort.passedElement.element.addEventListener(
     "choice",
-    (event) => {
+    async (event) => {
       insightSortStatus = event.detail.choice.value;
-      getEditorInsights(currentPage, perPage, insightSortStatus);
+      const { items } = await getEditorInsights(
+        currentPage,
+        perPage,
+        insightSortStatus
+      );
+      if (insightSortStatus === "Approved" && items.length > 0) {
+        moveToLiveBtn?.setAttribute("dev-display", "flex");
+        deleteRejectedBtn?.setAttribute("dev-display", "none");
+      } else if (insightSortStatus === "Rejected" && items.length > 0) {
+        deleteRejectedBtn?.setAttribute("dev-display", "flex");
+        moveToLiveBtn?.setAttribute("dev-display", "none");
+      } else {
+        deleteRejectedBtn?.setAttribute("dev-display", "none");
+        moveToLiveBtn?.setAttribute("dev-display", "none");
+      }
     },
     false
   );
@@ -96,10 +123,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights",
         editTableNameValue
       );
-      console.log("search", event);
-
-      //   addDataToForm(event.detail.customProperties);
-      //   console.log("event", event);
     },
     false
   );
@@ -138,8 +161,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       })
       .catch((err) => console.log("err", err));
   });
-
-  // adminTableRowTemplate && displayRowsOnTable(insights, adminTableRowTemplate);
 
   function displayRowsOnTable(
     data: GetEditorInsightsResponse,
@@ -634,6 +655,33 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (error) {
       console.error("Error fetching or parsing data:", error);
     }
+  }
+  async function moveApprovedToLive() {
+    const res = await fetch(
+      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/move_all_approved_insights_to_live?x-data-source=${DATA_SOURCE}`
+    );
+    const data = await res.json();
+
+    if (adminTableBody) {
+      adminTableBody.innerHTML = "";
+    }
+
+    return data;
+  }
+  async function deleteAllRejectedInsights() {
+    const res = await fetch(
+      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/delete_all_rejected_insights?x-data-source=${DATA_SOURCE}`,
+      {
+        method: "DELETE",
+      }
+    );
+    const data = await res.json();
+
+    if (adminTableBody) {
+      adminTableBody.innerHTML = "";
+    }
+
+    return data;
   }
   function slugify(text: string) {
     return text
