@@ -2,26 +2,27 @@
 // import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 // import Choices from "choices.js";
 document.addEventListener("DOMContentLoaded", () => {
+    const DATA_SOURCE = "dev";
     const form = document.querySelector("[dev-target=form]");
-    const nameInput = document.querySelector("[dev-target=name-input]");
-    const slugInput = document.querySelector("[dev-target=slug-input]");
-    const companyInput = document.querySelector("[dev-target=company]");
-    const descriptionInput = document.querySelector("[dev-target=description-input]");
-    const insightDetailsInput = document.querySelector("[dev-target=insight-details]");
-    const curatedInput = document.querySelector("[dev-target=curated-input]");
-    const sourceInput = document.querySelector("[dev-target=source-input]");
-    const sourceAuthorInput = document.querySelector("[dev-target=source-author-input]");
-    const sourceUrlInput = document.querySelector("[dev-target=source-url-input]");
-    const sourcePublicationInput = document.querySelector("[dev-target=source-publication-input]");
-    const sourceCategoryInput = document.querySelector("[dev-target=source-category]");
-    const companyTypeInput = document.querySelector("[dev-target=company-type]");
-    const insightClassificationInput = document.querySelector("[dev-target=insight-classification]");
-    const technologyCategoryInput = document.querySelector("[dev-target=technology-category]");
-    const companiesMentionedInput = document.querySelector("[dev-target=companies-mentioned]");
-    const peopleInput = document.querySelector("[dev-target=people]");
-    const sourceDocumentsInput = document.querySelector("[dev-target=source-documents]");
-    const eventInput = document.querySelector("[dev-target=event]");
-    const previewBtn = document.querySelector("[dev-target=preview-btn]");
+    const nameInput = form.querySelector("[dev-target=name-input]");
+    const slugInput = form.querySelector("[dev-target=slug-input]");
+    const companyInput = form.querySelector("[dev-target=company]");
+    const descriptionInput = form.querySelector("[dev-target=description-input]");
+    const insightDetailsInput = form.querySelector("[dev-target=insight-details]");
+    const curatedInput = form.querySelector("[dev-target=curated-input]");
+    const sourceInput = form.querySelector("[dev-target=source-input]");
+    const sourceAuthorInput = form.querySelector("[dev-target=source-author-input]");
+    const sourceUrlInput = form.querySelector("[dev-target=source-url-input]");
+    const sourcePublicationInput = form.querySelector("[dev-target=source-publication-input]");
+    const sourceCategoryInput = form.querySelector("[dev-target=source-category]");
+    const companyTypeInput = form.querySelector("[dev-target=company-type]");
+    const insightClassificationInput = form.querySelector("[dev-target=insight-classification]");
+    const technologyCategoryInput = form.querySelector("[dev-target=technology-category]");
+    const companiesMentionedInput = form.querySelector("[dev-target=companies-mentioned]");
+    const peopleInput = form.querySelector("[dev-target=people]");
+    const sourceDocumentsInput = form.querySelector("[dev-target=source-documents]");
+    const eventInput = form.querySelector("[dev-target=event]");
+    const publishedInput = form.querySelector("[dev-target=published-input]");
     flatpickr(curatedInput, {});
     flatpickr(sourcePublicationInput, {});
     const company = new Choices(companyInput);
@@ -67,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
         e.stopPropagation();
         const transformedData = await getFormData();
         console.log("transformedData", transformedData);
-        fetch("https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/add_to_insight", {
+        fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/add_to_insight?x-data-source=${DATA_SOURCE}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -164,10 +165,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 ? sourceDocuments.getValue().map(({ value }) => value)
                 : [],
             event: event.getValue() ? event.getValue().value : [],
+            published: publishedInput ? publishedInput.checked : false,
         };
     }
     const debounceSlugCheck = debounce(async (value) => {
-        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/insight_slug_checker?slug=${value}`);
+        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/insight_slug_checker?slug=${value}&x-data-source=${DATA_SOURCE}`);
         const data = (await res.json());
         slugInput.classList[data ? "add" : "remove"]("is-error");
     }, 300);
@@ -177,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const debouncedFetch = debounce(async (userInput) => {
             try {
                 // Fetch data from the endpoint
-                const response = await fetch(`${endpoint}?table_name=${tableName}&search_query=${userInput}`);
+                const response = await fetch(`${endpoint}?table_name=${tableName}&search_query=${userInput}&x-data-source=${DATA_SOURCE}`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch data");
                 }

@@ -2,62 +2,63 @@
 // import Choices from "choices.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+  const DATA_SOURCE = "dev";
   const form = document.querySelector<HTMLFormElement>("[dev-target=form]")!;
-  const nameInput = document.querySelector<HTMLInputElement>(
+  const nameInput = form.querySelector<HTMLInputElement>(
     "[dev-target=name-input]"
   )!;
-  const slugInput = document.querySelector<HTMLInputElement>(
+  const slugInput = form.querySelector<HTMLInputElement>(
     "[dev-target=slug-input]"
   )!;
-  const companyInput = document.querySelector<HTMLInputElement>(
+  const companyInput = form.querySelector<HTMLInputElement>(
     "[dev-target=company]"
   )!;
-  const descriptionInput = document.querySelector<HTMLInputElement>(
+  const descriptionInput = form.querySelector<HTMLInputElement>(
     "[dev-target=description-input]"
   )!;
-  const insightDetailsInput = document.querySelector<HTMLInputElement>(
+  const insightDetailsInput = form.querySelector<HTMLInputElement>(
     "[dev-target=insight-details]"
   )!;
-  const curatedInput = document.querySelector<HTMLInputElement>(
+  const curatedInput = form.querySelector<HTMLInputElement>(
     "[dev-target=curated-input]"
   )!;
-  const sourceInput = document.querySelector<HTMLInputElement>(
+  const sourceInput = form.querySelector<HTMLInputElement>(
     "[dev-target=source-input]"
   )!;
-  const sourceAuthorInput = document.querySelector<HTMLInputElement>(
+  const sourceAuthorInput = form.querySelector<HTMLInputElement>(
     "[dev-target=source-author-input]"
   )!;
-  const sourceUrlInput = document.querySelector<HTMLInputElement>(
+  const sourceUrlInput = form.querySelector<HTMLInputElement>(
     "[dev-target=source-url-input]"
   )!;
-  const sourcePublicationInput = document.querySelector<HTMLInputElement>(
+  const sourcePublicationInput = form.querySelector<HTMLInputElement>(
     "[dev-target=source-publication-input]"
   )!;
-  const sourceCategoryInput = document.querySelector<HTMLInputElement>(
+  const sourceCategoryInput = form.querySelector<HTMLInputElement>(
     "[dev-target=source-category]"
   )!;
-  const companyTypeInput = document.querySelector<HTMLInputElement>(
+  const companyTypeInput = form.querySelector<HTMLInputElement>(
     "[dev-target=company-type]"
   )!;
-  const insightClassificationInput = document.querySelector<HTMLInputElement>(
+  const insightClassificationInput = form.querySelector<HTMLInputElement>(
     "[dev-target=insight-classification]"
   )!;
-  const technologyCategoryInput = document.querySelector<HTMLInputElement>(
+  const technologyCategoryInput = form.querySelector<HTMLInputElement>(
     "[dev-target=technology-category]"
   )!;
-  const companiesMentionedInput = document.querySelector<HTMLInputElement>(
+  const companiesMentionedInput = form.querySelector<HTMLInputElement>(
     "[dev-target=companies-mentioned]"
   )!;
-  const peopleInput = document.querySelector<HTMLInputElement>(
+  const peopleInput = form.querySelector<HTMLInputElement>(
     "[dev-target=people]"
   )!;
-  const sourceDocumentsInput = document.querySelector<HTMLInputElement>(
+  const sourceDocumentsInput = form.querySelector<HTMLInputElement>(
     "[dev-target=source-documents]"
   )!;
   const eventInput =
-    document.querySelector<HTMLInputElement>("[dev-target=event]")!;
-  const previewBtn = document.querySelector<HTMLButtonElement>(
-    "[dev-target=preview-btn]"
+    form.querySelector<HTMLInputElement>("[dev-target=event]")!;
+  const publishedInput = form.querySelector<HTMLInputElement>(
+    "[dev-target=published-input]"
   )!;
 
   flatpickr(curatedInput, {});
@@ -88,12 +89,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   const insightDetails = ClassicEditor.create(insightDetailsInput, {});
 
-  insightDetails.then((value)=>{
-    value.model.document.on("change:data",()=>{
-        const data = value.getData();
-        localStorage.setItem("editor_insight_richtext",JSON.stringify(data))
-    })
-  })
+  insightDetails.then((value) => {
+    value.model.document.on("change:data", () => {
+      const data = value.getData();
+      localStorage.setItem("editor_insight_richtext", JSON.stringify(data));
+    });
+  });
 
   nameInput.addEventListener("input", () => {
     slugInput.value = slugify(nameInput.value);
@@ -113,15 +114,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log("transformedData", transformedData);
 
-    fetch("https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/add_to_insight", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        data: transformedData,
-      }),
-    })
+    fetch(
+      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/add_to_insight?x-data-source=${DATA_SOURCE}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          data: transformedData,
+        }),
+      }
+    )
       .then((res) => res.json())
       .then((dataRes) => {
         console.log("dataRes", dataRes);
@@ -253,12 +257,13 @@ document.addEventListener("DOMContentLoaded", () => {
         ? sourceDocuments.getValue().map(({ value }) => value)
         : [],
       event: event.getValue() ? event.getValue().value : [],
+      published: publishedInput ? publishedInput.checked : false,
     };
   }
 
   const debounceSlugCheck = debounce(async (value: string) => {
     const res = await fetch(
-      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/insight_slug_checker?slug=${value}`
+      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/insight_slug_checker?slug=${value}&x-data-source=${DATA_SOURCE}`
     );
     const data = (await res.json()) as boolean;
 
@@ -276,7 +281,7 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         // Fetch data from the endpoint
         const response = await fetch(
-          `${endpoint}?table_name=${tableName}&search_query=${userInput}`
+          `${endpoint}?table_name=${tableName}&search_query=${userInput}&x-data-source=${DATA_SOURCE}`
         );
 
         if (!response.ok) {
