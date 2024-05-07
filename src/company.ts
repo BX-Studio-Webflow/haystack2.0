@@ -259,6 +259,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         slug,
       });
       const company = res.getBody() as Company;
+      if(company === null){
+        return window.location.href = "/404";
+      }
       qs("title").textContent = company.name
       console.log("company", company);
       const aboutRichText = qs(`[dev-target="about-rich-text"]`);

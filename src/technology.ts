@@ -688,6 +688,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         slug,
       });
       const event = res.getBody() as Event;
+      if(event === null){
+        return window.location.href = "/404";
+      }
       qs("title").textContent = event.name
       console.log("event", event);
 

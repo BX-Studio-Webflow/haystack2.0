@@ -493,6 +493,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 slug,
             });
             const event = res.getBody();
+            if (event === null) {
+                return window.location.href = "/404";
+            }
             qs("title").textContent = event.name;
             console.log("event", event);
             techCatCards.forEach((techCatCard) => {

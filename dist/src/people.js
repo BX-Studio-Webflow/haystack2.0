@@ -140,6 +140,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 slug,
             });
             const person = res.getBody();
+            if (person === null) {
+                return window.location.href = "/404";
+            }
             qs("title").textContent = person.name;
             console.log("person", person);
             personCards.forEach((personCard) => {

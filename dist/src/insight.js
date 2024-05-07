@@ -247,6 +247,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 slug,
             });
             const insightResponse = res.getBody();
+            if (insightResponse === null) {
+                return window.location.href = "/404";
+            }
             qs("title").textContent = insightResponse.name;
             console.log("insightResponse", insightResponse);
             return insightResponse;
