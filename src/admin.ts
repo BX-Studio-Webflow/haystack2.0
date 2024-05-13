@@ -215,6 +215,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         editTab?.click();
         console.log("edit");
+        resetTableAndSearchInsightValue();
       });
 
       adminTableBody?.appendChild(row);
@@ -694,6 +695,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       .replace(/\-\-+/g, "-")
       .replace(/^-+/, "")
       .replace(/-+$/, "");
+  }
+  function resetTableAndSearchInsightValue(){
+    editTableName.destroy();
+    editTableName.init();
+    editInsightName.destroy();
+    editInsightName.init();
+    fetchDataFromEndpoint(
+      "",
+      editInsightName,
+      "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights",
+      "editor_insights"
+    );
   }
   class MyUploadAdapter {
     constructor( loader ) {
