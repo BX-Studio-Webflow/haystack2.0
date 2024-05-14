@@ -649,7 +649,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Convert the data to the format required by Choices.js
       const choicesData = data.map((item) => ({
         value: item.id,
-        label: item.name,
+        label: item.title ? `${item.title} ${item.name}` : item.name,
         customProperties: item,
       }));
 
