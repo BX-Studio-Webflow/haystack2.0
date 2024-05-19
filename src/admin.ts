@@ -324,8 +324,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       "[dev-target=published-input]"
     )!;
 
-    flatpickr(curatedInput, {});
-    flatpickr(sourcePublicationInput, {});
+    flatpickr(curatedInput, {
+      dateFormat: "m-d-Y"
+    });
+    flatpickr(sourcePublicationInput, {
+      dateFormat: "m-d-Y"
+    });
 
     const company = new Choices(companyInput);
     const event = new Choices(eventInput);

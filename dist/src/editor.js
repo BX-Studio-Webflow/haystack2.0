@@ -23,8 +23,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const sourceDocumentsInput = form.querySelector("[dev-target=source-documents]");
     const eventInput = form.querySelector("[dev-target=event]");
     const publishedInput = form.querySelector("[dev-target=published-input]");
-    flatpickr(curatedInput, {});
-    flatpickr(sourcePublicationInput, {});
+    flatpickr(curatedInput, {
+        dateFormat: "m-d-Y"
+    });
+    flatpickr(sourcePublicationInput, {
+        dateFormat: "m-d-Y"
+    });
     const company = new Choices(companyInput);
     const event = new Choices(eventInput);
     const sourceCategory = new Choices(sourceCategoryInput, {
