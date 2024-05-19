@@ -462,14 +462,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       value.setData(insight["insight-detail"]);
     });
     curatedInput.value = insight.curated
-      ? new Date(insight.curated).toISOString().slice(0, 10)
+      ? new Date(insight.curated).toLocaleDateString("en-US",{
+        month:"2-digit",
+        day:"2-digit",
+        year:"numeric"
+      }).replace(/\//g, '-')
       : "";
 
     sourceInput.value = insight.source;
     sourceAuthorInput.value = insight.source_author;
     sourceUrlInput.value = insight["source-url"];
     sourcePublicationInput.value = insight["source-publication-date"]
-      ? new Date(insight["source-publication-date"]).toISOString().slice(0, 10)
+      ? new Date(insight["source-publication-date"]).toLocaleDateString("en-US",{
+        month:"2-digit",
+        day:"2-digit",
+        year:"numeric"
+      }).replace(/\//g, '-')
       : "";
 
     sourceCategory.setValue(
