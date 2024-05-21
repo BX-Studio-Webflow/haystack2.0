@@ -96,13 +96,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             const row = rowTemplate.cloneNode(true);
             const name = row.querySelector("[dev-target=name]");
             const status = row.querySelector("[dev-target=status]");
+            const createdOn = row.querySelector("[dev-target=created-on]");
             const approve = row.querySelector("[dev-target=approve]");
             const reject = row.querySelector("[dev-target=reject]");
             const edit = row.querySelector("[dev-target=edit]");
             const deleteRejectedInsight = row.querySelector("[dev-target=delete-rejected-insight]");
+            const createdOnDate = new Date(insight.created_at);
             deleteRejectedInsight.style.display = "none";
             if (name)
                 name.textContent = insight.name;
+            if (createdOn)
+                createdOn.textContent = `${String(createdOnDate.getMonth() + 1).padStart(2, '0')}-${String(createdOnDate.getDate()).padStart(2, '0')}-${createdOnDate.getFullYear()}`;
+            ;
             if (status)
                 status.textContent = insight.status;
             if (insight.status === "Approved") {
