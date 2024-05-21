@@ -306,6 +306,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const insightDetailsInput = form.querySelector<HTMLInputElement>(
       "[dev-target=insight-details]"
     )!;
+    const insightDetailsHeightToggle = form.querySelector<HTMLInputElement>(
+      "[dev-target=rich-text-height-toggle]"
+    )!;
     const curatedInput = form.querySelector<HTMLInputElement>(
       "[dev-target=curated-input]"
     )!;
@@ -381,6 +384,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const insightDetails = ClassicEditor.create(insightDetailsInput, {
       extraPlugins: [ MyCustomUploadAdapterPlugin ]
     });
+
+    insightDetailsInput.addEventListener("change",()=>{
+      const checked = insightDetailsInput.checked;
+      const insightDetailContent = document.querySelector<HTMLDivElement>(".ck.ck-editor__main>.ck-editor__editable")!
+      insightDetailContent.style.maxHeight = checked ? "50vh" : "none"
+    })
 
     insightDetails.then((value) => {
       value.model.document.on("change:data", () => {

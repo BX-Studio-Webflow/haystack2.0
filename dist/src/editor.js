@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const companyInput = form.querySelector("[dev-target=company]");
     const descriptionInput = form.querySelector("[dev-target=description-input]");
     const insightDetailsInput = form.querySelector("[dev-target=insight-details]");
+    const insightDetailsHeightToggle = form.querySelector("[dev-target=rich-text-height-toggle]");
     const curatedInput = form.querySelector("[dev-target=curated-input]");
     const sourceInput = form.querySelector("[dev-target=source-input]");
     const sourceAuthorInput = form.querySelector("[dev-target=source-author-input]");
@@ -54,6 +55,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     const insightDetails = ClassicEditor.create(insightDetailsInput, {
         extraPlugins: [MyCustomUploadAdapterPlugin]
+    });
+    insightDetailsInput.addEventListener("change", () => {
+        const checked = insightDetailsInput.checked;
+        const insightDetailContent = document.querySelector(".ck.ck-editor__main>.ck-editor__editable");
+        insightDetailContent.style.maxHeight = checked ? "50vh" : "none";
     });
     insightDetails.then((value) => {
         value.model.document.on("change:data", () => {
