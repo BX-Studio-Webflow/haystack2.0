@@ -192,6 +192,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         "[dev-target=reject]"
       )!;
       const edit = row.querySelector<HTMLButtonElement>("[dev-target=edit]")!;
+      const preview = row.querySelector<HTMLButtonElement>("[dev-target=admin-preview]")!;
       const deleteRejectedInsight = row.querySelector<HTMLButtonElement>("[dev-target=delete-rejected-insight]")!;
 
       deleteRejectedInsight.style.display = "none"
@@ -229,6 +230,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             deleteRejectedInsight.style.display = "flex"
           })
           .catch((err) => console.log("error"));
+      });
+      preview?.addEventListener("click", () => {
+        localStorage.setItem("editor_insight_richtext", JSON.stringify(insight["insight-detail"]));
       });
       deleteRejectedInsight?.addEventListener("click", () => {
         adminAction("delete", insight.id)
