@@ -191,7 +191,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       const reject = row.querySelector<HTMLButtonElement>(
         "[dev-target=reject]"
       )!;
-      const edit = row.querySelector<HTMLButtonElement>("[dev-target=edit]");
+      const edit = row.querySelector<HTMLButtonElement>("[dev-target=edit]")!;
+      const deleteRejectedInsight = row.querySelector<HTMLButtonElement>("[dev-target=delete-rejected-insight]")!;
+
+      deleteRejectedInsight.style.display = "none"
 
       if (name) name.textContent = insight.name;
       if (status) status.textContent = insight.status;
@@ -201,6 +204,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } else if (insight.status === "Rejected") {
         reject.textContent = "Rejected";
         reject.classList.add("btn-disabled");
+        deleteRejectedInsight.style.display = "flex"
       }
       approve?.addEventListener("click", () => {
         adminAction("approve", insight.id)
@@ -210,6 +214,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             reject.textContent = "Reject";
             reject.classList.remove("btn-disabled");
             status!.textContent = "Approved";
+            deleteRejectedInsight.style.display = "none"
           })
           .catch((err) => console.log("error"));
       });
@@ -221,6 +226,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             approve.textContent = "Approve";
             approve.classList.remove("btn-disabled");
             status!.textContent = "Rejected";
+            deleteRejectedInsight.style.display = "flex"
+          })
+          .catch((err) => console.log("error"));
+      });
+      deleteRejectedInsight?.addEventListener("click", () => {
+        adminAction("delete", insight.id)
+          .then(() => {
+            deleteRejectedInsight.textContent = "Deleted";
+            deleteRejectedInsight.classList.add("btn-disabled");
+            approve.classList.add("btn-disabled");
+            reject.classList.add("btn-disabled");
+            edit.classList.add("btn-disabled");
+            status!.textContent = "Deleted";
           })
           .catch((err) => console.log("error"));
       });
@@ -645,7 +663,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  async function adminAction(action: "approve" | "reject", id: number) {
+  async function adminAction(action: "approve" | "reject" | "delete", id: number) {
     const res = await fetch(
       `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/admin_action?action=${action}&insight_id=${id}&x-data-source=${DATA_SOURCE}`
     );

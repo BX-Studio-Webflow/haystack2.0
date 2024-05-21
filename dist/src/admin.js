@@ -99,6 +99,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             const approve = row.querySelector("[dev-target=approve]");
             const reject = row.querySelector("[dev-target=reject]");
             const edit = row.querySelector("[dev-target=edit]");
+            const deleteRejectedInsight = row.querySelector("[dev-target=delete-rejected-insight]");
+            deleteRejectedInsight.style.display = "none";
             if (name)
                 name.textContent = insight.name;
             if (status)
@@ -110,6 +112,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             else if (insight.status === "Rejected") {
                 reject.textContent = "Rejected";
                 reject.classList.add("btn-disabled");
+                deleteRejectedInsight.style.display = "flex";
             }
             approve?.addEventListener("click", () => {
                 adminAction("approve", insight.id)
@@ -119,6 +122,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     reject.textContent = "Reject";
                     reject.classList.remove("btn-disabled");
                     status.textContent = "Approved";
+                    deleteRejectedInsight.style.display = "none";
                 })
                     .catch((err) => console.log("error"));
             });
@@ -130,6 +134,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                     approve.textContent = "Approve";
                     approve.classList.remove("btn-disabled");
                     status.textContent = "Rejected";
+                    deleteRejectedInsight.style.display = "flex";
+                })
+                    .catch((err) => console.log("error"));
+            });
+            deleteRejectedInsight?.addEventListener("click", () => {
+                adminAction("delete", insight.id)
+                    .then(() => {
+                    deleteRejectedInsight.textContent = "Deleted";
+                    deleteRejectedInsight.classList.add("btn-disabled");
+                    approve.classList.add("btn-disabled");
+                    reject.classList.add("btn-disabled");
+                    edit.classList.add("btn-disabled");
+                    status.textContent = "Deleted";
                 })
                     .catch((err) => console.log("error"));
             });
