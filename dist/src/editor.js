@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const slugInput = form.querySelector("[dev-target=slug-input]");
     const companyInput = form.querySelector("[dev-target=company]");
     const descriptionInput = form.querySelector("[dev-target=description-input]");
+    const internalNoteInput = form.querySelector("[dev-target=internal-note]");
     const insightDetailsInput = form.querySelector("[dev-target=insight-details]");
     const insightDetailsHeightToggle = form.querySelector("[dev-target=rich-text-height-toggle]");
     const curatedInput = form.querySelector("[dev-target=curated-input]");
@@ -144,6 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
         sourceAuthorInput.value = "";
         sourceUrlInput.value = "";
         sourcePublicationInput.value = "";
+        internalNoteInput.value = "";
         clearSelections(sourceCategory);
         clearSelections(companyType);
         clearSelections(insightClassification);
@@ -159,6 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
             slug: slugInput.value,
             company: company.getValue() ? company.getValue().value : "",
             description: descriptionInput.value,
+            internalNote: internalNoteInput.value,
             insightDetails: await insightDetails.then((val) => val.getData()),
             curated: curatedInput.value.trim() !== ""
                 ? new Date(curatedInput.value).toISOString()

@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     let perPage = 100;
     let insightSortStatus = "";
     let editTableNameValue = "editor_insights";
-    const { companiesMentioned, company, companyType, curatedInput, descriptionInput, event, insightClassification, insightDetails, nameInput, idInput, people, publishedInput, slugInput, sourceAuthorInput, sourceCategory, sourceDocuments, sourceInput, sourcePublicationInput, sourceUrlInput, technologyCategory, form: insightForm, } = initForm();
+    const { companiesMentioned, company, companyType, curatedInput, descriptionInput, event, insightClassification, insightDetails, nameInput, idInput, people, publishedInput, slugInput, sourceAuthorInput, sourceCategory, sourceDocuments, sourceInput, sourcePublicationInput, sourceUrlInput, technologyCategory, internalNoteInput, form: insightForm, } = initForm();
     getEditorInsights(currentPage, perPage, insightSortStatus);
     fetchDataFromEndpoint("", editInsightName, "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights", editTableNameValue);
     deleteRejectedBtn?.addEventListener("click", () => {
@@ -202,6 +202,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const slugInput = form.querySelector("[dev-target=slug-input]");
         const companyInput = form.querySelector("[dev-target=company]");
         const descriptionInput = form.querySelector("[dev-target=description-input]");
+        const internalNoteInput = form.querySelector("[dev-target=internal-note]");
         const insightDetailsInput = form.querySelector("[dev-target=insight-details]");
         const insightDetailsHeightToggle = form.querySelector("[dev-target=rich-text-height-toggle]");
         const curatedInput = form.querySelector("[dev-target=curated-input]");
@@ -299,6 +300,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             sourceDocuments,
             event,
             publishedInput,
+            internalNoteInput,
             form,
         };
     }
@@ -307,6 +309,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         idInput.value = insight.id.toString();
         nameInput.value = insight.name;
         slugInput.value = insight.slug;
+        internalNoteInput.value = insight.internal_note;
         insight._company &&
             company.setValue([
                 {
@@ -397,6 +400,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         sourceAuthorInput.value = "";
         sourceUrlInput.value = "";
         sourcePublicationInput.value = "";
+        internalNoteInput.value = "";
         clearSelections(sourceCategory);
         clearSelections(companyType);
         clearSelections(insightClassification);
@@ -417,6 +421,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             slug: slugInput.value,
             company: company.getValue() ? company.getValue().value : "",
             description: descriptionInput.value,
+            internalNote: internalNoteInput.value,
             insightDetails: await insightDetails.then((val) => val.getData()),
             curated: curatedInput.value.trim() !== ""
                 ? new Date(curatedInput.value).toISOString()

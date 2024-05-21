@@ -16,6 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const descriptionInput = form.querySelector<HTMLInputElement>(
     "[dev-target=description-input]"
   )!;
+  const internalNoteInput = form.querySelector<HTMLInputElement>(
+    "[dev-target=internal-note]"
+  )!;
   const insightDetailsInput = form.querySelector<HTMLInputElement>(
     "[dev-target=insight-details]"
   )!;
@@ -236,6 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
     sourceAuthorInput.value = "";
     sourceUrlInput.value = "";
     sourcePublicationInput.value = "";
+    internalNoteInput.value = "";
     clearSelections(sourceCategory);
     clearSelections(companyType);
     clearSelections(insightClassification);
@@ -252,6 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
       slug: slugInput.value,
       company: company.getValue() ? company.getValue().value : "",
       description: descriptionInput.value,
+      internalNote: internalNoteInput.value,
       insightDetails: await insightDetails.then((val) => val.getData()),
       curated:
         curatedInput.value.trim() !== ""

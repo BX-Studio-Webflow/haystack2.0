@@ -59,6 +59,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     sourcePublicationInput,
     sourceUrlInput,
     technologyCategory,
+    internalNoteInput,
     form: insightForm,
   } = initForm();
 
@@ -315,6 +316,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const descriptionInput = form.querySelector<HTMLInputElement>(
       "[dev-target=description-input]"
     )!;
+    const internalNoteInput = form.querySelector<HTMLInputElement>(
+      "[dev-target=internal-note]"
+    )!;
     const insightDetailsInput = form.querySelector<HTMLInputElement>(
       "[dev-target=insight-details]"
     )!;
@@ -487,6 +491,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       sourceDocuments,
       event,
       publishedInput,
+      internalNoteInput,
       form,
     };
   }
@@ -495,6 +500,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     idInput.value = insight.id.toString();
     nameInput.value = insight.name;
     slugInput.value = insight.slug;
+    internalNoteInput.value = insight.internal_note;
     insight._company &&
       company.setValue([
         {
@@ -605,6 +611,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     sourceAuthorInput.value = "";
     sourceUrlInput.value = "";
     sourcePublicationInput.value = "";
+    internalNoteInput.value = "";
     clearSelections(sourceCategory);
     clearSelections(companyType);
     clearSelections(insightClassification);
@@ -626,6 +633,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       slug: slugInput.value,
       company: company.getValue() ? company.getValue().value : "",
       description: descriptionInput.value,
+      internalNote: internalNoteInput.value,
       insightDetails: await insightDetails.then((val) => val.getData()),
       curated:
         curatedInput.value.trim() !== ""
@@ -875,6 +883,7 @@ interface Insight {
   slug: string;
   company_id: number;
   description: string;
+  internal_note: string;
   "insight-detail": string;
   curated: Date;
   source_author: string;
