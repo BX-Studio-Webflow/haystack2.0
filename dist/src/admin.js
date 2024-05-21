@@ -99,7 +99,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const approve = row.querySelector("[dev-target=approve]");
             const reject = row.querySelector("[dev-target=reject]");
             const edit = row.querySelector("[dev-target=edit]");
-            const preview = row.querySelector("[dev-target=admin-preview]");
             const deleteRejectedInsight = row.querySelector("[dev-target=delete-rejected-insight]");
             deleteRejectedInsight.style.display = "none";
             if (name)
@@ -139,7 +138,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 })
                     .catch((err) => console.log("error"));
             });
-            preview?.addEventListener("click", () => {
+            name?.addEventListener("click", () => {
                 localStorage.setItem("editor_insight_richtext", JSON.stringify(insight["insight-detail"]));
             });
             deleteRejectedInsight?.addEventListener("click", () => {

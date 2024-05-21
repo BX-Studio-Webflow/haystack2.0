@@ -183,7 +183,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (adminTableBody) adminTableBody.innerHTML = "";
     data.items.forEach((insight) => {
       const row = rowTemplate.cloneNode(true) as HTMLElement;
-      const name = row.querySelector<HTMLElement>("[dev-target=name]");
+      const name = row.querySelector<HTMLLinkElement>("[dev-target=name]");
       const status = row.querySelector<HTMLElement>("[dev-target=status]");
       const approve = row.querySelector<HTMLButtonElement>(
         "[dev-target=approve]"
@@ -192,7 +192,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         "[dev-target=reject]"
       )!;
       const edit = row.querySelector<HTMLButtonElement>("[dev-target=edit]")!;
-      const preview = row.querySelector<HTMLButtonElement>("[dev-target=admin-preview]")!;
       const deleteRejectedInsight = row.querySelector<HTMLButtonElement>("[dev-target=delete-rejected-insight]")!;
 
       deleteRejectedInsight.style.display = "none"
@@ -231,7 +230,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           })
           .catch((err) => console.log("error"));
       });
-      preview?.addEventListener("click", () => {
+      name?.addEventListener("click", () => {
         localStorage.setItem("editor_insight_richtext", JSON.stringify(insight["insight-detail"]));
       });
       deleteRejectedInsight?.addEventListener("click", () => {
