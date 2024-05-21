@@ -385,7 +385,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       extraPlugins: [ MyCustomUploadAdapterPlugin ]
     });
 
-    insightDetailsInput.addEventListener("change",()=>{
+    insightDetailsHeightToggle.addEventListener("change",()=>{
       const checked = insightDetailsInput.checked;
       const insightDetailContent = document.querySelector<HTMLDivElement>(".ck.ck-editor__main>.ck-editor__editable")!
       insightDetailContent.style.maxHeight = checked ? "50vh" : "none"
