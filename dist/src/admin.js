@@ -240,7 +240,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         insightDetailsHeightToggle.addEventListener("change", () => {
             const checked = insightDetailsHeightToggle.checked;
             const insightDetailContent = document.querySelector(".ck.ck-editor__main>.ck-editor__editable");
-            insightDetailContent.style.maxHeight = checked ? "50vh" : "none";
+            insightDetailContent.style.maxHeight = checked ? "20vh" : "none";
         });
         insightDetails.then((value) => {
             value.model.document.on("change:data", () => {
