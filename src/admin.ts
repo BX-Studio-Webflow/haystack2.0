@@ -186,6 +186,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const name = row.querySelector<HTMLLinkElement>("[dev-target=name]");
       const status = row.querySelector<HTMLElement>("[dev-target=status]");
       const createdOn = row.querySelector<HTMLElement>("[dev-target=created-on]");
+      const company = row.querySelector<HTMLElement>("[dev-target=company]");
+      const sourceListWrap = row.querySelector<HTMLElement>("[dev-target=source-list]");
+      const sourceListItem = row.querySelector<HTMLElement>("[dev-target=source-list-item]");
       const approve = row.querySelector<HTMLButtonElement>(
         "[dev-target=approve]"
       )!;
@@ -201,6 +204,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (name) name.textContent = insight.name;
       if (createdOn) createdOn.textContent = `${String(createdOnDate.getMonth() + 1).padStart(2, '0')}-${String(createdOnDate.getDate()).padStart(2, '0')}-${createdOnDate.getFullYear()}`;;
       if (status) status.textContent = insight.status;
+      if (company) company.textContent = insight._company ? `${insight._company?.name}(${insight._company?.id})`:"";
+      if (sourceListWrap) {
+        sourceListWrap.innerHTML = "";
+        insight.source_category_id.forEach(({name,id})=>{
+          const item = sourceListItem?.cloneNode(true) as HTMLElement;
+          item.textContent = `${name}(${id})`;
+          sourceListWrap.appendChild(item);
+        })
+      }
       if (insight.status === "Approved") {
         approve.textContent = "Approved";
         approve.classList.add("btn-disabled");

@@ -97,6 +97,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             const name = row.querySelector("[dev-target=name]");
             const status = row.querySelector("[dev-target=status]");
             const createdOn = row.querySelector("[dev-target=created-on]");
+            const company = row.querySelector("[dev-target=company]");
+            const sourceListWrap = row.querySelector("[dev-target=source-list]");
+            const sourceListItem = row.querySelector("[dev-target=source-list-item]");
             const approve = row.querySelector("[dev-target=approve]");
             const reject = row.querySelector("[dev-target=reject]");
             const edit = row.querySelector("[dev-target=edit]");
@@ -110,6 +113,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             ;
             if (status)
                 status.textContent = insight.status;
+            if (company)
+                company.textContent = insight._company ? `${insight._company?.name}(${insight._company?.id})` : "";
+            if (sourceListWrap) {
+                sourceListWrap.innerHTML = "";
+                insight.source_category_id.forEach(({ name, id }) => {
+                    const item = sourceListItem?.cloneNode(true);
+                    item.textContent = `${name}(${id})`;
+                    sourceListWrap.appendChild(item);
+                });
+            }
             if (insight.status === "Approved") {
                 approve.textContent = "Approved";
                 approve.classList.add("btn-disabled");
