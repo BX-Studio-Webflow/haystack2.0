@@ -59,7 +59,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     insightDetailsHeightToggle.addEventListener("change", () => {
         const checked = insightDetailsHeightToggle.checked;
-        const insightDetailContent = document.querySelector(".ck.ck-editor__main>.ck-editor__editable");
+        const insightDetailContent = document.querySelector(".ck.ck-editor__main");
+        insightDetailContent.style.overflow = "auto";
         insightDetailContent.style.maxHeight = checked ? "20vh" : "none";
     });
     insightDetails.then((value) => {
