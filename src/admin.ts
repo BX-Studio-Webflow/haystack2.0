@@ -606,6 +606,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       event.setValue([
         { label: insight._event.name, value: insight._event.id },
       ]);
+    choicesDropdownInit();
     publishedInput.checked = insight.published;
     publishedInput.parentElement
       ?.querySelector(".w-checkbox-input")
@@ -796,6 +797,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     return data;
+  }
+  function choicesDropdownInit() {
+    const choicesInstances = [
+      { choicesInstance: company, tableName: "company" },
+      { choicesInstance: companiesMentioned, tableName: "company" },
+      { choicesInstance: people, tableName: "people" },
+      { choicesInstance: event, tableName: "event" },
+      { choicesInstance: sourceCategory, tableName: "source-category" },
+      {
+        choicesInstance: insightClassification,
+        tableName: "insight-classification",
+      },
+      { choicesInstance: sourceDocuments, tableName: "source-documents" },
+      { choicesInstance: technologyCategory, tableName: "technology-category" },
+      { choicesInstance: companyType, tableName: "company-type" },
+    ];
+    const endpoint =
+      "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/table-item-search";
+
+    choicesInstances.forEach(({ choicesInstance, tableName }) =>
+      fetchDataFromEndpoint("", choicesInstance, endpoint, tableName)
+    );
   }
   function slugify(text: string) {
     return text
