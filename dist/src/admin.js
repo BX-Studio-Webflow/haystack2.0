@@ -232,24 +232,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         const event = new Choices(eventInput);
         const sourceCategory = new Choices(sourceCategoryInput, {
             removeItemButton: true,
+            duplicateItemsAllowed: false,
         });
         const companyType = new Choices(companyTypeInput, {
             removeItemButton: true,
+            duplicateItemsAllowed: false,
         });
         const insightClassification = new Choices(insightClassificationInput, {
             removeItemButton: true,
+            duplicateItemsAllowed: false,
         });
         const technologyCategory = new Choices(technologyCategoryInput, {
             removeItemButton: true,
+            duplicateItemsAllowed: false,
         });
         const companiesMentioned = new Choices(companiesMentionedInput, {
             removeItemButton: true,
+            duplicateItemsAllowed: false,
         });
         const people = new Choices(peopleInput, {
             removeItemButton: true,
+            duplicateItemsAllowed: false,
         });
         const sourceDocuments = new Choices(sourceDocumentsInput, {
             removeItemButton: true,
+            duplicateItemsAllowed: false,
         });
         const insightDetails = ClassicEditor.create(insightDetailsInput, {
             extraPlugins: [MyCustomUploadAdapterPlugin],

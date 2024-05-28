@@ -26,36 +26,43 @@ document.addEventListener("DOMContentLoaded", () => {
     const eventInput = form.querySelector("[dev-target=event]");
     const publishedInput = form.querySelector("[dev-target=published-input]");
     flatpickr(curatedInput, {
-        dateFormat: "m-d-Y"
+        dateFormat: "m-d-Y",
     });
     flatpickr(sourcePublicationInput, {
-        dateFormat: "m-d-Y"
+        dateFormat: "m-d-Y",
     });
     const company = new Choices(companyInput);
     const event = new Choices(eventInput);
     const sourceCategory = new Choices(sourceCategoryInput, {
         removeItemButton: true,
+        duplicateItemsAllowed: false,
     });
     const companyType = new Choices(companyTypeInput, {
         removeItemButton: true,
+        duplicateItemsAllowed: false,
     });
     const insightClassification = new Choices(insightClassificationInput, {
         removeItemButton: true,
+        duplicateItemsAllowed: false,
     });
     const technologyCategory = new Choices(technologyCategoryInput, {
         removeItemButton: true,
+        duplicateItemsAllowed: false,
     });
     const companiesMentioned = new Choices(companiesMentionedInput, {
         removeItemButton: true,
+        duplicateItemsAllowed: false,
     });
     const people = new Choices(peopleInput, {
         removeItemButton: true,
+        duplicateItemsAllowed: false,
     });
     const sourceDocuments = new Choices(sourceDocumentsInput, {
         removeItemButton: true,
+        duplicateItemsAllowed: false,
     });
     const insightDetails = ClassicEditor.create(insightDetailsInput, {
-        extraPlugins: [MyCustomUploadAdapterPlugin]
+        extraPlugins: [MyCustomUploadAdapterPlugin],
     });
     insightDetailsHeightToggle.addEventListener("change", () => {
         const checked = insightDetailsHeightToggle.checked;
@@ -106,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 style: {
                     background: "linear-gradient(to right, #00b09b, #96c93d)",
                 },
-                onClick: function () { } // Callback after click
+                onClick: function () { }, // Callback after click
             }).showToast();
             clearForm();
         })
@@ -250,8 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         // Starts the upload process.
         upload() {
-            return this.loader.file
-                .then(file => new Promise((resolve, reject) => {
+            return this.loader.file.then((file) => new Promise((resolve, reject) => {
                 this._initRequest();
                 this._initListeners(resolve, reject, file);
                 this._sendRequest(file);
@@ -265,28 +271,30 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         // Initializes the XMLHttpRequest object using the URL passed to the constructor.
         _initRequest() {
-            const xhr = this.xhr = new XMLHttpRequest();
-            xhr.open('POST', 'https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/image_upload', true);
-            xhr.responseType = 'json';
+            const xhr = (this.xhr = new XMLHttpRequest());
+            xhr.open("POST", "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/image_upload", true);
+            xhr.responseType = "json";
         }
         // Initializes XMLHttpRequest listeners.
         _initListeners(resolve, reject, file) {
             const xhr = this.xhr;
             const loader = this.loader;
             const genericErrorText = `Couldn't upload file: ${file.name}.`;
-            xhr.addEventListener('error', () => reject(genericErrorText));
-            xhr.addEventListener('abort', () => reject());
-            xhr.addEventListener('load', () => {
+            xhr.addEventListener("error", () => reject(genericErrorText));
+            xhr.addEventListener("abort", () => reject());
+            xhr.addEventListener("load", () => {
                 const response = xhr.response;
                 if (!response || response.error) {
-                    return reject(response && response.error ? response.error.message : genericErrorText);
+                    return reject(response && response.error
+                        ? response.error.message
+                        : genericErrorText);
                 }
                 resolve({
-                    default: response.url
+                    default: response.url,
                 });
             });
             if (xhr.upload) {
-                xhr.upload.addEventListener('progress', evt => {
+                xhr.upload.addEventListener("progress", (evt) => {
                     if (evt.lengthComputable) {
                         loader.uploadTotal = evt.total;
                         loader.uploaded = evt.loaded;
@@ -298,13 +306,13 @@ document.addEventListener("DOMContentLoaded", () => {
         _sendRequest(file) {
             // Prepare the form data.
             const data = new FormData();
-            data.append('upload', file);
+            data.append("upload", file);
             // Send the request.
             this.xhr.send(data);
         }
     }
     function MyCustomUploadAdapterPlugin(editor) {
-        editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+        editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
             // Configure the URL to the upload script in your back-end here!
             return new MyUploadAdapter(loader);
         };
