@@ -83,9 +83,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 style: {
                     background: "linear-gradient(to right, #00b09b, #96c93d)",
                 },
-                onClick: function () { } // Callback after click
+                onClick: function () { }, // Callback after click
             }).showToast();
             clearForm();
+            // refetch editor table
+            getEditorInsights(currentPage, perPage, insightSortStatus);
         })
             .catch((err) => console.log("err", err));
     });
@@ -109,12 +111,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (name)
                 name.textContent = insight.name;
             if (createdOn)
-                createdOn.textContent = `${String(createdOnDate.getMonth() + 1).padStart(2, '0')}-${String(createdOnDate.getDate()).padStart(2, '0')}-${createdOnDate.getFullYear()}`;
-            ;
+                createdOn.textContent = `${String(createdOnDate.getMonth() + 1).padStart(2, "0")}-${String(createdOnDate.getDate()).padStart(2, "0")}-${createdOnDate.getFullYear()}`;
             if (status)
                 status.textContent = insight.status;
             if (company)
-                company.textContent = insight._company ? `${insight._company?.name}(${insight._company?.id})` : "";
+                company.textContent = insight._company
+                    ? `${insight._company?.name}(${insight._company?.id})`
+                    : "";
             if (sourceListWrap) {
                 sourceListWrap.innerHTML = "";
                 insight.source_category_id.forEach(({ name, id }) => {
@@ -220,10 +223,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         const eventInput = form.querySelector("[dev-target=event]");
         const publishedInput = form.querySelector("[dev-target=published-input]");
         flatpickr(curatedInput, {
-            dateFormat: "m-d-Y"
+            dateFormat: "m-d-Y",
         });
         flatpickr(sourcePublicationInput, {
-            dateFormat: "m-d-Y"
+            dateFormat: "m-d-Y",
         });
         const company = new Choices(companyInput);
         const event = new Choices(eventInput);
@@ -249,7 +252,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             removeItemButton: true,
         });
         const insightDetails = ClassicEditor.create(insightDetailsInput, {
-            extraPlugins: [MyCustomUploadAdapterPlugin]
+            extraPlugins: [MyCustomUploadAdapterPlugin],
         });
         insightDetailsHeightToggle.addEventListener("change", () => {
             const checked = insightDetailsHeightToggle.checked;
@@ -323,21 +326,25 @@ document.addEventListener("DOMContentLoaded", async () => {
             value.setData(insight["insight-detail"]);
         });
         curatedInput.value = insight.curated
-            ? new Date(insight.curated).toLocaleDateString("en-US", {
+            ? new Date(insight.curated)
+                .toLocaleDateString("en-US", {
                 month: "2-digit",
                 day: "2-digit",
-                year: "numeric"
-            }).replace(/\//g, '-')
+                year: "numeric",
+            })
+                .replace(/\//g, "-")
             : "";
         sourceInput.value = insight.source;
         sourceAuthorInput.value = insight.source_author;
         sourceUrlInput.value = insight["source-url"];
         sourcePublicationInput.value = insight["source-publication-date"]
-            ? new Date(insight["source-publication-date"]).toLocaleDateString("en-US", {
+            ? new Date(insight["source-publication-date"])
+                .toLocaleDateString("en-US", {
                 month: "2-digit",
                 day: "2-digit",
-                year: "numeric"
-            }).replace(/\//g, '-')
+                year: "numeric",
+            })
+                .replace(/\//g, "-")
             : "";
         sourceCategory.setValue(insight.source_category_id.map(({ id, name }) => ({
             label: name,
@@ -542,8 +549,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         // Starts the upload process.
         upload() {
-            return this.loader.file
-                .then(file => new Promise((resolve, reject) => {
+            return this.loader.file.then((file) => new Promise((resolve, reject) => {
                 this._initRequest();
                 this._initListeners(resolve, reject, file);
                 this._sendRequest(file);
@@ -557,28 +563,30 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         // Initializes the XMLHttpRequest object using the URL passed to the constructor.
         _initRequest() {
-            const xhr = this.xhr = new XMLHttpRequest();
-            xhr.open('POST', 'https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/image_upload', true);
-            xhr.responseType = 'json';
+            const xhr = (this.xhr = new XMLHttpRequest());
+            xhr.open("POST", "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/image_upload", true);
+            xhr.responseType = "json";
         }
         // Initializes XMLHttpRequest listeners.
         _initListeners(resolve, reject, file) {
             const xhr = this.xhr;
             const loader = this.loader;
             const genericErrorText = `Couldn't upload file: ${file.name}.`;
-            xhr.addEventListener('error', () => reject(genericErrorText));
-            xhr.addEventListener('abort', () => reject());
-            xhr.addEventListener('load', () => {
+            xhr.addEventListener("error", () => reject(genericErrorText));
+            xhr.addEventListener("abort", () => reject());
+            xhr.addEventListener("load", () => {
                 const response = xhr.response;
                 if (!response || response.error) {
-                    return reject(response && response.error ? response.error.message : genericErrorText);
+                    return reject(response && response.error
+                        ? response.error.message
+                        : genericErrorText);
                 }
                 resolve({
-                    default: response.url
+                    default: response.url,
                 });
             });
             if (xhr.upload) {
-                xhr.upload.addEventListener('progress', evt => {
+                xhr.upload.addEventListener("progress", (evt) => {
                     if (evt.lengthComputable) {
                         loader.uploadTotal = evt.total;
                         loader.uploaded = evt.loaded;
@@ -590,13 +598,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         _sendRequest(file) {
             // Prepare the form data.
             const data = new FormData();
-            data.append('upload', file);
+            data.append("upload", file);
             // Send the request.
             this.xhr.send(data);
         }
     }
     function MyCustomUploadAdapterPlugin(editor) {
-        editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+        editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
             // Configure the URL to the upload script in your back-end here!
             return new MyUploadAdapter(loader);
         };
