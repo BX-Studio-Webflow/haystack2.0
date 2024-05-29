@@ -765,12 +765,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const data = await response.json();
 
+      const currentSelectedID = choicesInstance.getValue(true) as
+        | number[]
+        | number
+        | undefined;
+      console.log("currentSelectedID", currentSelectedID);
       // Convert the data to the format required by Choices.js
-      const choicesData = data.map((item) => ({
-        value: item.id,
-        label: item.title ? `${item.name} ${item.title}` : item.name,
-        customProperties: item,
-      }));
+      const choicesData = data
+        .filter((item) =>
+          typeof currentSelectedID === "number"
+            ? ![currentSelectedID].includes(item.id)
+            : typeof currentSelectedID === "object"
+            ? !currentSelectedID.includes(item.id)
+            : true
+        )
+        .map((item) => ({
+          value: item.id,
+          label: item.title ? `${item.name} ${item.title}` : item.name,
+          customProperties: item,
+        }));
 
       // Update Choices.js with new choices
       choicesInstance.setChoices(choicesData, "value", "label", true);

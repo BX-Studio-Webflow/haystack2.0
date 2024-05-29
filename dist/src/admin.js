@@ -502,8 +502,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 throw new Error("Failed to fetch data");
             }
             const data = await response.json();
+            const currentSelectedID = choicesInstance.getValue(true);
+            console.log("currentSelectedID", currentSelectedID);
             // Convert the data to the format required by Choices.js
-            const choicesData = data.map((item) => ({
+            const choicesData = data
+                .filter((item) => typeof currentSelectedID === "number"
+                ? ![currentSelectedID].includes(item.id)
+                : typeof currentSelectedID === "object"
+                    ? !currentSelectedID.includes(item.id)
+                    : true)
+                .map((item) => ({
                 value: item.id,
                 label: item.title ? `${item.name} ${item.title}` : item.name,
                 customProperties: item,
