@@ -2,7 +2,7 @@
 // import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 // import Choices from "choices.js";
 document.addEventListener("DOMContentLoaded", () => {
-    const DATA_SOURCE = "dev";
+    const DATA_SOURCE = "live";
     const form = document.querySelector("[dev-target=form]");
     const nameInput = form.querySelector("[dev-target=name-input]");
     const slugInput = form.querySelector("[dev-target=slug-input]");

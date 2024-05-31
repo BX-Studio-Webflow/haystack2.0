@@ -2,7 +2,7 @@
 // import Choices from "choices.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const DATA_SOURCE = "dev";
+  const DATA_SOURCE = "live";
   const form = document.querySelector<HTMLFormElement>("[dev-target=form]")!;
   const nameInput = form.querySelector<HTMLInputElement>(
     "[dev-target=name-input]"

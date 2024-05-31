@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const DATA_SOURCE = "dev";
+  const DATA_SOURCE = "live";
   const paginationNextBtn = document.querySelector<HTMLButtonElement>(
     "[dev-target=next-btn]"
   );

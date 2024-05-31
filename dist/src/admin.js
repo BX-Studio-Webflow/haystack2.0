@@ -1,6 +1,6 @@
 "use strict";
 document.addEventListener("DOMContentLoaded", async () => {
-    const DATA_SOURCE = "dev";
+    const DATA_SOURCE = "live";
     const paginationNextBtn = document.querySelector("[dev-target=next-btn]");
     const paginationPreviousBtn = document.querySelector("[dev-target=previous-btn]");
     const statusTab = document.querySelector("[dev-target=status-tab]");
