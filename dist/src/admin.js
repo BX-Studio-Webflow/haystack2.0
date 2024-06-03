@@ -57,22 +57,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     insightForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        const transformedData = await getFormData();
-        console.log("transformedData", transformedData);
-        fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/update_insight?table_name=${editTableNameValue}&x-data-source=${DATA_SOURCE}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                data: transformedData,
-            }),
-        })
-            .then((res) => res.json())
-            .then((dataRes) => {
-            console.log("dataRes", dataRes);
+        if (slugInput.classList.contains("is-error")) {
             Toastify({
-                text: "Submitted",
+                text: "Slug Already in use",
                 duration: 3000,
                 destination: "https://github.com/apvarun/toastify-js",
                 newWindow: true,
@@ -81,15 +68,46 @@ document.addEventListener("DOMContentLoaded", async () => {
                 position: "left",
                 stopOnFocus: true,
                 style: {
-                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    background: "linear-gradient(to right, #ff5f6d, #ffc371)",
                 },
                 onClick: function () { }, // Callback after click
             }).showToast();
-            clearForm();
-            // refetch editor table
-            getEditorInsights(currentPage, perPage, insightSortStatus);
-        })
-            .catch((err) => console.log("err", err));
+        }
+        else {
+            const transformedData = await getFormData();
+            console.log("transformedData", transformedData);
+            fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/update_insight?table_name=${editTableNameValue}&x-data-source=${DATA_SOURCE}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    data: transformedData,
+                }),
+            })
+                .then((res) => res.json())
+                .then((dataRes) => {
+                console.log("dataRes", dataRes);
+                Toastify({
+                    text: "Submitted",
+                    duration: 3000,
+                    destination: "https://github.com/apvarun/toastify-js",
+                    newWindow: true,
+                    close: true,
+                    gravity: "top",
+                    position: "left",
+                    stopOnFocus: true,
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    },
+                    onClick: function () { }, // Callback after click
+                }).showToast();
+                clearForm();
+                // refetch editor table
+                getEditorInsights(currentPage, perPage, insightSortStatus);
+            })
+                .catch((err) => console.log("err", err));
+        }
     });
     function displayRowsOnTable(data, rowTemplate) {
         if (adminTableBody)
@@ -279,7 +297,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
         slugInput.addEventListener("input", () => {
             console.log("logging");
-            debounceSlugCheck(slugInput.value);
+            const currentInsightSlug = localStorage.getItem("current-insight-slug");
+            if (currentInsightSlug) {
+                currentInsightSlug !== slugInput.value &&
+                    debounceSlugCheck(slugInput.value);
+            }
         });
         fetchChoicesOnKeystroke(company, "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/table-item-search", "company");
         fetchChoicesOnKeystroke(companiesMentioned, "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/table-item-search", "company");
@@ -317,6 +339,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     function addDataToForm(insight) {
         clearForm();
+        localStorage.setItem("current-insight-slug", insight.slug);
         idInput.value = insight.id.toString();
         nameInput.value = insight.name;
         slugInput.value = insight.slug;

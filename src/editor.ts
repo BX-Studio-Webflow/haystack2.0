@@ -138,11 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     e.stopPropagation();
 
-    console.log(
-      `slugInput.classList.contains("is-error")`,
-      slugInput.classList.contains("is-error")
-    );
-
     if (slugInput.classList.contains("is-error")) {
       Toastify({
         text: "Slug Already in use",

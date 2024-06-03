@@ -139,44 +139,61 @@ document.addEventListener("DOMContentLoaded", async () => {
     e.preventDefault();
     e.stopPropagation();
 
-    const transformedData = await getFormData();
-
-    console.log("transformedData", transformedData);
-
-    fetch(
-      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/update_insight?table_name=${editTableNameValue}&x-data-source=${DATA_SOURCE}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    if (slugInput.classList.contains("is-error")) {
+      Toastify({
+        text: "Slug Already in use",
+        duration: 3000,
+        destination: "https://github.com/apvarun/toastify-js",
+        newWindow: true,
+        close: true,
+        gravity: "top", // `top` or `bottom`
+        position: "left", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: "linear-gradient(to right, #ff5f6d, #ffc371)",
         },
-        body: JSON.stringify({
-          data: transformedData,
-        }),
-      }
-    )
-      .then((res) => res.json())
-      .then((dataRes) => {
-        console.log("dataRes", dataRes);
-        Toastify({
-          text: "Submitted",
-          duration: 3000,
-          destination: "https://github.com/apvarun/toastify-js",
-          newWindow: true,
-          close: true,
-          gravity: "top", // `top` or `bottom`
-          position: "left", // `left`, `center` or `right`
-          stopOnFocus: true, // Prevents dismissing of toast on hover
-          style: {
-            background: "linear-gradient(to right, #00b09b, #96c93d)",
+        onClick: function () {}, // Callback after click
+      }).showToast();
+    } else {
+      const transformedData = await getFormData();
+
+      console.log("transformedData", transformedData);
+
+      fetch(
+        `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/update_insight?table_name=${editTableNameValue}&x-data-source=${DATA_SOURCE}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-          onClick: function () {}, // Callback after click
-        }).showToast();
-        clearForm();
-        // refetch editor table
-        getEditorInsights(currentPage, perPage, insightSortStatus);
-      })
-      .catch((err) => console.log("err", err));
+          body: JSON.stringify({
+            data: transformedData,
+          }),
+        }
+      )
+        .then((res) => res.json())
+        .then((dataRes) => {
+          console.log("dataRes", dataRes);
+          Toastify({
+            text: "Submitted",
+            duration: 3000,
+            destination: "https://github.com/apvarun/toastify-js",
+            newWindow: true,
+            close: true,
+            gravity: "top", // `top` or `bottom`
+            position: "left", // `left`, `center` or `right`
+            stopOnFocus: true, // Prevents dismissing of toast on hover
+            style: {
+              background: "linear-gradient(to right, #00b09b, #96c93d)",
+            },
+            onClick: function () {}, // Callback after click
+          }).showToast();
+          clearForm();
+          // refetch editor table
+          getEditorInsights(currentPage, perPage, insightSortStatus);
+        })
+        .catch((err) => console.log("err", err));
+    }
   });
 
   function displayRowsOnTable(
@@ -453,7 +470,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     slugInput.addEventListener("input", () => {
       console.log("logging");
-      debounceSlugCheck(slugInput.value);
+      const currentInsightSlug = localStorage.getItem("current-insight-slug");
+      if (currentInsightSlug) {
+        currentInsightSlug !== slugInput.value &&
+          debounceSlugCheck(slugInput.value);
+      }
     });
 
     fetchChoicesOnKeystroke(
@@ -529,6 +550,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   function addDataToForm(insight: Insight) {
     clearForm();
+    localStorage.setItem("current-insight-slug", insight.slug);
     idInput.value = insight.id.toString();
     nameInput.value = insight.name;
     slugInput.value = insight.slug;
