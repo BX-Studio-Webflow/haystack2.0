@@ -111,6 +111,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights",
         editTableNameValue
       );
+      clearForm();
     },
     false
   );
@@ -158,6 +159,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const transformedData = await getFormData();
 
       console.log("transformedData", transformedData);
+      console.log("editTableNameValue", editTableNameValue);
 
       fetch(
         `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/update_insight?table_name=${editTableNameValue}&x-data-source=${DATA_SOURCE}`,
@@ -302,6 +304,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
       edit?.addEventListener("click", () => {
         addDataToForm(insight);
+        editTableNameValue = "editor_insights";
 
         editTab?.click();
         console.log("edit");

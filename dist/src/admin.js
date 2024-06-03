@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     editTableName.passedElement.element.addEventListener("choice", (event) => {
         editTableNameValue = event.detail.choice.value;
         fetchDataFromEndpoint("", editInsightName, "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights", editTableNameValue);
+        clearForm();
     }, false);
     editInsightName.passedElement.element.addEventListener("search", (event) => {
         debouncedFetch(event.detail.value, editInsightName, "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights", editTableNameValue);
@@ -76,6 +77,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         else {
             const transformedData = await getFormData();
             console.log("transformedData", transformedData);
+            console.log("editTableNameValue", editTableNameValue);
             fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/update_insight?table_name=${editTableNameValue}&x-data-source=${DATA_SOURCE}`, {
                 method: "POST",
                 headers: {
@@ -194,6 +196,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
             edit?.addEventListener("click", () => {
                 addDataToForm(insight);
+                editTableNameValue = "editor_insights";
                 editTab?.click();
                 console.log("edit");
                 resetTableAndSearchInsightValue();
