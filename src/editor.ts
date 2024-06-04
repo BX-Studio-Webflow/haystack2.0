@@ -68,10 +68,14 @@ document.addEventListener("DOMContentLoaded", () => {
   )!;
 
   flatpickr(curatedInput, {
-    dateFormat: "m-d-Y",
+    dateFormat: "Y-m-d",
+    altFormat: "m-d-Y",
+    altInput: true,
   });
   flatpickr(sourcePublicationInput, {
-    dateFormat: "m-d-Y",
+    dateFormat: "Y-m-d",
+    altFormat: "m-d-Y",
+    altInput: true,
   });
 
   const company = new Choices(companyInput);
@@ -261,11 +265,17 @@ document.addEventListener("DOMContentLoaded", () => {
     insightDetails.then((val) => {
       val.setData("");
     });
-    curatedInput.value = "";
+    curatedInput.parentElement?.querySelectorAll("input").forEach((input) => {
+      input.value = "";
+    });
     sourceInput.value = "";
     sourceAuthorInput.value = "";
     sourceUrlInput.value = "";
-    sourcePublicationInput.value = "";
+    sourcePublicationInput.parentElement
+      ?.querySelectorAll("input")
+      .forEach((input) => {
+        input.value = "";
+      });
     internalNoteInput.value = "";
     clearSelections(sourceCategory);
     clearSelections(companyType);
