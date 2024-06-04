@@ -365,7 +365,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         curatedInput.parentElement?.querySelectorAll("input").forEach((input) => {
             input.value = insight.curated
                 ? new Date(insight.curated)
-                    .toLocaleDateString("en-US", {
+                    .toLocaleString("default", {
+                    timeZone: "UTC",
                     month: "2-digit",
                     day: "2-digit",
                     year: "numeric",
@@ -381,7 +382,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             .forEach((input) => {
             input.value = insight["source-publication-date"]
                 ? new Date(insight["source-publication-date"])
-                    .toLocaleDateString("en-US", {
+                    .toLocaleString("default", {
+                    timeZone: "UTC",
                     month: "2-digit",
                     day: "2-digit",
                     year: "numeric",
