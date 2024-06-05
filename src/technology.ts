@@ -181,22 +181,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     sortLogicInit(technologySlug);
   }
 
-  async function getTechnologyCatInsights(slug: string, payload: InsightPayload) {
-    const {
-      page = 0,
-      perPage = 0,
-      offset = 0,
-    } = payload;
+  async function getTechnologyCatInsights(
+    slug: string,
+    payload: InsightPayload
+  ) {
+    const { page = 0, perPage = 0, offset = 0 } = payload;
     try {
-      const res = await xano_individual_pages.get("/technology_category_insights", {
-        slug,
-        page,
-        perPage,
-        offset,
-        sortBy: sortObject.sortBy,
-        orderBy: sortObject.orderBy,
-        filtering:searchObject,
-      });
+      const res = await xano_individual_pages.get(
+        "/technology_category_insights",
+        {
+          slug,
+          page,
+          perPage,
+          offset,
+          sortBy: sortObject.sortBy,
+          orderBy: sortObject.orderBy,
+          filtering: searchObject,
+        }
+      );
       const eventInsightResponse = res.getBody() as PersonInsightResponse;
       allTabsTarget.innerHTML = "";
 
@@ -208,7 +210,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           allTabsTarget,
           userFollowingAndFavourite
         );
-      insightsSkeleton.remove()
+      insightsSkeleton.remove();
       console.log("eventInsightResponse", eventInsightResponse);
       return eventInsightResponse;
     } catch (error) {
@@ -217,7 +219,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  function paginationLogic(insight: PersonInsightResponse, technologySlug: string) {
+  function paginationLogic(
+    insight: PersonInsightResponse,
+    technologySlug: string
+  ) {
     const paginationTarget = qs(`[dev-target="all-tab-pagination_wrapper"]`);
 
     const { curPage, nextPage, prevPage, pageTotal, itemsReceived } = insight;
@@ -374,9 +379,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     // pagination.style.display = pageTotal === 1 ? "none" : "flex";
 
-    if(nextPage === null && prevPage === null){
-      paginationTarget?.classList.add("hide")
-    };
+    if (nextPage === null && prevPage === null) {
+      paginationTarget?.classList.add("hide");
+    }
     paginationTarget.appendChild(pagination);
   }
 
@@ -424,48 +429,55 @@ document.addEventListener("DOMContentLoaded", async () => {
       const sourceAuthorTarget = newInsight.querySelector(
         `[dev-target="source-author"]`
       );
-      
-      const curatedDate = insight.curated ? formatCuratedDate(insight.curated):"";
-      const publishedDate = insight["source-publication-date"]?formatPublishedDate(insight["source-publication-date"]):"";
+
+      const curatedDate = insight.curated
+        ? formatCuratedDate(insight.curated)
+        : "";
+      const publishedDate = insight["source-publication-date"]
+        ? formatPublishedDate(insight["source-publication-date"])
+        : "";
       const sourceCatArray = insight.source_category_id;
       const companyTypeArray = insight.company_type_id;
       const insightClassArray = insight.insight_classification_id;
       const lineOfBusArray = insight.line_of_business_id;
       const techCatArray = insight.technology_category_id;
-      
+
       const companyInputs = newInsight.querySelectorAll<HTMLInputElement>(
         `[dev-target=company-input]`
-        );
-      companyInputs.forEach((companyInput)=>{
+      );
+      companyInputs.forEach((companyInput) => {
         fakeCheckboxToggle(companyInput!);
         companyInput?.setAttribute("dev-input-type", "company_id");
-        companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
+        companyInput?.setAttribute(
+          "dev-input-id",
+          insight.company_id.toString()
+        );
         companyInput && followFavouriteLogic(companyInput);
         companyInput &&
-        setCheckboxesInitialState(
-          companyInput,
-          convertArrayOfObjToNumber(
-            userFollowingAndFavourite.user_following.company_id
+          setCheckboxesInitialState(
+            companyInput,
+            convertArrayOfObjToNumber(
+              userFollowingAndFavourite.user_following.company_id
             )
-            );
-          })
+          );
+      });
       const favouriteInputs = newInsight.querySelectorAll<HTMLInputElement>(
         `[dev-target=favourite-input]`
       );
-      favouriteInputs.forEach((favouriteInput)=>{
+      favouriteInputs.forEach((favouriteInput) => {
         fakeCheckboxToggle(favouriteInput!);
-  
+
         favouriteInput?.setAttribute("dev-input-type", "favourite");
         favouriteInput?.setAttribute("dev-input-id", insight.id.toString());
-  
+
         favouriteInput && followFavouriteLogic(favouriteInput);
-  
+
         favouriteInput &&
           setCheckboxesInitialState(
             favouriteInput,
             userFollowingAndFavourite.user_favourite.insight_id
           );
-      })
+      });
 
       addTagsToInsight(sourceCatArray, tagsWrapperTarget!, false);
       addTagsToInsight(companyTypeArray, tagsWrapperTarget!, false);
@@ -478,9 +490,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         "technology_category_id"
       );
 
-      if(insight.company_details.company_logo){
-        companyImage!.src = insight.company_details.company_logo.url
-      }else{
+      if (insight.company_details.company_logo) {
+        companyImage!.src = insight.company_details.company_logo.url;
+      } else {
         companyImage!.src =
           "https://logo.clearbit.com/" +
           insight.company_details["company-website"];
@@ -494,19 +506,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
       }
       insightNameTarget!.textContent = insight.name;
-      curatedDateTargetWrapper?.classList[curatedDate ? "remove":"add"]("hide")
+      curatedDateTargetWrapper?.classList[curatedDate ? "remove" : "add"](
+        "hide"
+      );
       curatedDateTarget!.textContent = curatedDate ?? "";
       publishedDateTarget!.textContent = publishedDate ?? "";
-      publishedDateTargetWrapper.forEach((item)=>item.classList[publishedDate ? "remove":"add"]("hide"))
+      publishedDateTargetWrapper.forEach((item) =>
+        item.classList[publishedDate ? "remove" : "add"]("hide")
+      );
       insightLink!.setAttribute("href", "/insight/" + insight.slug);
       sourceTarget!.setAttribute("href", insight["source-url"]);
-      sourceTargetWrapper?.classList[insight["source-url"] ? "remove":"add"]("hide")
+      sourceTargetWrapper?.classList[insight["source-url"] ? "remove" : "add"](
+        "hide"
+      );
       companyLink!.setAttribute(
         "href",
         "/company/" + insight.company_details.slug
       );
       sourceTarget!.textContent = insight.source;
-      sourceAuthorTargetWrapper.forEach((item)=>item.classList[insight.source_author ? "remove":"add"]("hide"))
+      sourceAuthorTargetWrapper.forEach((item) =>
+        item.classList[insight.source_author ? "remove" : "add"]("hide")
+      );
       sourceAuthorTarget!.textContent = insight.source_author;
       target.appendChild(newInsight);
     });
@@ -555,12 +575,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const sortItems = qsa<HTMLLinkElement>(`[dev-target="sort"]`);
     sortItems.forEach((item) => {
       item.addEventListener("click", () => {
-        sortItems.forEach((sortItem)=>{
-          sortItem.classList.remove("active")
-        })
-        item.classList.add("active")
+        sortItems.forEach((sortItem) => {
+          sortItem.classList.remove("active");
+        });
+        item.classList.add("active");
         const value = item.textContent;
-        qs(`[dev-target=sorted-item-name]`).textContent = value
+        qs(`[dev-target=sorted-item-name]`).textContent = value;
         const orderBy = item.getAttribute("dev-orderby");
         const sortBy = item.getAttribute("dev-sortby");
 
@@ -635,41 +655,41 @@ document.addEventListener("DOMContentLoaded", async () => {
   function updateInsightsInputs(insight: HTMLDivElement) {
     const companyInputs = insight.querySelectorAll<HTMLInputElement>(
       `[dev-input-type="company_id"]`
-      );
-    companyInputs.forEach((companyInput)=>{
+    );
+    companyInputs.forEach((companyInput) => {
       companyInput &&
-      setCheckboxesInitialState(
-        companyInput,
-        convertArrayOfObjToNumber(
-          userFollowingAndFavourite?.user_following.company_id!
+        setCheckboxesInitialState(
+          companyInput,
+          convertArrayOfObjToNumber(
+            userFollowingAndFavourite?.user_following.company_id!
           )
-          );
-        });
+        );
+    });
     const favorites = insight.querySelectorAll<HTMLInputElement>(
       `[dev-input="fav-insight"]`
-      );
-      favorites.forEach((favourite)=>{
-        favourite &&
-          setCheckboxesInitialState(
-            favourite,
-            userFollowingAndFavourite?.user_favourite.insight_id!
-          );
-      })
+    );
+    favorites.forEach((favourite) => {
+      favourite &&
+        setCheckboxesInitialState(
+          favourite,
+          userFollowingAndFavourite?.user_favourite.insight_id!
+        );
+    });
     const tagInputs = insight.querySelectorAll<HTMLInputElement>(
       `[dev-input-type="technology_category_id"]`
     );
 
-    techCatCards.forEach((techCatCard)=>{
+    techCatCards.forEach((techCatCard) => {
       const pageTechCatInput = techCatCard.querySelector<HTMLInputElement>(
         `[dev-input-type="technology_category_id"]`
       );
       pageTechCatInput &&
-      setCheckboxesInitialState(
-        pageTechCatInput,
-        convertArrayOfObjToNumber(
-          userFollowingAndFavourite?.user_following.technology_category_id!
-        )
-      );
+        setCheckboxesInitialState(
+          pageTechCatInput,
+          convertArrayOfObjToNumber(
+            userFollowingAndFavourite?.user_following.technology_category_id!
+          )
+        );
     });
 
     tagInputs?.forEach((tag) => {
@@ -688,48 +708,48 @@ document.addEventListener("DOMContentLoaded", async () => {
         slug,
       });
       const event = res.getBody() as Event;
-      if(event === null){
-        return window.location.href = "/404";
+      if (event === null) {
+        return (window.location.href = "/404");
       }
-      qs("title").textContent = event.name
+      qs("title").textContent = event.name;
       console.log("event", event);
 
-      techCatCards.forEach((techCatCard)=>{
-      const techCatName = techCatCard.querySelector<HTMLHeadingElement>(
-        `[dev-target=event-name]`
-      );
-      
-      const eventImageWrapper = techCatCard.querySelector(
-        `[dev-target=event-image-wrapper]`
-      );
-      const eventImageLink =
-        eventImageWrapper?.querySelector<HTMLLinkElement>(
-          `[dev-target=event-picture-link]`
+      techCatCards.forEach((techCatCard) => {
+        const techCatName = techCatCard.querySelector<HTMLHeadingElement>(
+          `[dev-target=event-name]`
         );
-      const eventImage = eventImageWrapper?.querySelector(
-        `[dev-target=event-image]`
-      );
-      const eventInput = eventImageWrapper?.querySelector<HTMLInputElement>(
-        `[dev-target=event-input]`
-      );
 
-      techCatName!.textContent = event.name;
-
-      cardSkeletons.forEach((cardSkeleton)=>cardSkeleton.remove());
-      techCatCard.classList.remove("dev-hide")
-
-      fakeCheckboxToggle(eventInput!);
-      eventInput?.setAttribute("dev-input-type", "technology_category_id");
-      eventInput?.setAttribute("dev-input-id", event.id.toString());
-      eventInput && followFavouriteLogic(eventInput);
-      eventInput &&
-        setCheckboxesInitialState(
-          eventInput,
-          convertArrayOfObjToNumber(
-            userFollowingAndFavourite!.user_following.technology_category_id
-          )
+        const eventImageWrapper = techCatCard.querySelector(
+          `[dev-target=event-image-wrapper]`
         );
-      })
+        const eventImageLink =
+          eventImageWrapper?.querySelector<HTMLLinkElement>(
+            `[dev-target=event-picture-link]`
+          );
+        const eventImage = eventImageWrapper?.querySelector(
+          `[dev-target=event-image]`
+        );
+        const eventInput = eventImageWrapper?.querySelector<HTMLInputElement>(
+          `[dev-target=event-input]`
+        );
+
+        techCatName!.textContent = event.name;
+
+        cardSkeletons.forEach((cardSkeleton) => cardSkeleton.remove());
+        techCatCard.classList.remove("dev-hide");
+
+        fakeCheckboxToggle(eventInput!);
+        eventInput?.setAttribute("dev-input-type", "technology_category_id");
+        eventInput?.setAttribute("dev-input-id", event.id.toString());
+        eventInput && followFavouriteLogic(eventInput);
+        eventInput &&
+          setCheckboxesInitialState(
+            eventInput,
+            convertArrayOfObjToNumber(
+              userFollowingAndFavourite!.user_following.technology_category_id
+            )
+          );
+      });
       eventDetails.forEach((item) => {
         item.classList.remove("opacity-hide");
       });
@@ -784,22 +804,31 @@ document.addEventListener("DOMContentLoaded", async () => {
           `[dev-target=tag-input]`
         );
         showCheckbox && tagInput && fakeCheckboxToggle(tagInput);
-        showCheckbox && type && tagInput && tagInput.setAttribute("dev-input-type", type);
-        showCheckbox && tagInput && tagInput.setAttribute("dev-input-id", item.id.toString());
+        showCheckbox &&
+          type &&
+          tagInput &&
+          tagInput.setAttribute("dev-input-type", type);
+        showCheckbox &&
+          tagInput &&
+          tagInput.setAttribute("dev-input-id", item.id.toString());
         showCheckbox && tagInput && followFavouriteLogic(tagInput);
         newTag.querySelector(`[dev-target=tag-name]`)!.textContent =
           item?.name!;
 
-        if(showCheckbox){
-          const tagSpan = newTag.querySelector<HTMLSpanElement>(`[dev-target="tag-name"]`)
-          newTag.style.cursor = "pointer"
-          newTag.querySelector<HTMLLabelElement>(`[dev-fake-checkbox-wrapper]`)!.style.cursor = "pointer"
-          const anchor = document.createElement('a');
-          anchor.href = `/technology/${item.slug}`
-          anchor.textContent = tagSpan!.textContent
-          anchor.style.cursor = "pointer"
-          anchor.classList.add("tag-span-name")
-          tagSpan?.replaceWith(anchor)
+        if (showCheckbox) {
+          const tagSpan = newTag.querySelector<HTMLSpanElement>(
+            `[dev-target="tag-name"]`
+          );
+          newTag.style.cursor = "pointer";
+          newTag.querySelector<HTMLLabelElement>(
+            `[dev-fake-checkbox-wrapper]`
+          )!.style.cursor = "pointer";
+          const anchor = document.createElement("a");
+          anchor.href = `/technology/${item.slug}`;
+          anchor.textContent = tagSpan!.textContent;
+          anchor.style.cursor = "pointer";
+          anchor.classList.add("tag-span-name");
+          tagSpan?.replaceWith(anchor);
         }
 
         if (tagCheckbox && !showCheckbox) {
@@ -819,16 +848,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  function formatCuratedDate(inputDate:Date) {
+  function formatCuratedDate(inputDate: Date) {
     const date = new Date(inputDate);
-    return `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
+    return `${date.toLocaleString("default", {
+      month: "short",
+      timeZone: "UTC",
+    })} ${date.getFullYear()}`;
   }
 
-  function formatPublishedDate(inputDate:Date) {
+  function formatPublishedDate(inputDate: Date) {
     const date = new Date(inputDate);
-    return `${date.toLocaleString('default', { month: 'long' })} ${date.getUTCDate()}, ${date.getFullYear()}`;
+    return `${date.toLocaleString("default", {
+      month: "long",
+      timeZone: "UTC",
+    })} ${date.getUTCDate()}, ${date.getFullYear()}`;
   }
-
 
   // Function to debounce a given function
   function debounce(func: (...args: any[]) => void, delay: number) {
@@ -878,5 +912,5 @@ interface Event {
   "event-venue-name": string;
   people_id: number[];
   "event-description": string;
-  image: { url: string; } | null;
+  image: { url: string } | null;
 }

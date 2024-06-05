@@ -384,52 +384,56 @@ document.addEventListener("DOMContentLoaded", async () => {
       const sourceAuthorTarget = newInsight.querySelector(
         `[dev-target="source-author"]`
       );
-      
+
       const curatedDate = insight.curated
-      ? formatCuratedDate(insight.curated)
-      : "";
+        ? formatCuratedDate(insight.curated)
+        : "";
       const publishedDate = insight["source-publication-date"]
-      ? formatPublishedDate(insight["source-publication-date"])
-      : "";
+        ? formatPublishedDate(insight["source-publication-date"])
+        : "";
       const sourceCatArray = insight.source_category_id;
       const companyTypeArray = insight.company_type_id;
       const insightClassArray = insight.insight_classification_id;
       const lineOfBusArray = insight.line_of_business_id;
       const techCatArray = insight.technology_category_id;
-      
+
       const companyInputs = newInsight.querySelectorAll<HTMLInputElement>(
         `[dev-target=company-input]`
-        );
-        companyInputs.forEach((companyInput)=>{
-          fakeCheckboxToggle(companyInput!);
-          companyInput?.setAttribute("dev-input-type", "company_id");
-          insight.company_id && companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
-          companyInput && followFavouriteLogic(companyInput);
-          companyInput &&
+      );
+      companyInputs.forEach((companyInput) => {
+        fakeCheckboxToggle(companyInput!);
+        companyInput?.setAttribute("dev-input-type", "company_id");
+        insight.company_id &&
+          companyInput?.setAttribute(
+            "dev-input-id",
+            insight.company_id.toString()
+          );
+        companyInput && followFavouriteLogic(companyInput);
+        companyInput &&
           setCheckboxesInitialState(
             companyInput,
             convertArrayOfObjToNumber(
               userFollowingAndFavourite.user_following.company_id
-              )
-              );
-            })
+            )
+          );
+      });
       const favouriteInputs = newInsight.querySelectorAll<HTMLInputElement>(
         `[dev-target=favourite-input]`
       );
-      favouriteInputs.forEach((favouriteInput)=>{
+      favouriteInputs.forEach((favouriteInput) => {
         fakeCheckboxToggle(favouriteInput!);
-  
+
         favouriteInput?.setAttribute("dev-input-type", "favourite");
         favouriteInput?.setAttribute("dev-input-id", insight.id.toString());
-  
+
         favouriteInput && followFavouriteLogic(favouriteInput);
-  
+
         favouriteInput &&
           setCheckboxesInitialState(
             favouriteInput,
             userFollowingAndFavourite.user_favourite.insight_id
           );
-      })
+      });
 
       addTagsToInsight(sourceCatArray, tagsWrapperTarget!, false);
       addTagsToInsight(companyTypeArray, tagsWrapperTarget!, false);
@@ -445,23 +449,29 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (insight.company_details?.company_logo) {
         companyImage!.src = insight.company_details.company_logo.url;
       } else {
-        if (insight.company_details && insight.company_details["company-website"]) {
-          const imageUrl = "https://logo.clearbit.com/" + insight.company_details["company-website"];
-      
+        if (
+          insight.company_details &&
+          insight.company_details["company-website"]
+        ) {
+          const imageUrl =
+            "https://logo.clearbit.com/" +
+            insight.company_details["company-website"];
+
           fetch(imageUrl)
-              .then(response => {
-                  if (response.ok) {
-                      companyImage!.src = imageUrl;
-                  } else {
-                      throw new Error("Failed to fetch company logo");
-                  }
-              })
-              .catch(() => {
-                  companyImage!.src = "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp";
-              });
-      } else {
+            .then((response) => {
+              if (response.ok) {
+                companyImage!.src = imageUrl;
+              } else {
+                throw new Error("Failed to fetch company logo");
+              }
+            })
+            .catch(() => {
+              companyImage!.src =
+                "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp";
+            });
+        } else {
           companyImage!.src = "";
-      }      
+        }
       }
 
       insightNameTarget!.textContent = insight.name;
@@ -551,6 +561,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const date = new Date(inputDate);
     return `${date.toLocaleString("default", {
       month: "short",
+      timeZone: "UTC",
     })} ${date.getFullYear()}`;
   }
 
@@ -558,6 +569,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const date = new Date(inputDate);
     return `${date.toLocaleString("default", {
       month: "long",
+      timeZone: "UTC",
     })} ${date.getUTCDate()}, ${date.getFullYear()}`;
   }
 
@@ -599,30 +611,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   function updateInsightsInputs(insight: HTMLDivElement) {
     const tagInputs = insight.querySelectorAll<HTMLInputElement>(
       `[dev-input-type="technology_category_id"]`
-      );
-      const companyInputs = insight.querySelectorAll<HTMLInputElement>(
-        `[dev-input-type="company_id"]`
-        );
-      companyInputs.forEach((companyInput)=>{
-        companyInput &&
+    );
+    const companyInputs = insight.querySelectorAll<HTMLInputElement>(
+      `[dev-input-type="company_id"]`
+    );
+    companyInputs.forEach((companyInput) => {
+      companyInput &&
         setCheckboxesInitialState(
           companyInput,
           convertArrayOfObjToNumber(
             userFollowingAndFavourite?.user_following.company_id!
-            )
-            );
-          });
-      const favorites = insight.querySelectorAll<HTMLInputElement>(
-        `[dev-input="fav-insight"]`
+          )
         );
-        favorites.forEach((favourite)=>{
-          favourite &&
-            setCheckboxesInitialState(
-              favourite,
-              userFollowingAndFavourite?.user_favourite.insight_id!
-            );
-        })
-
+    });
+    const favorites = insight.querySelectorAll<HTMLInputElement>(
+      `[dev-input="fav-insight"]`
+    );
+    favorites.forEach((favourite) => {
+      favourite &&
+        setCheckboxesInitialState(
+          favourite,
+          userFollowingAndFavourite?.user_favourite.insight_id!
+        );
+    });
 
     tagInputs?.forEach((tag) => {
       setCheckboxesInitialState(
@@ -875,9 +886,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     // pagination.style.display = pageTotal === 1 ? "none" : "flex";
 
-    if(nextPage === null && prevPage === null){
-      paginationTarget?.classList.add("hide")
-    };
+    if (nextPage === null && prevPage === null) {
+      paginationTarget?.classList.add("hide");
+    }
     paginationTarget.appendChild(pagination);
   }
 
@@ -924,7 +935,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     slugArray: number[],
     followingTargets: NodeListOf<HTMLDivElement>
   ) {
-    followingTargets.forEach((followingTarget)=>{
+    followingTargets.forEach((followingTarget) => {
       followingTarget.innerHTML = "";
       userFollowing
         .sort((a, b) =>
@@ -961,7 +972,10 @@ document.addEventListener("DOMContentLoaded", async () => {
               "[dev-target=input]"
             );
           newFollowingItemInput?.setAttribute("dev-input-type", inputType);
-          newFollowingItemInput?.setAttribute("dev-input-id", item.id.toString());
+          newFollowingItemInput?.setAttribute(
+            "dev-input-id",
+            item.id.toString()
+          );
           newFollowingItemInput && followFavouriteLogic(newFollowingItemInput);
           newFollowingItemInput &&
             userFollowingAndFavourite &&
@@ -969,7 +983,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           newFollowingItemInput && fakeCheckboxToggle(newFollowingItemInput);
           followingTarget.appendChild(newFollowingItem);
         });
-    })
+    });
   }
   // Function to debounce a given function
   function debounce(func: (...args: any[]) => void, delay: number) {

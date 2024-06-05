@@ -187,72 +187,75 @@ document.addEventListener("DOMContentLoaded", async () => {
         slug,
       });
       const person = res.getBody() as Person;
-      if(person === null){
-        return window.location.href = "/404";
+      if (person === null) {
+        return (window.location.href = "/404");
       }
-      qs("title").textContent = person.name
+      qs("title").textContent = person.name;
       console.log("person", person);
 
-      personCards.forEach((personCard)=>{
-      const personName = personCard.querySelector<HTMLHeadingElement>(
-        `[dev-target=person-name]`
-      );
-      const personEmail = personCard.querySelector<HTMLLinkElement>(
-        `[dev-target=email-link]`
-      );
-      const personTitle = personCard.querySelector<HTMLParagraphElement>(
-        `[dev-target=person-title]`
-      );
-      const personBio = personCard.querySelector<HTMLParagraphElement>(
-        `[dev-target=person-bio]`
-      );
-      const personCompanyLink = personCard.querySelector<HTMLLinkElement>(
-        `[dev-target=person-company-link]`
-      );
-      const personLinkedinLink = personCard.querySelector<HTMLLinkElement>(
-        `[dev-target=linkedin-link]`
-      );
-      const personImageWrapper = personCard.querySelector(
-        `[dev-target=person-image-wrapper]`
-      );
-      const personImageLink =
-        personImageWrapper?.querySelector<HTMLLinkElement>(
-          `[dev-target=person-picture-link]`
+      personCards.forEach((personCard) => {
+        const personName = personCard.querySelector<HTMLHeadingElement>(
+          `[dev-target=person-name]`
         );
-      const PersonImage = personImageWrapper?.querySelector(
-        `[dev-target=person-image]`
-      );
-      const personInput = personImageWrapper?.querySelector<HTMLInputElement>(
-        `[dev-target=person-input]`
-      );
-
-      personName!.textContent = person.name;
-      personTitle!.textContent = person.title;
-      personBio!.textContent = person.bio;
-      personCompanyLink!.textContent = person.company_details.name;
-      personCompanyLink!.href = "company/" + person.company_details.slug;
-      personLinkedinLink!.href = person.linkedin;
-      personLinkedinLink?.classList[person.linkedin ? "remove":"add"]("hide")
-      personEmail!.href = person.email ? "mailto:" + person.email : "#";
-      personEmail?.classList[person.email ? "remove":"add"]("hide")
-
-      cardSkeletons.forEach((cardSkeleton)=>cardSkeleton.remove());
-      personCard.classList.remove("dev-hide")
-
-      fakeCheckboxToggle(personInput!);
-      personInput?.setAttribute("dev-input-type", "people_id");
-      personInput?.setAttribute("dev-input-id", person.id.toString());
-      personInput && followFavouriteLogic(personInput);
-      personInput &&
-        setCheckboxesInitialState(
-          personInput,
-          convertArrayOfObjToNumber(
-            userFollowingAndFavourite!.user_following.people_id
-          )
+        const personEmail = personCard.querySelector<HTMLLinkElement>(
+          `[dev-target=email-link]`
+        );
+        const personTitle = personCard.querySelector<HTMLParagraphElement>(
+          `[dev-target=person-title]`
+        );
+        const personBio = personCard.querySelector<HTMLParagraphElement>(
+          `[dev-target=person-bio]`
+        );
+        const personCompanyLink = personCard.querySelector<HTMLLinkElement>(
+          `[dev-target=person-company-link]`
+        );
+        const personLinkedinLink = personCard.querySelector<HTMLLinkElement>(
+          `[dev-target=linkedin-link]`
+        );
+        const personImageWrapper = personCard.querySelector(
+          `[dev-target=person-image-wrapper]`
+        );
+        const personImageLink =
+          personImageWrapper?.querySelector<HTMLLinkElement>(
+            `[dev-target=person-picture-link]`
+          );
+        const PersonImage = personImageWrapper?.querySelector(
+          `[dev-target=person-image]`
+        );
+        const personInput = personImageWrapper?.querySelector<HTMLInputElement>(
+          `[dev-target=person-input]`
         );
 
-      })
-      personDetails.forEach((personDetail)=>personDetail.classList.remove("opacity-hide"))
+        personName!.textContent = person.name;
+        personTitle!.textContent = person.title;
+        personBio!.textContent = person.bio;
+        personCompanyLink!.textContent = person.company_details.name;
+        personCompanyLink!.href = "company/" + person.company_details.slug;
+        personLinkedinLink!.href = person.linkedin;
+        personLinkedinLink?.classList[person.linkedin ? "remove" : "add"](
+          "hide"
+        );
+        personEmail!.href = person.email ? "mailto:" + person.email : "#";
+        personEmail?.classList[person.email ? "remove" : "add"]("hide");
+
+        cardSkeletons.forEach((cardSkeleton) => cardSkeleton.remove());
+        personCard.classList.remove("dev-hide");
+
+        fakeCheckboxToggle(personInput!);
+        personInput?.setAttribute("dev-input-type", "people_id");
+        personInput?.setAttribute("dev-input-id", person.id.toString());
+        personInput && followFavouriteLogic(personInput);
+        personInput &&
+          setCheckboxesInitialState(
+            personInput,
+            convertArrayOfObjToNumber(
+              userFollowingAndFavourite!.user_following.people_id
+            )
+          );
+      });
+      personDetails.forEach((personDetail) =>
+        personDetail.classList.remove("opacity-hide")
+      );
       return person;
     } catch (error) {
       console.log("getPerson_error", error);
@@ -260,15 +263,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  async function getPersonInsights(
-    slug: string,
-    payload: InsightPayload,
-  ) {
-    const {
-      page = 0,
-      perPage = 0,
-      offset = 0,
-    } = payload;
+  async function getPersonInsights(slug: string, payload: InsightPayload) {
+    const { page = 0, perPage = 0, offset = 0 } = payload;
     try {
       const res = await xano_individual_pages.get("/person_insights", {
         slug,
@@ -277,7 +273,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         offset,
         sortBy: sortObject.sortBy,
         orderBy: sortObject.orderBy,
-        filtering:searchObject,
+        filtering: searchObject,
       });
       const personInsightResponse = res.getBody() as PersonInsightResponse;
       allTabsTarget.innerHTML = "";
@@ -290,7 +286,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           allTabsTarget,
           userFollowingAndFavourite
         );
-      insightsSkeleton.remove()
+      insightsSkeleton.remove();
       console.log("personInsightResponse", personInsightResponse);
       return personInsightResponse;
     } catch (error) {
@@ -401,48 +397,55 @@ document.addEventListener("DOMContentLoaded", async () => {
       const sourceAuthorTarget = newInsight.querySelector(
         `[dev-target="source-author"]`
       );
-      
-      const curatedDate = insight.curated ? formatCuratedDate(insight.curated):"";
-      const publishedDate = insight["source-publication-date"]?formatPublishedDate(insight["source-publication-date"]):"";
+
+      const curatedDate = insight.curated
+        ? formatCuratedDate(insight.curated)
+        : "";
+      const publishedDate = insight["source-publication-date"]
+        ? formatPublishedDate(insight["source-publication-date"])
+        : "";
       const sourceCatArray = insight.source_category_id;
       const companyTypeArray = insight.company_type_id;
       const insightClassArray = insight.insight_classification_id;
       const lineOfBusArray = insight.line_of_business_id;
       const techCatArray = insight.technology_category_id;
-      
+
       const companyInputs = newInsight.querySelectorAll<HTMLInputElement>(
         `[dev-target=company-input]`
-        );
-      companyInputs.forEach((companyInput)=>{
+      );
+      companyInputs.forEach((companyInput) => {
         fakeCheckboxToggle(companyInput!);
         companyInput?.setAttribute("dev-input-type", "company_id");
-        companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
+        companyInput?.setAttribute(
+          "dev-input-id",
+          insight.company_id.toString()
+        );
         companyInput && followFavouriteLogic(companyInput);
         companyInput &&
-        setCheckboxesInitialState(
-          companyInput,
-          convertArrayOfObjToNumber(
-            userFollowingAndFavourite.user_following.company_id
+          setCheckboxesInitialState(
+            companyInput,
+            convertArrayOfObjToNumber(
+              userFollowingAndFavourite.user_following.company_id
             )
-            );
-          })
+          );
+      });
       const favouriteInputs = newInsight.querySelectorAll<HTMLInputElement>(
         `[dev-target=favourite-input]`
       );
-      favouriteInputs.forEach((favouriteInput)=>{
+      favouriteInputs.forEach((favouriteInput) => {
         fakeCheckboxToggle(favouriteInput!);
-  
+
         favouriteInput?.setAttribute("dev-input-type", "favourite");
         favouriteInput?.setAttribute("dev-input-id", insight.id.toString());
-  
+
         favouriteInput && followFavouriteLogic(favouriteInput);
-  
+
         favouriteInput &&
           setCheckboxesInitialState(
             favouriteInput,
             userFollowingAndFavourite.user_favourite.insight_id
           );
-      })
+      });
 
       addTagsToInsight(sourceCatArray, tagsWrapperTarget!, false);
       addTagsToInsight(companyTypeArray, tagsWrapperTarget!, false);
@@ -455,10 +458,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         "technology_category_id"
       );
 
-      if(insight.company_details.company_logo){
-        companyImage!.src = insight.company_details.company_logo.url
-      }else{
-        companyImage!.src = "https://logo.clearbit.com/"+insight.company_details["company-website"]
+      if (insight.company_details.company_logo) {
+        companyImage!.src = insight.company_details.company_logo.url;
+      } else {
+        companyImage!.src =
+          "https://logo.clearbit.com/" +
+          insight.company_details["company-website"];
         fetch(
           "https://logo.clearbit.com/" +
             insight.company_details["company-website"]
@@ -469,19 +474,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
       }
       insightNameTarget!.textContent = insight.name;
-      curatedDateTargetWrapper?.classList[curatedDate ? "remove":"add"]("hide")
+      curatedDateTargetWrapper?.classList[curatedDate ? "remove" : "add"](
+        "hide"
+      );
       curatedDateTarget!.textContent = curatedDate ?? "";
       publishedDateTarget!.textContent = publishedDate ?? "";
-      publishedDateTargetWrapper.forEach((item)=>item.classList[publishedDate ? "remove":"add"]("hide"))
+      publishedDateTargetWrapper.forEach((item) =>
+        item.classList[publishedDate ? "remove" : "add"]("hide")
+      );
       insightLink!.setAttribute("href", "/insight/" + insight.slug);
       sourceTarget!.setAttribute("href", insight["source-url"]);
-      sourceTargetWrapper?.classList[insight["source-url"] ? "remove":"add"]("hide")
+      sourceTargetWrapper?.classList[insight["source-url"] ? "remove" : "add"](
+        "hide"
+      );
       companyLink!.setAttribute(
         "href",
         "/company/" + insight.company_details.slug
       );
       sourceTarget!.textContent = insight.source;
-      sourceAuthorTargetWrapper.forEach((item)=>item.classList[insight.source_author ? "remove":"add"]("hide"))
+      sourceAuthorTargetWrapper.forEach((item) =>
+        item.classList[insight.source_author ? "remove" : "add"]("hide")
+      );
       sourceAuthorTarget!.textContent = insight.source_author;
       target.appendChild(newInsight);
     });
@@ -500,12 +513,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const sortItems = qsa<HTMLLinkElement>(`[dev-target="sort"]`);
     sortItems.forEach((item) => {
       item.addEventListener("click", () => {
-        sortItems.forEach((sortItem)=>{
-          sortItem.classList.remove("active")
-        })
-        item.classList.add("active")
+        sortItems.forEach((sortItem) => {
+          sortItem.classList.remove("active");
+        });
+        item.classList.add("active");
         const value = item.textContent;
-        qs(`[dev-target=sorted-item-name]`).textContent = value
+        qs(`[dev-target=sorted-item-name]`).textContent = value;
         const orderBy = item.getAttribute("dev-orderby");
         const sortBy = item.getAttribute("dev-sortby");
 
@@ -556,26 +569,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   function updateInsightsInputs(insight: HTMLDivElement) {
     const companyInputs = insight.querySelectorAll<HTMLInputElement>(
       `[dev-input-type="company_id"]`
-      );
-    companyInputs.forEach((companyInput)=>{
+    );
+    companyInputs.forEach((companyInput) => {
       companyInput &&
-      setCheckboxesInitialState(
-        companyInput,
-        convertArrayOfObjToNumber(
-          userFollowingAndFavourite?.user_following.company_id!
+        setCheckboxesInitialState(
+          companyInput,
+          convertArrayOfObjToNumber(
+            userFollowingAndFavourite?.user_following.company_id!
           )
-          );
-        });
+        );
+    });
     const favorites = insight.querySelectorAll<HTMLInputElement>(
       `[dev-input="fav-insight"]`
-      );
-      favorites.forEach((favourite)=>{
-        favourite &&
-          setCheckboxesInitialState(
-            favourite,
-            userFollowingAndFavourite?.user_favourite.insight_id!
-          );
-      })
+    );
+    favorites.forEach((favourite) => {
+      favourite &&
+        setCheckboxesInitialState(
+          favourite,
+          userFollowingAndFavourite?.user_favourite.insight_id!
+        );
+    });
     const tagInputs = insight.querySelectorAll<HTMLInputElement>(
       `[dev-input-type="technology_category_id"]`
     );
@@ -633,22 +646,31 @@ document.addEventListener("DOMContentLoaded", async () => {
           `[dev-target=tag-input]`
         );
         showCheckbox && tagInput && fakeCheckboxToggle(tagInput);
-        showCheckbox && type && tagInput && tagInput.setAttribute("dev-input-type", type);
-        showCheckbox && tagInput && tagInput.setAttribute("dev-input-id", item.id.toString());
+        showCheckbox &&
+          type &&
+          tagInput &&
+          tagInput.setAttribute("dev-input-type", type);
+        showCheckbox &&
+          tagInput &&
+          tagInput.setAttribute("dev-input-id", item.id.toString());
         showCheckbox && tagInput && followFavouriteLogic(tagInput);
         newTag.querySelector(`[dev-target=tag-name]`)!.textContent =
           item?.name!;
 
-        if(showCheckbox){
-          const tagSpan = newTag.querySelector<HTMLSpanElement>(`[dev-target="tag-name"]`)
-          newTag.style.cursor = "pointer"
-          newTag.querySelector<HTMLLabelElement>(`[dev-fake-checkbox-wrapper]`)!.style.cursor = "pointer"
-          const anchor = document.createElement('a');
-          anchor.href = `/technology/${item.slug}`
-          anchor.textContent = tagSpan!.textContent
-          anchor.style.cursor = "pointer"
-          anchor.classList.add("tag-span-name")
-          tagSpan?.replaceWith(anchor)
+        if (showCheckbox) {
+          const tagSpan = newTag.querySelector<HTMLSpanElement>(
+            `[dev-target="tag-name"]`
+          );
+          newTag.style.cursor = "pointer";
+          newTag.querySelector<HTMLLabelElement>(
+            `[dev-fake-checkbox-wrapper]`
+          )!.style.cursor = "pointer";
+          const anchor = document.createElement("a");
+          anchor.href = `/technology/${item.slug}`;
+          anchor.textContent = tagSpan!.textContent;
+          anchor.style.cursor = "pointer";
+          anchor.classList.add("tag-span-name");
+          tagSpan?.replaceWith(anchor);
         }
 
         if (tagCheckbox && !showCheckbox) {
@@ -827,9 +849,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     // pagination.style.display = pageTotal === 1 ? "none" : "flex";
 
-    if(nextPage === null && prevPage === null){
-      paginationTarget?.classList.add("hide")
-    };
+    if (nextPage === null && prevPage === null) {
+      paginationTarget?.classList.add("hide");
+    }
     paginationTarget.appendChild(pagination);
   }
 
@@ -843,16 +865,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
   }
 
-  function formatCuratedDate(inputDate:Date) {
+  function formatCuratedDate(inputDate: Date) {
     const date = new Date(inputDate);
-    return `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
+    return `${date.toLocaleString("default", {
+      month: "short",
+      timeZone: "UTC",
+    })} ${date.getFullYear()}`;
   }
 
-  function formatPublishedDate(inputDate:Date) {
+  function formatPublishedDate(inputDate: Date) {
     const date = new Date(inputDate);
-    return `${date.toLocaleString('default', { month: 'long' })} ${date.getUTCDate()}, ${date.getFullYear()}`;
+    return `${date.toLocaleString("default", {
+      month: "long",
+      timeZone: "UTC",
+    })} ${date.getUTCDate()}, ${date.getFullYear()}`;
   }
-
 
   // Function for querying a single element by selector
   function qs<T extends HTMLElement = HTMLDivElement>(selector: string): T {
@@ -944,8 +971,8 @@ interface PersonInsightResponse {
       id: number;
       name: string;
       slug: string;
-      "company-website":string;
-      company_logo:null|{url:string}
+      "company-website": string;
+      company_logo: null | { url: string };
     };
   }[];
 }

@@ -277,7 +277,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             companyInputs.forEach((companyInput) => {
                 fakeCheckboxToggle(companyInput);
                 companyInput?.setAttribute("dev-input-type", "company_id");
-                insight.company_id && companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
+                insight.company_id &&
+                    companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
                 companyInput && followFavouriteLogic(companyInput);
                 companyInput &&
                     setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id));
@@ -300,10 +301,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 companyImage.src = insight.company_details.company_logo.url;
             }
             else {
-                if (insight.company_details && insight.company_details["company-website"]) {
-                    const imageUrl = "https://logo.clearbit.com/" + insight.company_details["company-website"];
+                if (insight.company_details &&
+                    insight.company_details["company-website"]) {
+                    const imageUrl = "https://logo.clearbit.com/" +
+                        insight.company_details["company-website"];
                     fetch(imageUrl)
-                        .then(response => {
+                        .then((response) => {
                         if (response.ok) {
                             companyImage.src = imageUrl;
                         }
@@ -312,7 +315,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         }
                     })
                         .catch(() => {
-                        companyImage.src = "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp";
+                        companyImage.src =
+                            "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp";
                     });
                 }
                 else {
@@ -387,12 +391,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         const date = new Date(inputDate);
         return `${date.toLocaleString("default", {
             month: "short",
+            timeZone: "UTC",
         })} ${date.getFullYear()}`;
     }
     function formatPublishedDate(inputDate) {
         const date = new Date(inputDate);
         return `${date.toLocaleString("default", {
             month: "long",
+            timeZone: "UTC",
         })} ${date.getUTCDate()}, ${date.getFullYear()}`;
     }
     function followFavouriteLogic(input) {
@@ -629,7 +635,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (nextPage === null && prevPage === null) {
             paginationTarget?.classList.add("hide");
         }
-        ;
         paginationTarget.appendChild(pagination);
     }
     function insightSearch() {

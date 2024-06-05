@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
             const person = res.getBody();
             if (person === null) {
-                return window.location.href = "/404";
+                return (window.location.href = "/404");
             }
             qs("title").textContent = person.name;
             console.log("person", person);
@@ -183,7 +183,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
     async function getPersonInsights(slug, payload) {
-        const { page = 0, perPage = 0, offset = 0, } = payload;
+        const { page = 0, perPage = 0, offset = 0 } = payload;
         try {
             const res = await xano_individual_pages.get("/person_insights", {
                 slug,
@@ -262,8 +262,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             const sourceTarget = newInsight.querySelector(`[dev-target="source-name-link"]`);
             const sourceAuthorTargetWrapper = newInsight.querySelectorAll(`[dev-target="source-author-wrapper"]`);
             const sourceAuthorTarget = newInsight.querySelector(`[dev-target="source-author"]`);
-            const curatedDate = insight.curated ? formatCuratedDate(insight.curated) : "";
-            const publishedDate = insight["source-publication-date"] ? formatPublishedDate(insight["source-publication-date"]) : "";
+            const curatedDate = insight.curated
+                ? formatCuratedDate(insight.curated)
+                : "";
+            const publishedDate = insight["source-publication-date"]
+                ? formatPublishedDate(insight["source-publication-date"])
+                : "";
             const sourceCatArray = insight.source_category_id;
             const companyTypeArray = insight.company_type_id;
             const insightClassArray = insight.insight_classification_id;
@@ -296,7 +300,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 companyImage.src = insight.company_details.company_logo.url;
             }
             else {
-                companyImage.src = "https://logo.clearbit.com/" + insight.company_details["company-website"];
+                companyImage.src =
+                    "https://logo.clearbit.com/" +
+                        insight.company_details["company-website"];
                 fetch("https://logo.clearbit.com/" +
                     insight.company_details["company-website"]).catch(() => (companyImage.src =
                     "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
@@ -408,8 +414,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const tagCheckbox = newTag.querySelector(`[dev-target=fake-checkbox]`);
                 const tagInput = newTag.querySelector(`[dev-target=tag-input]`);
                 showCheckbox && tagInput && fakeCheckboxToggle(tagInput);
-                showCheckbox && type && tagInput && tagInput.setAttribute("dev-input-type", type);
-                showCheckbox && tagInput && tagInput.setAttribute("dev-input-id", item.id.toString());
+                showCheckbox &&
+                    type &&
+                    tagInput &&
+                    tagInput.setAttribute("dev-input-type", type);
+                showCheckbox &&
+                    tagInput &&
+                    tagInput.setAttribute("dev-input-id", item.id.toString());
                 showCheckbox && tagInput && followFavouriteLogic(tagInput);
                 newTag.querySelector(`[dev-target=tag-name]`).textContent =
                     item?.name;
@@ -417,7 +428,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const tagSpan = newTag.querySelector(`[dev-target="tag-name"]`);
                     newTag.style.cursor = "pointer";
                     newTag.querySelector(`[dev-fake-checkbox-wrapper]`).style.cursor = "pointer";
-                    const anchor = document.createElement('a');
+                    const anchor = document.createElement("a");
                     anchor.href = `/technology/${item.slug}`;
                     anchor.textContent = tagSpan.textContent;
                     anchor.style.cursor = "pointer";
@@ -578,7 +589,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (nextPage === null && prevPage === null) {
             paginationTarget?.classList.add("hide");
         }
-        ;
         paginationTarget.appendChild(pagination);
     }
     // Function to debounce a given function
@@ -592,11 +602,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     function formatCuratedDate(inputDate) {
         const date = new Date(inputDate);
-        return `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
+        return `${date.toLocaleString("default", {
+            month: "short",
+            timeZone: "UTC",
+        })} ${date.getFullYear()}`;
     }
     function formatPublishedDate(inputDate) {
         const date = new Date(inputDate);
-        return `${date.toLocaleString('default', { month: 'long' })} ${date.getUTCDate()}, ${date.getFullYear()}`;
+        return `${date.toLocaleString("default", {
+            month: "long",
+            timeZone: "UTC",
+        })} ${date.getUTCDate()}, ${date.getFullYear()}`;
     }
     // Function for querying a single element by selector
     function qs(selector) {
