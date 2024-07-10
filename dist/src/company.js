@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         sortLogicInit(companySlug);
     }
     async function getCompanyInsights(slug, payload) {
-        const { page = 0, perPage = 0, offset = 0, } = payload;
+        const { page = 0, perPage = 0, offset = 0 } = payload;
         try {
             const res = await xano_individual_pages.get("/company_insights", {
                 slug,
@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
             const company = res.getBody();
             if (company === null) {
-                return window.location.href = "/404";
+                return (window.location.href = "/404");
             }
             qs("title").textContent = company.name;
             console.log("company", company);
@@ -216,7 +216,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     location?.classList.add("hide");
                 }
                 if (company["company-size"]) {
-                    companySize.querySelector("p").textContent = company["company-size"];
+                    companySize.querySelector("p").textContent =
+                        company["company-size"];
                 }
                 else {
                     companySize?.classList.add("hide");
@@ -279,14 +280,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             keyDocumentsCards.forEach((keyDocumentsCard) => {
                 const keyDocumentsItemTemplate = keyDocumentsCard.querySelector(`[dev-target="key-documents-template"]`);
                 const keyDocumentsWrapper = keyDocumentsCard.querySelector(`[dev-target="key-documents-wrapper"]`);
-                if (company.key_documents && company.key_documents.length > 0 && company.key_documents.some((item) => item !== null)) {
+                if (company.key_documents &&
+                    company.key_documents.length > 0 &&
+                    company.key_documents.some((item) => item !== null)) {
                     company.key_documents.forEach((keyDocument) => {
                         if (keyDocument === null)
                             return;
                         const keyDocumentItem = keyDocumentsItemTemplate.cloneNode(true);
                         const keyDocumentItemLink = keyDocumentItem.querySelector(`[dev-target="key-documents-link"]`);
                         keyDocumentItemLink.textContent = keyDocument.name;
-                        keyDocumentItemLink.href = keyDocument.document.url ? keyDocument.document.url : keyDocument.document_url;
+                        keyDocumentItemLink.href = keyDocument.document
+                            ? keyDocument.document.url
+                            : keyDocument.document_url;
                         keyDocumentsWrapper?.appendChild(keyDocumentItem);
                     });
                     keyDocumentsCard
@@ -301,12 +306,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
             relatedBusinessCards.forEach((relatedBusinessCard) => {
-                if ((company["related-business-entities"] && company["related-business-entities"].length === 0) || company["related-business-entities"] === null) {
+                if ((company["related-business-entities"] &&
+                    company["related-business-entities"].length === 0) ||
+                    company["related-business-entities"] === null) {
                     relatedBusinessCard
                         .querySelector(`[dev-target=related-business-empty-state]`)
                         ?.classList.remove("hide");
                 }
-                if (company["related-business-entities"] && company["related-business-entities"].length > 0 && company["related-business-entities"][0] !== null) {
+                if (company["related-business-entities"] &&
+                    company["related-business-entities"].length > 0 &&
+                    company["related-business-entities"][0] !== null) {
                     company["related-business-entities"].forEach((item) => {
                         if (item === null)
                             return;
@@ -348,8 +357,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             const sourceTarget = newInsight.querySelector(`[dev-target="source-name-link"]`);
             const sourceAuthorTargetWrapper = newInsight.querySelectorAll(`[dev-target="source-author-wrapper"]`);
             const sourceAuthorTarget = newInsight.querySelector(`[dev-target="source-author"]`);
-            const curatedDate = insight.curated ? formatCuratedDate(insight.curated) : "";
-            const publishedDate = insight["source-publication-date"] ? formatPublishedDate(insight["source-publication-date"]) : "";
+            const curatedDate = insight.curated
+                ? formatCuratedDate(insight.curated)
+                : "";
+            const publishedDate = insight["source-publication-date"]
+                ? formatPublishedDate(insight["source-publication-date"])
+                : "";
             const sourceCatArray = insight.source_category_id;
             const companyTypeArray = insight.company_type_id;
             const insightClassArray = insight.insight_classification_id;
@@ -359,7 +372,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             companyInputs.forEach((companyInput) => {
                 fakeCheckboxToggle(companyInput);
                 companyInput?.setAttribute("dev-input-type", "company_id");
-                insight.company_id && companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
+                insight.company_id &&
+                    companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
                 companyInput && followFavouriteLogic(companyInput);
                 companyInput &&
                     setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id));
@@ -548,7 +562,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (nextPage === null && prevPage === null) {
             paginationTarget?.classList.add("hide");
         }
-        ;
         paginationTarget.appendChild(pagination);
     }
     function followFavouriteLogic(input) {
@@ -656,8 +669,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const tagCheckbox = newTag.querySelector(`[dev-target=fake-checkbox]`);
                 const tagInput = newTag.querySelector(`[dev-target=tag-input]`);
                 showCheckbox && tagInput && fakeCheckboxToggle(tagInput);
-                showCheckbox && type && tagInput && tagInput.setAttribute("dev-input-type", type);
-                showCheckbox && tagInput && tagInput.setAttribute("dev-input-id", item.id.toString());
+                showCheckbox &&
+                    type &&
+                    tagInput &&
+                    tagInput.setAttribute("dev-input-type", type);
+                showCheckbox &&
+                    tagInput &&
+                    tagInput.setAttribute("dev-input-id", item.id.toString());
                 showCheckbox && tagInput && followFavouriteLogic(tagInput);
                 newTag.querySelector(`[dev-target=tag-name]`).textContent =
                     item?.name;
@@ -665,7 +683,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const tagSpan = newTag.querySelector(`[dev-target="tag-name"]`);
                     newTag.style.cursor = "pointer";
                     newTag.querySelector(`[dev-fake-checkbox-wrapper]`).style.cursor = "pointer";
-                    const anchor = document.createElement('a');
+                    const anchor = document.createElement("a");
                     anchor.href = `/technology/${item.slug}`;
                     anchor.textContent = tagSpan.textContent;
                     anchor.style.cursor = "pointer";
@@ -684,11 +702,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     function formatCuratedDate(inputDate) {
         const date = new Date(inputDate);
-        return `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
+        return `${date.toLocaleString("default", {
+            month: "short",
+        })} ${date.getFullYear()}`;
     }
     function formatPublishedDate(inputDate) {
         const date = new Date(inputDate);
-        return `${date.toLocaleString('default', { month: 'long' })} ${date.getUTCDate()}, ${date.getFullYear()}`;
+        return `${date.toLocaleString("default", {
+            month: "long",
+        })} ${date.getUTCDate()}, ${date.getFullYear()}`;
     }
     // Function to debounce a given function
     function debounce(func, delay) {

@@ -51,10 +51,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function insightPageInit(insightSlug) {
         const insight = await getInsight(insightSlug);
         if (insight) {
-            const companyItemTemplate = companyCards.item(0).querySelector(`[dev-target="company-template"]`);
-            const peopleItemTemplate = peopleCards.item(0).querySelector(`[dev-target="people-template"]`);
+            const companyItemTemplate = companyCards
+                .item(0)
+                .querySelector(`[dev-target="company-template"]`);
+            const peopleItemTemplate = peopleCards
+                .item(0)
+                .querySelector(`[dev-target="people-template"]`);
             const sourceDocumentItemTemplate = sourceDocumentCard.querySelector(`[dev-target="source-document-template"]`);
-            const eventItemTemplate = eventCards.item(0).querySelector(`[dev-target="event-link"]`);
+            const eventItemTemplate = eventCards
+                .item(0)
+                .querySelector(`[dev-target="event-link"]`);
             // const eventItemTemplate = sourceDocumentCard.querySelector<HTMLDivElement>(
             //   `[dev-target="event-link"]`
             // ) as HTMLDivElement;
@@ -72,8 +78,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             const sourceTarget = insightTemplate.querySelector(`[dev-target="source-name-link"]`);
             const sourceAuthorTargetWrapper = insightTemplate.querySelectorAll(`[dev-target="source-author-wrapper"]`);
             const sourceAuthorTarget = insightTemplate.querySelector(`[dev-target="source-author"]`);
-            const curatedDate = insight.curated ? formatCuratedDate(insight.curated) : "";
-            const publishedDate = insight["source-publication-date"] ? formatPublishedDate(insight["source-publication-date"]) : "";
+            const curatedDate = insight.curated
+                ? formatCuratedDate(insight.curated)
+                : "";
+            const publishedDate = insight["source-publication-date"]
+                ? formatPublishedDate(insight["source-publication-date"])
+                : "";
             const favouriteInputs = insightTemplate.querySelectorAll(`[dev-target=favourite-input]`);
             const companyInputs = insightTemplate.querySelectorAll(`[dev-target=company-input]`);
             companyInputs.forEach((companyInput) => {
@@ -115,7 +125,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             insightName.textContent = insight.name;
             companyLink.textContent = insight.company_details.name;
             companyLink.href = "/pft/company_pft/" + insight.company_details.slug;
-            companyPictureLink.href = "/pft/company_pft/" + insight.company_details.slug;
+            companyPictureLink.href =
+                "/pft/company_pft/" + insight.company_details.slug;
             insightRichtext.innerHTML = insight["insight-detail"];
             addTagsToInsight(insight.company_type_id, tagsWrapperTarget, false);
             addTagsToInsight(insight.source_category_id, tagsWrapperTarget, false);
@@ -124,7 +135,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             addTagsToInsight(insight.technology_category_id, tagsWrapperTarget, true, "technology_category_id");
             const companyWrappers = Array.from(companyCards).map((companyCard) => companyCard.querySelector(`[dev-target="company-wrapper"]`));
             companyWrappers.forEach((companyWrapper) => {
-                if (insight.companies_mentioned && insight.companies_mentioned.length > 0) {
+                if (insight.companies_mentioned &&
+                    insight.companies_mentioned.length > 0) {
                     insight.companies_mentioned.forEach((item) => {
                         if (item === null)
                             return;
@@ -138,10 +150,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         }
                         else {
                             companyImage.src =
-                                "https://logo.clearbit.com/" +
-                                    item["company-website"];
-                            fetch("https://logo.clearbit.com/" +
-                                item["company-website"]).catch(() => (companyImage.src =
+                                "https://logo.clearbit.com/" + item["company-website"];
+                            fetch("https://logo.clearbit.com/" + item["company-website"]).catch(() => (companyImage.src =
                                 "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
                         }
                         companyPictureLink.href = "/pft/company_pft/" + item.slug;
@@ -174,7 +184,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const sourceDocumentItem = sourceDocumentItemTemplate.cloneNode(true);
                     const sourceDocumentItemLink = sourceDocumentItem.querySelector(`[dev-target="source-document-link"]`);
                     sourceDocumentItemLink.textContent = sourceDocument.name;
-                    sourceDocumentItemLink.href = sourceDocument.document.url ? sourceDocument.document.url : sourceDocument.document_url;
+                    sourceDocumentItemLink.href = sourceDocument.document
+                        ? sourceDocument.document.url
+                        : sourceDocument.document_url;
                     sourceDocumentWrapper?.appendChild(sourceDocumentItem);
                 });
                 sourceDocumentCard
@@ -197,7 +209,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const personItemLink = peopleItem.querySelector(`[dev-target="people-link"]`);
                         const companyItemLink = peopleItem.querySelector(`[dev-target="company-link"]`);
                         const personTitleName = person.title;
-                        const personName = `${person.name}${personTitleName && (", " + truncateText(personTitleName, 30))}`;
+                        const personName = `${person.name}${personTitleName && ", " + truncateText(personTitleName, 30)}`;
                         const personLink = "/pft/person_pft/" + person.slug;
                         const companyName = person._company?.name;
                         const companyLink = "/pft/company_pft/" + person._company?.slug;
@@ -278,7 +290,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
     function truncateText(input, maxLength) {
-        return input.length > maxLength ? input.slice(0, maxLength) + '...' : input;
+        return input.length > maxLength ? input.slice(0, maxLength) + "..." : input;
     }
     function addTagsToInsight(tagArray, targetWrapper, showCheckbox, type) {
         tagArray.forEach((item) => {
@@ -287,8 +299,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const tagCheckbox = newTag.querySelector(`[dev-target=fake-checkbox]`);
                 const tagInput = newTag.querySelector(`[dev-target=tag-input]`);
                 showCheckbox && tagInput && fakeCheckboxToggle(tagInput);
-                showCheckbox && type && tagInput && tagInput.setAttribute("dev-input-type", type);
-                showCheckbox && tagInput && tagInput.setAttribute("dev-input-id", item.id.toString());
+                showCheckbox &&
+                    type &&
+                    tagInput &&
+                    tagInput.setAttribute("dev-input-type", type);
+                showCheckbox &&
+                    tagInput &&
+                    tagInput.setAttribute("dev-input-id", item.id.toString());
                 showCheckbox && tagInput && followFavouriteLogic(tagInput);
                 newTag.querySelector(`[dev-target=tag-name]`).textContent =
                     item?.name;
@@ -296,7 +313,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const tagSpan = newTag.querySelector(`[dev-target="tag-name"]`);
                     newTag.style.cursor = "pointer";
                     newTag.querySelector(`[dev-fake-checkbox-wrapper]`).style.cursor = "pointer";
-                    const anchor = document.createElement('a');
+                    const anchor = document.createElement("a");
                     anchor.href = `/pft/technology_pft/${item.slug}`;
                     anchor.textContent = tagSpan.textContent;
                     anchor.style.cursor = "pointer";
@@ -375,11 +392,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     function formatCuratedDate(inputDate) {
         const date = new Date(inputDate);
-        return `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
+        return `${date.toLocaleString("default", {
+            month: "short",
+        })} ${date.getFullYear()}`;
     }
     function formatPublishedDate(inputDate) {
         const date = new Date(inputDate);
-        return `${date.toLocaleString('default', { month: 'long' })} ${date.getUTCDate()}, ${date.getFullYear()}`;
+        return `${date.toLocaleString("default", {
+            month: "long",
+        })} ${date.getUTCDate()}, ${date.getFullYear()}`;
     }
     function debounce(func, delay) {
         let debounceTimer;

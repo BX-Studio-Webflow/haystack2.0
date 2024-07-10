@@ -183,7 +183,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const sourceDocumentItem = sourceDocumentItemTemplate.cloneNode(true);
                     const sourceDocumentItemLink = sourceDocumentItem.querySelector(`[dev-target="source-document-link"]`);
                     sourceDocumentItemLink.textContent = sourceDocument.name;
-                    sourceDocumentItemLink.href = sourceDocument.document.url
+                    sourceDocumentItemLink.href = sourceDocument.document
                         ? sourceDocument.document.url
                         : sourceDocument.document_url;
                     sourceDocumentWrapper?.appendChild(sourceDocumentItem);
