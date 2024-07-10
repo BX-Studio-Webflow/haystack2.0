@@ -308,7 +308,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             );
 
           sourceDocumentItemLink!.textContent = sourceDocument.name;
-          sourceDocumentItemLink!.href = sourceDocument.document.url
+          sourceDocumentItemLink!.href = sourceDocument.document
             ? sourceDocument.document.url
             : sourceDocument.document_url;
 
