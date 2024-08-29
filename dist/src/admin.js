@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         moveApprovedToLive();
     });
     insightSort.passedElement.element.addEventListener("choice", async (event) => {
-        insightSortStatus = event.detail.choice.value;
+        insightSortStatus = event.detail.value;
         const { items } = await getEditorInsights(currentPage, perPage, insightSortStatus);
         if (insightSortStatus === "Approved" && items.length > 0) {
             moveToLiveBtn?.setAttribute("dev-display", "flex");
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }, false);
     editTableName.passedElement.element.addEventListener("choice", (event) => {
-        editTableNameValue = event.detail.choice.value;
+        editTableNameValue = event.detail.value;
         fetchDataFromEndpoint("", editInsightName, "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights", editTableNameValue);
         clearForm();
     }, false);

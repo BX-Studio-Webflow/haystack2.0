@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   insightSort.passedElement.element.addEventListener(
     "choice",
     async (event) => {
-      insightSortStatus = event.detail.choice.value;
+      insightSortStatus = event.detail.value;
       const { items } = await getEditorInsights(
         currentPage,
         perPage,
@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   editTableName.passedElement.element.addEventListener(
     "choice",
     (event) => {
-      editTableNameValue = event.detail.choice.value;
+      editTableNameValue = event.detail.value;
       fetchDataFromEndpoint(
         "",
         editInsightName,
