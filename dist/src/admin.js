@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         debouncedFetch(event.detail.value, editInsightName, "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights", editTableNameValue);
     }, false);
     editInsightName.passedElement.element.addEventListener("choice", (event) => {
-        addDataToForm(event.detail.choice.customProperties);
+        addDataToForm(event.detail.customProperties);
     }, false);
     insightForm.addEventListener("submit", async (e) => {
         e.preventDefault();

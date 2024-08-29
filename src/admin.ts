@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   editInsightName.passedElement.element.addEventListener(
     "choice",
     (event) => {
-      addDataToForm(event.detail.choice.customProperties);
+      addDataToForm(event.detail.customProperties);
     },
     false
   );
