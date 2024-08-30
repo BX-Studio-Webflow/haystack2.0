@@ -75,6 +75,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             }).showToast();
         }
         else {
+            console.log("curatedInput", curatedInput.value);
+            console.log("sourcePublicationInput", sourcePublicationInput.value);
             const transformedData = await getFormData();
             console.log("transformedData", transformedData);
             console.log("editTableNameValue", editTableNameValue);
@@ -484,13 +486,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             internalNote: internalNoteInput.value,
             insightDetails: await insightDetails.then((val) => val.getData()),
             curated: curatedInput.value.trim() !== ""
-                ? new Date(curatedInput.value).toISOString()
+                ? new Date(convert_DD_MM_YYYY_to_YYYY_MM_DD(curatedInput.value)).toISOString()
                 : "",
             source: sourceInput.value,
             sourceAuthor: sourceAuthorInput.value,
             sourceUrl: sourceUrlInput.value,
             sourcePublication: sourcePublicationInput.value.trim() !== ""
-                ? new Date(sourcePublicationInput.value).toISOString()
+                ? new Date(convert_DD_MM_YYYY_to_YYYY_MM_DD(sourcePublicationInput.value)).toISOString()
                 : "",
             sourceCategory: sourceCategory.getValue()
                 ? sourceCategory.getValue().map(({ value }) => value)
@@ -566,6 +568,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         catch (error) {
             console.error("Error fetching or parsing data:", error);
         }
+    }
+    function convert_DD_MM_YYYY_to_YYYY_MM_DD(date) {
+        const [day, month, year] = date.split("-");
+        return `${year}-${month}-${day}`;
     }
     async function moveApprovedToLive() {
         const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/move_all_approved_insights_to_live?x-data-source=${DATA_SOURCE}`);
