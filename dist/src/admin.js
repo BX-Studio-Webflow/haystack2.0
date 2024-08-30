@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         moveApprovedToLive();
     });
     insightSort.passedElement.element.addEventListener("choice", async (event) => {
-        insightSortStatus = event.detail.value;
+        insightSortStatus = event.detail.choice.value;
         const { items } = await getEditorInsights(currentPage, perPage, insightSortStatus);
         if (insightSortStatus === "Approved" && items.length > 0) {
             moveToLiveBtn?.setAttribute("dev-display", "flex");
@@ -45,15 +45,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }, false);
     editTableName.passedElement.element.addEventListener("choice", (event) => {
-        editTableNameValue = event.detail.value;
+        editTableNameValue = event.detail.choice.value;
         fetchDataFromEndpoint("", editInsightName, "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights", editTableNameValue);
         clearForm();
     }, false);
     editInsightName.passedElement.element.addEventListener("search", (event) => {
-        debouncedFetch(event.detail.value, editInsightName, "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights", editTableNameValue);
+        debouncedFetch(event.detail.choice.value, editInsightName, "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights", editTableNameValue);
     }, false);
     editInsightName.passedElement.element.addEventListener("choice", (event) => {
-        addDataToForm(event.detail.customProperties);
+        addDataToForm(event.detail.choice.customProperties);
     }, false);
     insightForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -75,8 +75,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }).showToast();
         }
         else {
-            console.log("curatedInput", curatedInput.value);
-            console.log("sourcePublicationInput", sourcePublicationInput.value);
             const transformedData = await getFormData();
             console.log("transformedData", transformedData);
             console.log("editTableNameValue", editTableNameValue);
@@ -549,7 +547,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             const data = await response.json();
             const currentSelectedID = choicesInstance.getValue(true);
-            console.log("currentSelectedID", currentSelectedID);
             // Convert the data to the format required by Choices.js
             const choicesData = data
                 .filter((item) => typeof currentSelectedID === "number"
