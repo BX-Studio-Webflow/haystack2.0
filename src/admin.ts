@@ -410,13 +410,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     )!;
 
     flatpickr(curatedInput, {
-      dateFormat: "Y-m-d",
-      altFormat: "m-d-Y",
+      dateFormat: "d-m-Y",
+      altFormat: "d-m-Y",
       altInput: true,
     });
     flatpickr(sourcePublicationInput, {
-      dateFormat: "Y-m-d",
-      altFormat: "m-d-Y",
+      dateFormat: "d-m-Y",
+      altFormat: "d-m-Y",
       altInput: true,
     });
 

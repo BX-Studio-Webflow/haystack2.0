@@ -26,13 +26,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const eventInput = form.querySelector("[dev-target=event]");
     const publishedInput = form.querySelector("[dev-target=published-input]");
     flatpickr(curatedInput, {
-        dateFormat: "Y-m-d",
-        altFormat: "m-d-Y",
+        dateFormat: "d-m-Y",
+        altFormat: "d-m-Y",
         altInput: true,
     });
     flatpickr(sourcePublicationInput, {
-        dateFormat: "Y-m-d",
-        altFormat: "m-d-Y",
+        dateFormat: "d-m-Y",
+        altFormat: "d-m-Y",
         altInput: true,
     });
     const company = new Choices(companyInput);
