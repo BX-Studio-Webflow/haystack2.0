@@ -385,7 +385,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         sourcePublicationInput.parentElement
             ?.querySelectorAll("input")
             .forEach((input) => {
-            console.log(`insight["source-publication-date"]`, insight["source-publication-date"]);
             const [year, month, day] = insight["source-publication-date"].split("-");
             input.value = `${month}-${day}-${year}`;
         });
