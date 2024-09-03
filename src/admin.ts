@@ -31,9 +31,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   const adminTableRowTemplate = document.querySelector<HTMLElement>(
     "[dev-target=table-row-template]"
   );
-  const editTableName = new Choices(editTableNameInput);
-  const editInsightName = new Choices(editInsightNameInput);
-  const insightSort = new Choices(insightSortInput);
+  const editTableName = new Choices(editTableNameInput, {
+    searchResultLimit: 20,
+  });
+  const editInsightName = new Choices(editInsightNameInput, {
+    searchResultLimit: 20,
+  });
+  const insightSort = new Choices(insightSortInput, {
+    searchResultLimit: 20,
+  });
   let currentPage = 1;
   let perPage = 100;
   let insightSortStatus: "Pending" | "Approved" | "Rejected" | "" = "";
@@ -120,7 +126,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     "search",
     (event) => {
       debouncedFetch(
-        event.detail.choice.value,
+        event.detail.value,
         editInsightName,
         "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights",
         editTableNameValue

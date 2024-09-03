@@ -12,9 +12,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const insightSortInput = document.querySelector("[dev-target=status-sort]");
     const adminTableBody = document.querySelector("[dev-target=table-body]");
     const adminTableRowTemplate = document.querySelector("[dev-target=table-row-template]");
-    const editTableName = new Choices(editTableNameInput);
-    const editInsightName = new Choices(editInsightNameInput);
-    const insightSort = new Choices(insightSortInput);
+    const editTableName = new Choices(editTableNameInput, {
+        searchResultLimit: 20,
+    });
+    const editInsightName = new Choices(editInsightNameInput, {
+        searchResultLimit: 20,
+    });
+    const insightSort = new Choices(insightSortInput, {
+        searchResultLimit: 20,
+    });
     let currentPage = 1;
     let perPage = 100;
     let insightSortStatus = "";
@@ -50,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         clearForm();
     }, false);
     editInsightName.passedElement.element.addEventListener("search", (event) => {
-        debouncedFetch(event.detail.choice.value, editInsightName, "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights", editTableNameValue);
+        debouncedFetch(event.detail.value, editInsightName, "https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_insights", editTableNameValue);
     }, false);
     editInsightName.passedElement.element.addEventListener("choice", (event) => {
         addDataToForm(event.detail.choice.customProperties);
