@@ -68,13 +68,13 @@ document.addEventListener("DOMContentLoaded", () => {
   )!;
 
   flatpickr(curatedInput, {
-    dateFormat: "d-m-Y",
-    altFormat: "d-m-Y",
+    dateFormat: "m-d-Y",
+    altFormat: "m-d-Y",
     altInput: true,
   });
   flatpickr(sourcePublicationInput, {
-    dateFormat: "d-m-Y",
-    altFormat: "d-m-Y",
+    dateFormat: "m-d-Y",
+    altFormat: "m-d-Y",
     altInput: true,
   });
 
@@ -297,14 +297,18 @@ document.addEventListener("DOMContentLoaded", () => {
       insightDetails: await insightDetails.then((val) => val.getData()),
       curated:
         curatedInput.value.trim() !== ""
-          ? new Date(curatedInput.value).toISOString()
+          ? new Date(
+              convert_MM_DD_YYYY_to_YYYY_MM_DD(curatedInput.value)
+            ).toISOString()
           : "",
       source: sourceInput.value,
       sourceAuthor: sourceAuthorInput.value,
       sourceUrl: sourceUrlInput.value,
       sourcePublication:
         sourcePublicationInput.value.trim() !== ""
-          ? new Date(sourcePublicationInput.value).toISOString()
+          ? new Date(
+              convert_MM_DD_YYYY_to_YYYY_MM_DD(sourcePublicationInput.value)
+            ).toISOString()
           : "",
       sourceCategory: sourceCategory.getValue()
         ? sourceCategory.getValue().map(({ value }) => value)
@@ -394,6 +398,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const userInput = input.value.trim();
       debouncedFetch(userInput);
     });
+  }
+  function convert_MM_DD_YYYY_to_YYYY_MM_DD(date: string) {
+    const [month, day, year] = date.split("-");
+    return `${year}-${month}-${day}`;
   }
   function slugify(text: string) {
     return text

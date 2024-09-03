@@ -250,13 +250,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         const eventInput = form.querySelector("[dev-target=event]");
         const publishedInput = form.querySelector("[dev-target=published-input]");
         flatpickr(curatedInput, {
-            dateFormat: "d-m-Y",
-            altFormat: "d-m-Y",
+            dateFormat: "m-d-Y",
+            altFormat: "m-d-Y",
             altInput: true,
         });
         flatpickr(sourcePublicationInput, {
-            dateFormat: "d-m-Y",
-            altFormat: "d-m-Y",
+            dateFormat: "m-d-Y",
+            altFormat: "m-d-Y",
             altInput: true,
         });
         const company = new Choices(companyInput, { searchResultLimit: 20 });
@@ -376,16 +376,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             value.setData(insight["insight-detail"]);
         });
         curatedInput.parentElement?.querySelectorAll("input").forEach((input) => {
-            input.value = insight.curated
-                ? new Date(insight.curated)
-                    .toLocaleString("default", {
-                    timeZone: "UTC",
-                    month: "2-digit",
-                    day: "2-digit",
-                    year: "numeric",
-                })
-                    .replace(/\//g, "-")
-                : "";
+            const [year, month, day] = insight.curated.split("-");
+            input.value = `${month}-${day}-${year}`;
         });
         sourceInput.value = insight.source;
         sourceAuthorInput.value = insight.source_author;
@@ -393,16 +385,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         sourcePublicationInput.parentElement
             ?.querySelectorAll("input")
             .forEach((input) => {
-            input.value = insight["source-publication-date"]
-                ? new Date(insight["source-publication-date"])
-                    .toLocaleString("default", {
-                    timeZone: "UTC",
-                    month: "2-digit",
-                    day: "2-digit",
-                    year: "numeric",
-                })
-                    .replace(/\//g, "-")
-                : "";
+            console.log(`insight["source-publication-date"]`, insight["source-publication-date"]);
+            const [year, month, day] = insight["source-publication-date"].split("-");
+            input.value = `${month}-${day}-${year}`;
         });
         sourceCategory.setValue(insight.source_category_id.map(({ id, name }) => ({
             label: name,
@@ -497,13 +482,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             internalNote: internalNoteInput.value,
             insightDetails: await insightDetails.then((val) => val.getData()),
             curated: curatedInput.value.trim() !== ""
-                ? new Date(convert_DD_MM_YYYY_to_YYYY_MM_DD(curatedInput.value)).toISOString()
+                ? new Date(convert_MM_DD_YYYY_to_YYYY_MM_DD(curatedInput.value)).toISOString()
                 : "",
             source: sourceInput.value,
             sourceAuthor: sourceAuthorInput.value,
             sourceUrl: sourceUrlInput.value,
             sourcePublication: sourcePublicationInput.value.trim() !== ""
-                ? new Date(convert_DD_MM_YYYY_to_YYYY_MM_DD(sourcePublicationInput.value)).toISOString()
+                ? new Date(convert_MM_DD_YYYY_to_YYYY_MM_DD(sourcePublicationInput.value)).toISOString()
                 : "",
             sourceCategory: sourceCategory.getValue()
                 ? sourceCategory.getValue().map(({ value }) => value)
@@ -579,8 +564,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.error("Error fetching or parsing data:", error);
         }
     }
-    function convert_DD_MM_YYYY_to_YYYY_MM_DD(date) {
-        const [day, month, year] = date.split("-");
+    function convert_MM_DD_YYYY_to_YYYY_MM_DD(date) {
+        const [month, day, year] = date.split("-");
         return `${year}-${month}-${day}`;
     }
     async function moveApprovedToLive() {
