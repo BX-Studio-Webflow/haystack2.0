@@ -587,8 +587,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       value.setData(insight["insight-detail"]);
     });
     curatedInput.parentElement?.querySelectorAll("input").forEach((input) => {
-      const [year, month, day] = (insight.curated as string).split("-");
-      input.value = `${month}-${day}-${year}`;
+      if (insight.curated) {
+        const [year, month, day] = (insight.curated as string).split("-");
+        input.value = `${month}-${day}-${year}`;
+      } else {
+        input.value = "";
+      }
     });
 
     sourceInput.value = insight.source;
@@ -597,10 +601,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     sourcePublicationInput.parentElement
       ?.querySelectorAll("input")
       .forEach((input) => {
-        const [year, month, day] = (
-          insight["source-publication-date"] as string
-        ).split("-");
-        input.value = `${month}-${day}-${year}`;
+        if (insight["source-publication-date"]) {
+          const [year, month, day] = (
+            insight["source-publication-date"] as string
+          ).split("-");
+          input.value = `${month}-${day}-${year}`;
+        } else {
+          input.value = "";
+        }
       });
 
     sourceCategory.setValue(

@@ -376,8 +376,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             value.setData(insight["insight-detail"]);
         });
         curatedInput.parentElement?.querySelectorAll("input").forEach((input) => {
-            const [year, month, day] = insight.curated.split("-");
-            input.value = `${month}-${day}-${year}`;
+            if (insight.curated) {
+                const [year, month, day] = insight.curated.split("-");
+                input.value = `${month}-${day}-${year}`;
+            }
+            else {
+                input.value = "";
+            }
         });
         sourceInput.value = insight.source;
         sourceAuthorInput.value = insight.source_author;
@@ -385,8 +390,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         sourcePublicationInput.parentElement
             ?.querySelectorAll("input")
             .forEach((input) => {
-            const [year, month, day] = insight["source-publication-date"].split("-");
-            input.value = `${month}-${day}-${year}`;
+            if (insight["source-publication-date"]) {
+                const [year, month, day] = insight["source-publication-date"].split("-");
+                input.value = `${month}-${day}-${year}`;
+            }
+            else {
+                input.value = "";
+            }
         });
         sourceCategory.setValue(insight.source_category_id.map(({ id, name }) => ({
             label: name,
