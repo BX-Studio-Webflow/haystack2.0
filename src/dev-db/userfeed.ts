@@ -1,4 +1,4 @@
-// import { XanoClient } from "@xano/js-sdk";
+import { XanoClient } from "@xano/js-sdk";
 document.addEventListener("DOMContentLoaded", async () => {
   const DATA_SOURCE = "dev";
   const xano_userFeed = new XanoClient({
