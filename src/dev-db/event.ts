@@ -508,14 +508,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       publishedDateTargetWrapper.forEach((item) =>
         item.classList[publishedDate ? "remove" : "add"]("hide")
       );
-      insightLink!.setAttribute("href", "/insight/" + insight.slug);
+      insightLink!.setAttribute("href", "/dev/insight/" + insight.slug);
       sourceTarget!.setAttribute("href", insight["source-url"]);
       sourceTargetWrapper?.classList[insight["source-url"] ? "remove" : "add"](
         "hide"
       );
       companyLink!.setAttribute(
         "href",
-        "/company/" + insight.company_details.slug
+        "/dev/company/" + insight.company_details.slug
       );
       sourceTarget!.textContent = insight.source;
       sourceAuthorTargetWrapper.forEach((item) =>
@@ -865,7 +865,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             `[dev-fake-checkbox-wrapper]`
           )!.style.cursor = "pointer";
           const anchor = document.createElement("a");
-          anchor.href = `/technology/${item.slug}`;
+          anchor.href = `/dev/technology/${item.slug}`;
           anchor.textContent = tagSpan!.textContent;
           anchor.style.cursor = "pointer";
           anchor.classList.add("tag-span-name");

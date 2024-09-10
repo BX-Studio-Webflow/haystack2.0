@@ -125,8 +125,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             sourceAuthorTarget.textContent = insight.source_author;
             insightName.textContent = insight.name;
             companyLink.textContent = insight.company_details.name;
-            companyLink.href = "/company/" + insight.company_details.slug;
-            companyPictureLink.href = "/company/" + insight.company_details.slug;
+            companyLink.href = "/dev/company/" + insight.company_details.slug;
+            companyPictureLink.href = "/dev/company/" + insight.company_details.slug;
             insightRichtext.innerHTML = insight["insight-detail"];
             addTagsToInsight(insight.company_type_id, tagsWrapperTarget, false);
             addTagsToInsight(insight.source_category_id, tagsWrapperTarget, false);
@@ -154,8 +154,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                             fetch("https://logo.clearbit.com/" + item["company-website"]).catch(() => (companyImage.src =
                                 "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp"));
                         }
-                        companyPictureLink.href = "/company/" + item.slug;
-                        companyLink.href = "/company/" + item.slug;
+                        companyPictureLink.href = "/dev/company/" + item.slug;
+                        companyLink.href = "/dev/company/" + item.slug;
                         companyLink.textContent = item.name;
                         fakeCheckboxToggle(companyInput);
                         companyInput?.setAttribute("dev-input-type", "company_id");
@@ -210,9 +210,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const companyItemLink = peopleItem.querySelector(`[dev-target="company-link"]`);
                         const personTitleName = person.title;
                         const personName = `${person.name}${personTitleName && ", " + truncateText(personTitleName, 30)}`;
-                        const personLink = "/person/" + person.slug;
+                        const personLink = "/dev/person/" + person.slug;
                         const companyName = person._company?.name;
-                        const companyLink = "/company/" + person._company?.slug;
+                        const companyLink = "/dev/company/" + person._company?.slug;
                         personItemLink.textContent = personName;
                         personItemLink.href = personLink;
                         if (companyName) {
@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (insight.event_details) {
                     const eventItem = eventItemTemplate.cloneNode(true);
                     eventItem.textContent = insight.event_details.name;
-                    eventItem.href = "/event/" + insight.event_details.slug;
+                    eventItem.href = "/dev/event/" + insight.event_details.slug;
                     eventWrapper?.append(eventItem);
                     eventCards.forEach((eventCard) => eventCard
                         .querySelector(`[dev-target="empty-state"]`)
@@ -317,7 +317,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     newTag.style.cursor = "pointer";
                     newTag.querySelector(`[dev-fake-checkbox-wrapper]`).style.cursor = "pointer";
                     const anchor = document.createElement("a");
-                    anchor.href = `/technology/${item.slug}`;
+                    anchor.href = `/dev/technology/${item.slug}`;
                     anchor.textContent = tagSpan.textContent;
                     anchor.style.cursor = "pointer";
                     anchor.classList.add("tag-span-name");
