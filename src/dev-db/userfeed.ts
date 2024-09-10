@@ -1,12 +1,12 @@
-// import { XanoClient } from "@xano/js-sdk";
+import { XanoClient } from "@xano/js-sdk";
 document.addEventListener("DOMContentLoaded", async () => {
   const DATA_SOURCE = "dev";
   const xano_userFeed = new XanoClient({
-    apiGroupBaseUrl: `https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU?x-data-source=${DATA_SOURCE}`,
-  });
+    apiGroupBaseUrl: `https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU`,
+  }).setDataSource(DATA_SOURCE);
   const xano_wmx = new XanoClient({
-    apiGroupBaseUrl: `https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140?x-data-source=${DATA_SOURCE}`,
-  });
+    apiGroupBaseUrl: `https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140`,
+  }).setDataSource(DATA_SOURCE);
   const searchObject: SearchObject = {
     search: "",
     checkboxes: {
