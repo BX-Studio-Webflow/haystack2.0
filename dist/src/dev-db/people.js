@@ -52,10 +52,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         return console.error("No memberstack token");
     }
     const lsUserFollowingFavourite = localStorage.getItem("user-following-favourite");
-    const lsXanoAuthToken = localStorage.getItem("AuthToken");
-    if (lsXanoAuthToken) {
-        xanoToken = lsXanoAuthToken;
-    }
+    // const lsXanoAuthToken = localStorage.getItem("AuthToken");
+    // if (lsXanoAuthToken) {
+    //   xanoToken = lsXanoAuthToken;
+    // }
     if (lsUserFollowingFavourite) {
         userFollowingAndFavourite = JSON.parse(lsUserFollowingFavourite);
     }

@@ -70,12 +70,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const lsUserFollowingFavourite = localStorage.getItem(
     "user-following-favourite"
   );
-  const lsXanoAuthToken = localStorage.getItem("AuthToken");
+  // const lsXanoAuthToken = localStorage.getItem("AuthToken");
+  // if (lsXanoAuthToken) {
+  //   xanoToken = lsXanoAuthToken;
+  // }
   if (lsUserFollowingFavourite) {
     userFollowingAndFavourite = JSON.parse(lsUserFollowingFavourite);
-  }
-  if (lsXanoAuthToken) {
-    xanoToken = lsXanoAuthToken;
   }
 
   if (!companySlug) {
