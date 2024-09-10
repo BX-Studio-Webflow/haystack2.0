@@ -63,10 +63,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const lsUserFollowingFavourite = localStorage.getItem(
     "user-following-favourite"
   );
-  const lsXanoAuthToken = localStorage.getItem("AuthToken");
-  if (lsXanoAuthToken) {
-    xanoToken = lsXanoAuthToken;
-  }
+  // don't use token from ls when using dataSource=dev
+  // const lsXanoAuthToken = localStorage.getItem("AuthToken");
+  // if (lsXanoAuthToken) {
+  //   xanoToken = lsXanoAuthToken;
+  // }
   if (lsUserFollowingFavourite) {
     userFollowingAndFavourite = JSON.parse(lsUserFollowingFavourite);
   }
