@@ -3,11 +3,11 @@
 document.addEventListener("DOMContentLoaded", async () => {
     const DATA_SOURCE = "dev";
     const xano_global_search = new XanoClient({
-        apiGroupBaseUrl: `https://xhka-anc3-3fve.n7c.xano.io/api:G4uo48hy?x-data-source=${DATA_SOURCE}`,
-    });
+        apiGroupBaseUrl: `https://xhka-anc3-3fve.n7c.xano.io/api:G4uo48hy`,
+    }).setDataSource(DATA_SOURCE);
     const xano_wmx = new XanoClient({
-        apiGroupBaseUrl: `https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140?x-data-source=${DATA_SOURCE}`,
-    });
+        apiGroupBaseUrl: `https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140`,
+    }).setDataSource(DATA_SOURCE);
     const memberStackUserToken = localStorage.getItem("_ms-mid");
     const lsXanoAuthToken = localStorage.getItem("AuthToken");
     const searchForm = qs("[dev-search-form]");
