@@ -501,10 +501,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       sourceTargetWrapper?.classList[insight["source-url"] ? "remove" : "add"](
         "hide"
       );
-      companyLink!.setAttribute(
-        "href",
-        "/dev/company/" + insight.company_details?.slug
-      );
+      insight.company_details?.slug &&
+        companyLink!.setAttribute(
+          "href",
+          "/dev/company/" + insight.company_details?.slug
+        );
       sourceTarget!.textContent = insight.source;
       sourceAuthorTargetWrapper.forEach((item) =>
         item.classList[insight.source_author ? "remove" : "add"]("hide")
