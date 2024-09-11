@@ -373,8 +373,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             companyInputs.forEach((companyInput) => {
                 fakeCheckboxToggle(companyInput);
                 companyInput?.setAttribute("dev-input-type", "company_id");
-                insight.company_id &&
+                if (insight.company_id) {
                     companyInput?.setAttribute("dev-input-id", insight.company_id.toString());
+                }
+                else {
+                    const inputForm = companyInput.closest("form");
+                    if (inputForm) {
+                        inputForm.style.display = "none";
+                    }
+                }
+                // insight.company_id &&
+                //   companyInput?.setAttribute(
+                //     "dev-input-id",
+                //     insight.company_id.toString()
+                //   );
                 companyInput && followFavouriteLogic(companyInput);
                 companyInput &&
                     setCheckboxesInitialState(companyInput, convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id));
