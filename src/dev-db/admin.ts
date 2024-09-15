@@ -31,6 +31,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   const adminTableRowTemplate = document.querySelector<HTMLElement>(
     "[dev-target=table-row-template]"
   );
+  const adminEditTabActions = document.querySelector<HTMLElement>(
+    `[dev-target=admin-edit-tab-actions]`
+  )!;
+  const adminEditTabApprove = adminEditTabActions.querySelector<HTMLElement>(
+    `[dev-target=admin-edit-approve]`
+  )!;
+  const adminEditTabMoveToLive = adminEditTabActions.querySelector<HTMLElement>(
+    `[dev-target=edit-tab-move-to-live]`
+  )!;
+  const adminEditTabReject = adminEditTabActions.querySelector<HTMLElement>(
+    `[dev-target=admin-edit-reject]`
+  )!;
+  const adminEditTabDeleteReject =
+    adminEditTabActions.querySelector<HTMLElement>(
+      `[dev-target=admin-edit-delete-rejected-insight]`
+    )!;
   const editTableName = new Choices(editTableNameInput, {
     searchResultLimit: 20,
   });
@@ -40,6 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const insightSort = new Choices(insightSortInput, {
     searchResultLimit: 20,
   });
+  let currentInsight: Insight | null = null;
   let currentPage = 1;
   let perPage = 100;
   let insightSortStatus: "Pending" | "Approved" | "Rejected" | "" = "";
@@ -69,7 +86,33 @@ document.addEventListener("DOMContentLoaded", async () => {
     form: insightForm,
   } = initForm();
 
+  sourceDocuments.passedElement.element.addEventListener(
+    "addItem",
+    (event) => {
+      console.log({ values: sourceDocuments.getValue() });
+      const sourceDocumentPublishedDate =
+        sourceDocuments.getValue()[0]?.customProperties?.publication_date;
+      if (sourceDocumentPublishedDate) {
+        const [year, month, day] = sourceDocumentPublishedDate.split("-");
+        sourcePublicationInput.parentElement
+          ?.querySelectorAll("input")
+          .forEach((input) => {
+            input.value = `${month}-${day}-${year}`;
+          });
+      } else {
+        sourcePublicationInput.parentElement
+          ?.querySelectorAll("input")
+          .forEach((input) => {
+            input.value = "";
+          });
+      }
+    },
+    false
+  );
+
   getEditorInsights(currentPage, perPage, insightSortStatus);
+
+  initAdminEditTabActions();
 
   fetchDataFromEndpoint(
     "",
@@ -110,6 +153,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   editTableName.passedElement.element.addEventListener(
     "choice",
     (event) => {
+      adminEditTabActions.setAttribute("dev-display", "none");
       editTableNameValue = event.detail.choice.value;
       fetchDataFromEndpoint(
         "",
@@ -138,6 +182,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     "choice",
     (event) => {
       addDataToForm(event.detail.choice.customProperties);
+      updateAdminEditTabActionsStates(event.detail.choice.customProperties);
     },
     false
   );
@@ -269,24 +314,28 @@ document.addEventListener("DOMContentLoaded", async () => {
       approve?.addEventListener("click", () => {
         adminAction("approve", insight.id)
           .then(() => {
+            insight.status = "Approved";
             approve.textContent = "Approved";
             approve.classList.add("btn-disabled");
             reject.textContent = "Reject";
             reject.classList.remove("btn-disabled");
             status!.textContent = "Approved";
             deleteRejectedInsight.style.display = "none";
+            clearForm();
           })
           .catch((err) => console.log("error"));
       });
       reject?.addEventListener("click", () => {
         adminAction("reject", insight.id)
           .then(() => {
+            insight.status = "Rejected";
             reject.textContent = "Rejected";
             reject.classList.add("btn-disabled");
             approve.textContent = "Approve";
             approve.classList.remove("btn-disabled");
             status!.textContent = "Rejected";
             deleteRejectedInsight.style.display = "flex";
+            clearForm();
           })
           .catch((err) => console.log("error"));
       });
@@ -311,6 +360,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       edit?.addEventListener("click", () => {
         addDataToForm(insight);
         editTableNameValue = "editor_insights";
+        updateAdminEditTabActionsStates(insight);
 
         editTab?.click();
         console.log("edit");
@@ -665,6 +715,120 @@ document.addEventListener("DOMContentLoaded", async () => {
         "w--redirected-checked"
       );
   }
+
+  function updateAdminEditTabActionsStates(insight: Insight) {
+    currentInsight = insight;
+    adminEditTabActions.setAttribute(
+      "dev-display",
+      editTableNameValue === "editor_insights" ? "flex" : "none"
+    );
+    if (insight.status === "Pending") {
+      adminEditTabApprove.textContent = "Approve";
+      adminEditTabApprove.classList.remove("btn-disabled");
+      adminEditTabReject.textContent = "Reject";
+      adminEditTabReject.classList.remove("btn-disabled");
+      adminEditTabMoveToLive.setAttribute("dev-display", "none");
+      adminEditTabDeleteReject.setAttribute("dev-display", "none");
+    }
+    if (insight.status === "Approved") {
+      adminEditTabApprove.textContent = "Approved";
+      adminEditTabApprove.classList.add("btn-disabled");
+      adminEditTabReject.textContent = "Reject";
+      adminEditTabReject.classList.remove("btn-disabled");
+      adminEditTabMoveToLive.setAttribute("dev-display", "flex");
+      adminEditTabDeleteReject.setAttribute("dev-display", "none");
+    }
+    if (insight.status === "Rejected") {
+      adminEditTabApprove.textContent = "Approve";
+      adminEditTabApprove.classList.remove("btn-disabled");
+      adminEditTabReject.textContent = "Rejected";
+      adminEditTabReject.classList.add("btn-disabled");
+      adminEditTabMoveToLive.setAttribute("dev-display", "none");
+      adminEditTabDeleteReject.setAttribute("dev-display", "flex");
+    }
+  }
+  function initAdminEditTabActions() {
+    adminEditTabApprove.addEventListener("click", () => {
+      if (currentInsight && editTableNameValue === "editor_insights") {
+        currentInsight;
+        adminAction("approve", currentInsight.id)
+          .then(() => {
+            adminEditTabApprove.textContent = "Approved";
+            adminEditTabApprove.classList.add("btn-disabled");
+            adminEditTabReject.textContent = "Reject";
+            adminEditTabReject.classList.remove("btn-disabled");
+            adminEditTabMoveToLive.setAttribute("dev-display", "flex");
+            adminEditTabDeleteReject.setAttribute("dev-display", "none");
+            getEditorInsights(currentPage, perPage, insightSortStatus);
+          })
+          .catch((err) => console.log("error"));
+      }
+    });
+    adminEditTabReject.addEventListener("click", () => {
+      if (currentInsight && editTableNameValue === "editor_insights") {
+        adminAction("reject", currentInsight.id)
+          .then(() => {
+            adminEditTabApprove.textContent = "Approve";
+            adminEditTabApprove.classList.remove("btn-disabled");
+            adminEditTabReject.textContent = "Rejected";
+            adminEditTabReject.classList.add("btn-disabled");
+            adminEditTabMoveToLive.setAttribute("dev-display", "none");
+            adminEditTabDeleteReject.setAttribute("dev-display", "flex");
+            getEditorInsights(currentPage, perPage, insightSortStatus);
+          })
+          .catch((err) => console.log("error"));
+      }
+    });
+    adminEditTabDeleteReject.addEventListener("click", () => {
+      if (currentInsight && editTableNameValue === "editor_insights") {
+        adminAction("delete", currentInsight.id)
+          .then(() => {
+            Toastify({
+              text: "Deleted Insight",
+              duration: 3000,
+              destination: "https://github.com/apvarun/toastify-js",
+              newWindow: true,
+              close: true,
+              gravity: "top", // `top` or `bottom`
+              position: "left", // `left`, `center` or `right`
+              stopOnFocus: true, // Prevents dismissing of toast on hover
+              style: {
+                background: "linear-gradient(to right, #00b09b, #96c93d)",
+              },
+              onClick: function () {}, // Callback after click
+            }).showToast();
+            clearForm();
+            getEditorInsights(currentPage, perPage, insightSortStatus);
+          })
+          .catch((err) => console.log("error"));
+      }
+    });
+    adminEditTabMoveToLive.addEventListener("click", () => {
+      if (currentInsight && editTableNameValue === "editor_insights") {
+        adminAction("move-to-live", currentInsight.id)
+          .then((movedData) => {
+            console.log({ movedData });
+            Toastify({
+              text: "Moved to live",
+              duration: 3000,
+              destination: "https://github.com/apvarun/toastify-js",
+              newWindow: true,
+              close: true,
+              gravity: "top", // `top` or `bottom`
+              position: "left", // `left`, `center` or `right`
+              stopOnFocus: true, // Prevents dismissing of toast on hover
+              style: {
+                background: "linear-gradient(to right, #00b09b, #96c93d)",
+              },
+              onClick: function () {}, // Callback after click
+            }).showToast();
+            clearForm();
+            getEditorInsights(currentPage, perPage, insightSortStatus);
+          })
+          .catch((err) => console.log("error"));
+      }
+    });
+  }
   function debounce(func, delay) {
     let timeoutId;
     return function (...args) {
@@ -680,6 +844,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function clearForm() {
+    adminEditTabActions.setAttribute("dev-display", "none");
     nameInput.value = "";
     slugInput.value = "";
     clearSelections(company);
@@ -790,7 +955,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function adminAction(
-    action: "approve" | "reject" | "delete",
+    action: "approve" | "reject" | "delete" | "move-to-live",
     id: number
   ) {
     const res = await fetch(

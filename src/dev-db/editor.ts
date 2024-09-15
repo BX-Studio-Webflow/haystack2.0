@@ -78,39 +78,74 @@ document.addEventListener("DOMContentLoaded", () => {
     altInput: true,
   });
 
-  const company = new Choices(companyInput);
-  const event = new Choices(eventInput);
+  const company = new Choices(companyInput, {
+    searchResultLimit: 20,
+  });
+  const event = new Choices(eventInput, {
+    searchResultLimit: 20,
+  });
   const sourceCategory = new Choices(sourceCategoryInput, {
     removeItemButton: true,
     duplicateItemsAllowed: false,
+    searchResultLimit: 20,
   });
   const companyType = new Choices(companyTypeInput, {
     removeItemButton: true,
     duplicateItemsAllowed: false,
+    searchResultLimit: 20,
   });
   const insightClassification = new Choices(insightClassificationInput, {
     removeItemButton: true,
     duplicateItemsAllowed: false,
+    searchResultLimit: 20,
   });
   const technologyCategory = new Choices(technologyCategoryInput, {
     removeItemButton: true,
     duplicateItemsAllowed: false,
+    searchResultLimit: 20,
   });
   const companiesMentioned = new Choices(companiesMentionedInput, {
     removeItemButton: true,
     duplicateItemsAllowed: false,
+    searchResultLimit: 20,
   });
   const people = new Choices(peopleInput, {
     removeItemButton: true,
     duplicateItemsAllowed: false,
+    searchResultLimit: 20,
   });
   const sourceDocuments = new Choices(sourceDocumentsInput, {
     removeItemButton: true,
     duplicateItemsAllowed: false,
+    searchResultLimit: 20,
   });
   const insightDetails = ClassicEditor.create(insightDetailsInput, {
     extraPlugins: [MyCustomUploadAdapterPlugin],
   });
+
+  sourceDocuments.passedElement.element.addEventListener(
+    "addItem",
+    (event) => {
+      console.log({ values: sourceDocuments.getValue() });
+      const sourceDocumentPublishedDate =
+        sourceDocuments.getValue()[0]?.customProperties?.publication_date;
+      if (sourceDocumentPublishedDate) {
+        const [year, month, day] = sourceDocumentPublishedDate.split("-");
+        sourcePublicationInput.parentElement
+          ?.querySelectorAll("input")
+          .forEach((input) => {
+            input.value = `${month}-${day}-${year}`;
+          });
+      } else {
+        sourcePublicationInput.parentElement
+          ?.querySelectorAll("input")
+          .forEach((input) => {
+            input.value = "";
+          });
+      }
+    },
+    false
+  );
 
   insightDetailsHeightToggle.addEventListener("change", () => {
     const checked = insightDetailsHeightToggle.checked;
@@ -382,6 +417,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .map((item) => ({
             value: item.id,
             label: item.title ? `${item.name} ${item.title}` : item.name,
+            customProperties: item,
           }));
 
         // Update Choices.js with new choices
