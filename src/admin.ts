@@ -213,8 +213,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       const row = rowTemplate.cloneNode(true) as HTMLElement;
       const name = row.querySelector<HTMLLinkElement>("[dev-target=name]");
       const status = row.querySelector<HTMLElement>("[dev-target=status]");
-      const createdOn = row.querySelector<HTMLElement>(
-        "[dev-target=created-on]"
+      const curatedOn = row.querySelector<HTMLElement>(
+        "[dev-target=curated-on]"
       );
       const company = row.querySelector<HTMLElement>("[dev-target=company]");
       const sourceListWrap = row.querySelector<HTMLElement>(
@@ -233,18 +233,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       const deleteRejectedInsight = row.querySelector<HTMLButtonElement>(
         "[dev-target=delete-rejected-insight]"
       )!;
-      const createdOnDate = new Date(insight.created_at);
+      const curatedOnDate = new Date(insight.created_at);
 
       deleteRejectedInsight.style.display = "none";
 
       if (name) name.textContent = insight.name;
-      if (createdOn)
-        createdOn.textContent = `${String(
-          createdOnDate.getMonth() + 1
-        ).padStart(2, "0")}-${String(createdOnDate.getDate()).padStart(
+      if (curatedOn)
+        curatedOn.textContent = `${String(
+          curatedOnDate.getMonth() + 1
+        ).padStart(2, "0")}-${String(curatedOnDate.getDate()).padStart(
           2,
           "0"
-        )}-${createdOnDate.getFullYear()}`;
+        )}-${curatedOnDate.getFullYear()}`;
       if (status) status.textContent = insight.status;
       if (company)
         company.textContent = insight._company

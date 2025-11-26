@@ -71,9 +71,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 destination: "https://github.com/apvarun/toastify-js",
                 newWindow: true,
                 close: true,
-                gravity: "top",
-                position: "left",
-                stopOnFocus: true,
+                gravity: "top", // `top` or `bottom`
+                position: "left", // `left`, `center` or `right`
+                stopOnFocus: true, // Prevents dismissing of toast on hover
                 style: {
                     background: "linear-gradient(to right, #ff5f6d, #ffc371)",
                 },
@@ -102,9 +102,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                     destination: "https://github.com/apvarun/toastify-js",
                     newWindow: true,
                     close: true,
-                    gravity: "top",
-                    position: "left",
-                    stopOnFocus: true,
+                    gravity: "top", // `top` or `bottom`
+                    position: "left", // `left`, `center` or `right`
+                    stopOnFocus: true, // Prevents dismissing of toast on hover
                     style: {
                         background: "linear-gradient(to right, #00b09b, #96c93d)",
                     },
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const row = rowTemplate.cloneNode(true);
             const name = row.querySelector("[dev-target=name]");
             const status = row.querySelector("[dev-target=status]");
-            const createdOn = row.querySelector("[dev-target=created-on]");
+            const curatedOn = row.querySelector("[dev-target=curated-on]");
             const company = row.querySelector("[dev-target=company]");
             const sourceListWrap = row.querySelector("[dev-target=source-list]");
             const sourceListItem = row.querySelector("[dev-target=source-list-item]");
@@ -132,12 +132,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             const reject = row.querySelector("[dev-target=reject]");
             const edit = row.querySelector("[dev-target=edit]");
             const deleteRejectedInsight = row.querySelector("[dev-target=delete-rejected-insight]");
-            const createdOnDate = new Date(insight.created_at);
+            const curatedOnDate = new Date(insight.created_at);
             deleteRejectedInsight.style.display = "none";
             if (name)
                 name.textContent = insight.name;
-            if (createdOn)
-                createdOn.textContent = `${String(createdOnDate.getMonth() + 1).padStart(2, "0")}-${String(createdOnDate.getDate()).padStart(2, "0")}-${createdOnDate.getFullYear()}`;
+            if (curatedOn)
+                curatedOn.textContent = `${String(curatedOnDate.getMonth() + 1).padStart(2, "0")}-${String(curatedOnDate.getDate()).padStart(2, "0")}-${curatedOnDate.getFullYear()}`;
             if (status)
                 status.textContent = insight.status;
             if (company)
