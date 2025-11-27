@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         style: {
           background: "linear-gradient(to right, #ff5f6d, #ffc371)",
         },
-        onClick: function () {}, // Callback after click
+        onClick: function () { }, // Callback after click
       }).showToast();
     } else {
       const transformedData = await getFormData();
@@ -194,7 +194,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             style: {
               background: "linear-gradient(to right, #00b09b, #96c93d)",
             },
-            onClick: function () {}, // Callback after click
+            onClick: function () { }, // Callback after click
           }).showToast();
           clearForm();
           // refetch editor table
@@ -239,12 +239,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (name) name.textContent = insight.name;
       if (curatedOn)
-        curatedOn.textContent = `${String(
-          curatedOnDate.getMonth() + 1
-        ).padStart(2, "0")}-${String(curatedOnDate.getDate()).padStart(
-          2,
-          "0"
-        )}-${curatedOnDate.getFullYear()}`;
+        curatedOn.textContent = curatedOnDate.toDateString();
       if (status) status.textContent = insight.status;
       if (company)
         company.textContent = insight._company
@@ -725,8 +720,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       curated:
         curatedInput.value.trim() !== ""
           ? new Date(
-              convert_MM_DD_YYYY_to_YYYY_MM_DD(curatedInput.value)
-            ).toISOString()
+            convert_MM_DD_YYYY_to_YYYY_MM_DD(curatedInput.value)
+          ).toISOString()
           : "",
       source: sourceInput.value,
       sourceAuthor: sourceAuthorInput.value,
@@ -734,8 +729,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       sourcePublication:
         sourcePublicationInput.value.trim() !== ""
           ? new Date(
-              convert_MM_DD_YYYY_to_YYYY_MM_DD(sourcePublicationInput.value)
-            ).toISOString()
+            convert_MM_DD_YYYY_to_YYYY_MM_DD(sourcePublicationInput.value)
+          ).toISOString()
           : "",
       sourceCategory: sourceCategory.getValue()
         ? sourceCategory.getValue().map(({ value }) => value)
@@ -829,8 +824,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           typeof currentSelectedID === "number"
             ? ![currentSelectedID].includes(item.id)
             : typeof currentSelectedID === "object"
-            ? !currentSelectedID.includes(item.id)
-            : true
+              ? !currentSelectedID.includes(item.id)
+              : true
         )
         .map((item) => ({
           value: item.id,
