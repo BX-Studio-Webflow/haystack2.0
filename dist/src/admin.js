@@ -132,12 +132,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             const reject = row.querySelector("[dev-target=reject]");
             const edit = row.querySelector("[dev-target=edit]");
             const deleteRejectedInsight = row.querySelector("[dev-target=delete-rejected-insight]");
-            const curatedOnDate = new Date(insight.created_at);
+            const curatedOnDate = new Date(insight.curated);
             deleteRejectedInsight.style.display = "none";
             if (name)
                 name.textContent = insight.name;
             if (curatedOn)
-                curatedOn.textContent = `${String(curatedOnDate.getMonth() + 1).padStart(2, "0")}-${String(curatedOnDate.getDate()).padStart(2, "0")}-${curatedOnDate.getFullYear()}`;
+                curatedOn.textContent = curatedOnDate.toDateString();
             if (status)
                 status.textContent = insight.status;
             if (company)
