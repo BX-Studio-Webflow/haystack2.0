@@ -233,7 +233,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const deleteRejectedInsight = row.querySelector<HTMLButtonElement>(
         "[dev-target=delete-rejected-insight]"
       )!;
-      const curatedOnDate = new Date(insight.created_at);
+      const curatedOnDate = new Date(insight.curated);
 
       deleteRejectedInsight.style.display = "none";
 
