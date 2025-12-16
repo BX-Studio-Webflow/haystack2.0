@@ -2,7 +2,7 @@
 // import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 // import Choices from "choices.js";
 document.addEventListener("DOMContentLoaded", () => {
-    const DATA_SOURCE = "live";
+    const DATA_SOURCE = location.pathname.includes("dev") ? "dev" : "live";
     const form = document.querySelector("[dev-target=form]");
     const nameInput = form.querySelector("[dev-target=name-input]");
     const slugInput = form.querySelector("[dev-target=slug-input]");
@@ -109,7 +109,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         else {
             const transformedData = await getFormData();
-            console.log("transformedData", transformedData);
             fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/add_to_insight?x-data-source=${DATA_SOURCE}`, {
                 method: "POST",
                 headers: {

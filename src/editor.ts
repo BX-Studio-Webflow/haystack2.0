@@ -2,7 +2,7 @@
 // import Choices from "choices.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const DATA_SOURCE = "live";
+  const DATA_SOURCE = location.pathname.includes("dev") ? "dev" : "live";
   const form = document.querySelector<HTMLFormElement>("[dev-target=form]")!;
   const nameInput = form.querySelector<HTMLInputElement>(
     "[dev-target=name-input]"
@@ -155,12 +155,10 @@ document.addEventListener("DOMContentLoaded", () => {
         style: {
           background: "linear-gradient(to right, #ff5f6d, #ffc371)",
         },
-        onClick: function () {}, // Callback after click
+        onClick: function () { }, // Callback after click
       }).showToast();
     } else {
       const transformedData = await getFormData();
-
-      console.log("transformedData", transformedData);
 
       fetch(
         `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/add_to_insight?x-data-source=${DATA_SOURCE}`,
@@ -189,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
             style: {
               background: "linear-gradient(to right, #00b09b, #96c93d)",
             },
-            onClick: function () {}, // Callback after click
+            onClick: function () { }, // Callback after click
           }).showToast();
           clearForm();
         })
@@ -298,8 +296,8 @@ document.addEventListener("DOMContentLoaded", () => {
       curated:
         curatedInput.value.trim() !== ""
           ? new Date(
-              convert_MM_DD_YYYY_to_YYYY_MM_DD(curatedInput.value)
-            ).toISOString()
+            convert_MM_DD_YYYY_to_YYYY_MM_DD(curatedInput.value)
+          ).toISOString()
           : "",
       source: sourceInput.value,
       sourceAuthor: sourceAuthorInput.value,
@@ -307,8 +305,8 @@ document.addEventListener("DOMContentLoaded", () => {
       sourcePublication:
         sourcePublicationInput.value.trim() !== ""
           ? new Date(
-              convert_MM_DD_YYYY_to_YYYY_MM_DD(sourcePublicationInput.value)
-            ).toISOString()
+            convert_MM_DD_YYYY_to_YYYY_MM_DD(sourcePublicationInput.value)
+          ).toISOString()
           : "",
       sourceCategory: sourceCategory.getValue()
         ? sourceCategory.getValue().map(({ value }) => value)
@@ -376,8 +374,8 @@ document.addEventListener("DOMContentLoaded", () => {
             typeof currentSelectedID === "number"
               ? ![currentSelectedID].includes(item.id)
               : typeof currentSelectedID === "object"
-              ? !currentSelectedID.includes(item.id)
-              : true
+                ? !currentSelectedID.includes(item.id)
+                : true
           )
           .map((item) => ({
             value: item.id,
