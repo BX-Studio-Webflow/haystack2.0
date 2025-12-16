@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ".ck.ck-editor__main"
     )!;
     insightDetailContent.style.overflow = "auto";
-    insightDetailContent.style.maxHeight = checked ? "20vh" : "none";
+    insightDetailContent.style.maxHeight = checked ? "400px" : "none";
   });
 
   insightDetails.then((value) => {
