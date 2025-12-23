@@ -11,6 +11,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     richtextEditor!.innerHTML = insightEditorFormData;
   }
+  
+   //TABLE CODE
+   const figure = document.querySelector('figure.table') as HTMLElement;
+   console.log('figure', figure)
+   if (figure) {
+     console.log('setting height')
+     const topOffset = figure.getBoundingClientRect().top + window.scrollY;
+     figure.style.height = `calc(100vh - ${topOffset}px)`;
+   }
+   window.addEventListener('resize', () => {
+     if (figure) {
+       console.log('setting height on resize')
+       const topOffset = figure.getBoundingClientRect().top + window.scrollY;
+       figure.style.height = `calc(100vh - ${topOffset}px)`;
+     }
+   });
   window.addEventListener("storage", function (event) {
     if (
       richtextEditor &&
@@ -21,20 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
       richtextEditor.innerHTML = JSON.parse(event.newValue);
     }
 
-     //TABLE CODE
-     const figure = document.querySelector('figure.table') as HTMLElement;
-     console.log('figure', figure)
-     if (figure) {
-       console.log('setting height')
-       const topOffset = figure.getBoundingClientRect().top + window.scrollY;
-       figure.style.height = `calc(100vh - ${topOffset}px)`;
-     }
-     window.addEventListener('resize', () => {
-       if (figure) {
-         console.log('setting height on resize')
-         const topOffset = figure.getBoundingClientRect().top + window.scrollY;
-         figure.style.height = `calc(100vh - ${topOffset}px)`;
-       }
-     });
+    
   });
 });
