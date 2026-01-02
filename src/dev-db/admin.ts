@@ -213,11 +213,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.log("editTableNameValue", editTableNameValue);
 
       fetch(
-        `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/update_insight?table_name=${editTableNameValue}&x-data-source=${DATA_SOURCE}`,
+        `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/update_insight?table_name=${editTableNameValue}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "X-Data-Source": DATA_SOURCE,
           },
           body: JSON.stringify({
             data: transformedData,
@@ -376,7 +377,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     status: "Pending" | "Approved" | "Rejected" | ""
   ) {
     const res = await fetch(
-      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_editor_insights?x-data-source=${DATA_SOURCE}&page=${page}&per_page=${perPage}&status=${status}`
+      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_editor_insights?page=${page}&per_page=${perPage}&status=${status}`,
+      {
+        headers: {
+          "X-Data-Source": DATA_SOURCE,
+        },
+      }
     );
     const data = (await res.json()) as GetEditorInsightsResponse;
     paginationNextBtn?.classList[data.nextPage ? "remove" : "add"](
@@ -930,7 +936,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const debounceSlugCheck = debounce(async (value: string) => {
     const res = await fetch(
-      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/insight_slug_checker?slug=${value}&x-data-source=${DATA_SOURCE}`
+      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/insight_slug_checker?slug=${value}`,
+      {
+        headers: {
+          "X-Data-Source": DATA_SOURCE,
+        },
+      }
     );
     const data = (await res.json()) as boolean;
 
@@ -975,7 +986,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       // Fetch data from the endpoint
       const response = await fetch(
-        `${endpoint}?table_name=${tableName}&search_query=${userInput}&x-data-source=${DATA_SOURCE}`
+        `${endpoint}?table_name=${tableName}&search_query=${userInput}`,
+        {
+          headers: {
+            "X-Data-Source": DATA_SOURCE,
+          },
+        }
       );
 
       if (!response.ok) {
@@ -1027,9 +1043,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   async function deleteAllRejectedInsights() {
     const res = await fetch(
-      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/delete_all_rejected_insights?x-data-source=${DATA_SOURCE}`,
+      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/delete_all_rejected_insights`,
       {
         method: "DELETE",
+        headers: {
+          "X-Data-Source": DATA_SOURCE,
+        },
       }
     );
     const data = await res.json();

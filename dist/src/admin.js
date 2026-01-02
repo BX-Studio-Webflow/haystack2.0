@@ -84,10 +84,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             const transformedData = await getFormData();
             console.log("transformedData", transformedData);
             console.log("editTableNameValue", editTableNameValue);
-            fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/update_insight?table_name=${editTableNameValue}&x-data-source=${DATA_SOURCE}`, {
+            fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/update_insight?table_name=${editTableNameValue}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "X-Data-Source": DATA_SOURCE,
                 },
                 body: JSON.stringify({
                     data: transformedData,
@@ -211,7 +212,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
     async function getEditorInsights(page, perPage, status) {
-        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_editor_insights?x-data-source=${DATA_SOURCE}&page=${page}&per_page=${perPage}&status=${status}`);
+        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/get_editor_insights?page=${page}&per_page=${perPage}&status=${status}`, {
+            headers: {
+                "X-Data-Source": DATA_SOURCE,
+            },
+        });
         const data = (await res.json());
         paginationNextBtn?.classList[data.nextPage ? "remove" : "add"]("btn-disabled");
         paginationPreviousBtn?.classList[data.prevPage ? "remove" : "add"]("btn-disabled");
@@ -525,7 +530,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         };
     }
     const debounceSlugCheck = debounce(async (value) => {
-        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/insight_slug_checker?slug=${value}&x-data-source=${DATA_SOURCE}`);
+        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/insight_slug_checker?slug=${value}`, {
+            headers: {
+                "X-Data-Source": DATA_SOURCE,
+            },
+        });
         const data = (await res.json());
         slugInput.classList[data ? "add" : "remove"]("is-error");
     }, 300);
@@ -540,7 +549,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
     async function adminAction(action, id) {
-        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/admin_action?action=${action}&insight_id=${id}&x-data-source=${DATA_SOURCE}`);
+        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/admin_action?action=${action}&insight_id=${id}`, {
+            headers: {
+                "X-Data-Source": DATA_SOURCE,
+            },
+        });
         const data = await res.json();
         return data;
     }
@@ -548,7 +561,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function fetchDataFromEndpoint(userInput, choicesInstance, endpoint, tableName) {
         try {
             // Fetch data from the endpoint
-            const response = await fetch(`${endpoint}?table_name=${tableName}&search_query=${userInput}&x-data-source=${DATA_SOURCE}`);
+            const response = await fetch(`${endpoint}?table_name=${tableName}&search_query=${userInput}`, {
+                headers: {
+                    "X-Data-Source": DATA_SOURCE,
+                },
+            });
             if (!response.ok) {
                 throw new Error("Failed to fetch data");
             }
@@ -578,7 +595,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         return `${year}-${month}-${day}`;
     }
     async function moveApprovedToLive() {
-        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/move_all_approved_insights_to_live?data_source=${DATA_SOURCE}`);
+        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/move_all_approved_insights_to_live`, {
+            headers: {
+                "X-Data-Source": DATA_SOURCE,
+            },
+        });
         const data = await res.json();
         if (adminTableBody) {
             adminTableBody.innerHTML = "";
@@ -586,8 +607,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         return data;
     }
     async function deleteAllRejectedInsights() {
-        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/delete_all_rejected_insights?data_source=${DATA_SOURCE}`, {
+        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/delete_all_rejected_insights`, {
             method: "DELETE",
+            headers: {
+                "X-Data-Source": DATA_SOURCE,
+            },
         });
         const data = await res.json();
         if (adminTableBody) {

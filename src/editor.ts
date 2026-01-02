@@ -161,11 +161,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const transformedData = await getFormData();
 
       fetch(
-        `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/add_to_insight?data_source=${DATA_SOURCE}`,
+        `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/add_to_insight`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "X-Data-Source": DATA_SOURCE,
           },
           body: JSON.stringify({
             data: transformedData,
@@ -336,7 +337,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const debounceSlugCheck = debounce(async (value: string) => {
     const res = await fetch(
-      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/insight_slug_checker?slug=${value}&x-data-source=${DATA_SOURCE}`
+      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/insight_slug_checker?slug=${value}`,
+      {
+        headers: {
+          "X-Data-Source": DATA_SOURCE,
+        },
+      }
     );
     const data = (await res.json()) as boolean;
 
@@ -354,7 +360,12 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         // Fetch data from the endpoint
         const response = await fetch(
-          `${endpoint}?table_name=${tableName}&search_query=${userInput}&x-data-source=${DATA_SOURCE}`
+          `${endpoint}?table_name=${tableName}&search_query=${userInput}`,
+          {
+            headers: {
+              "X-Data-Source": DATA_SOURCE,
+            },
+          }
         );
 
         if (!response.ok) {
