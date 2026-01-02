@@ -1,6 +1,6 @@
 "use strict";
 document.addEventListener("DOMContentLoaded", async () => {
-    const DATA_SOURCE = "live";
+    const DATA_SOURCE = location.pathname.includes("dev") ? "dev" : "live";
     const paginationNextBtn = document.querySelector("[dev-target=next-btn]");
     const paginationPreviousBtn = document.querySelector("[dev-target=previous-btn]");
     const statusTab = document.querySelector("[dev-target=status-tab]");
@@ -578,7 +578,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return `${year}-${month}-${day}`;
     }
     async function moveApprovedToLive() {
-        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/move_all_approved_insights_to_live?x-data-source=${DATA_SOURCE}`);
+        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/move_all_approved_insights_to_live?data_source=${DATA_SOURCE}`);
         const data = await res.json();
         if (adminTableBody) {
             adminTableBody.innerHTML = "";
@@ -586,7 +586,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return data;
     }
     async function deleteAllRejectedInsights() {
-        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/delete_all_rejected_insights?x-data-source=${DATA_SOURCE}`, {
+        const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/delete_all_rejected_insights?data_source=${DATA_SOURCE}`, {
             method: "DELETE",
         });
         const data = await res.json();

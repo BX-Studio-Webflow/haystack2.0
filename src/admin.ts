@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const DATA_SOURCE = "live";
+  const DATA_SOURCE = location.pathname.includes("dev") ? "dev" : "live";
   const paginationNextBtn = document.querySelector<HTMLButtonElement>(
     "[dev-target=next-btn]"
   );
@@ -845,7 +845,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   async function moveApprovedToLive() {
     const res = await fetch(
-      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/move_all_approved_insights_to_live?x-data-source=${DATA_SOURCE}`
+      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/move_all_approved_insights_to_live?data_source=${DATA_SOURCE}`
     );
     const data = await res.json();
 
@@ -857,7 +857,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   async function deleteAllRejectedInsights() {
     const res = await fetch(
-      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/delete_all_rejected_insights?x-data-source=${DATA_SOURCE}`,
+      `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/delete_all_rejected_insights?data_source=${DATA_SOURCE}`,
       {
         method: "DELETE",
       }
