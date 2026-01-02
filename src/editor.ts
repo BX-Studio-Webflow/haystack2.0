@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const transformedData = await getFormData();
 
       fetch(
-        `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/add_to_insight?x-data-source=${DATA_SOURCE}`,
+        `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/add_to_insight?data_source=${DATA_SOURCE}`,
         {
           method: "POST",
           headers: {

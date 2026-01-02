@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         else {
             const transformedData = await getFormData();
-            fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/add_to_insight?x-data-source=${DATA_SOURCE}`, {
+            fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/add_to_insight?data_source=${DATA_SOURCE}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
