@@ -290,8 +290,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     function convert_MM_DD_YYYY_to_midday_timestamp(date) {
         const [month, day, year] = date.split("-").map(Number);
-        // Create a UTC timestamp for midday (12:00) of that date
-        return Date.UTC(year, month - 1, day, 12, 0, 0);
+        const localDate = new Date(year, month - 1, day, 12, // midday local time
+        0, 0);
+        return localDate.getTime();
     }
     function slugify(text) {
         return text

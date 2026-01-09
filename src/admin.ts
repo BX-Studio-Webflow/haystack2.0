@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         style: {
           background: "linear-gradient(to right, #ff5f6d, #ffc371)",
         },
-        onClick: function () { }, // Callback after click
+        onClick: function () {}, // Callback after click
       }).showToast();
     } else {
       const transformedData = await getFormData();
@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             style: {
               background: "linear-gradient(to right, #00b09b, #96c93d)",
             },
-            onClick: function () { }, // Callback after click
+            onClick: function () {}, // Callback after click
           }).showToast();
           clearForm();
           // refetch editor table
@@ -239,8 +239,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       deleteRejectedInsight.style.display = "none";
 
       if (name) name.textContent = insight.name;
-      if (curatedOn)
-        curatedOn.textContent = curatedOnDate.toDateString();
+      if (curatedOn) curatedOn.textContent = curatedOnDate.toDateString();
       if (status) status.textContent = insight.status;
       if (company)
         company.textContent = insight._company
@@ -724,7 +723,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       internalNote: internalNoteInput.value,
       insightDetails: await insightDetails.then((val) => val.getData()),
       curated:
-         curatedInput.value.trim() !== ""
+        curatedInput.value.trim() !== ""
           ? convert_MM_DD_YYYY_to_midday_timestamp(curatedInput.value)
           : "",
       source: sourceInput.value,
@@ -733,8 +732,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       sourcePublication:
         sourcePublicationInput.value.trim() !== ""
           ? new Date(
-            convert_MM_DD_YYYY_to_YYYY_MM_DD(sourcePublicationInput.value)
-          ).toISOString()
+              convert_MM_DD_YYYY_to_YYYY_MM_DD(sourcePublicationInput.value)
+            ).toISOString()
           : "",
       sourceCategory: sourceCategory.getValue()
         ? sourceCategory.getValue().map(({ value }) => value)
@@ -761,11 +760,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       published: publishedInput ? publishedInput.checked : false,
     };
   }
-function convert_MM_DD_YYYY_to_midday_timestamp(date: string) {
-  const [month, day, year] = date.split("-").map(Number);
-  // Create a UTC timestamp for midday (12:00) of that date
-  return Date.UTC(year, month - 1, day, 12, 0, 0);
-}
+  function convert_MM_DD_YYYY_to_midday_timestamp(date: string) {
+    const [month, day, year] = date.split("-").map(Number);
+
+    const localDate = new Date(
+      year,
+      month - 1,
+      day,
+      12, // midday local time
+      0,
+      0
+    );
+
+    return localDate.getTime();
+  }
   const debounceSlugCheck = debounce(async (value: string) => {
     const res = await fetch(
       `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/insight_slug_checker?slug=${value}`,
@@ -847,8 +855,8 @@ function convert_MM_DD_YYYY_to_midday_timestamp(date: string) {
           typeof currentSelectedID === "number"
             ? ![currentSelectedID].includes(item.id)
             : typeof currentSelectedID === "object"
-              ? !currentSelectedID.includes(item.id)
-              : true
+            ? !currentSelectedID.includes(item.id)
+            : true
         )
         .map((item) => ({
           value: item.id,

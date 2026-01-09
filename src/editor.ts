@@ -155,24 +155,21 @@ document.addEventListener("DOMContentLoaded", () => {
         style: {
           background: "linear-gradient(to right, #ff5f6d, #ffc371)",
         },
-        onClick: function () { }, // Callback after click
+        onClick: function () {}, // Callback after click
       }).showToast();
     } else {
       const transformedData = await getFormData();
 
-      fetch(
-        `https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/add_to_insight`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Data-Source": DATA_SOURCE,
-          },
-          body: JSON.stringify({
-            data: transformedData,
-          }),
-        }
-      )
+      fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/add_to_insight`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Data-Source": DATA_SOURCE,
+        },
+        body: JSON.stringify({
+          data: transformedData,
+        }),
+      })
         .then((res) => res.json())
         .then((dataRes) => {
           console.log("dataRes", dataRes);
@@ -188,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
             style: {
               background: "linear-gradient(to right, #00b09b, #96c93d)",
             },
-            onClick: function () { }, // Callback after click
+            onClick: function () {}, // Callback after click
           }).showToast();
           clearForm();
         })
@@ -304,8 +301,8 @@ document.addEventListener("DOMContentLoaded", () => {
       sourcePublication:
         sourcePublicationInput.value.trim() !== ""
           ? new Date(
-            convert_MM_DD_YYYY_to_YYYY_MM_DD(sourcePublicationInput.value)
-          ).toISOString()
+              convert_MM_DD_YYYY_to_YYYY_MM_DD(sourcePublicationInput.value)
+            ).toISOString()
           : "",
       sourceCategory: sourceCategory.getValue()
         ? sourceCategory.getValue().map(({ value }) => value)
@@ -383,8 +380,8 @@ document.addEventListener("DOMContentLoaded", () => {
             typeof currentSelectedID === "number"
               ? ![currentSelectedID].includes(item.id)
               : typeof currentSelectedID === "object"
-                ? !currentSelectedID.includes(item.id)
-                : true
+              ? !currentSelectedID.includes(item.id)
+              : true
           )
           .map((item) => ({
             value: item.id,
@@ -410,11 +407,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const [month, day, year] = date.split("-");
     return `${year}-${month}-${day}`;
   }
+
   function convert_MM_DD_YYYY_to_midday_timestamp(date: string) {
-  const [month, day, year] = date.split("-").map(Number);
-  // Create a UTC timestamp for midday (12:00) of that date
-  return Date.UTC(year, month - 1, day, 12, 0, 0);
-}
+    const [month, day, year] = date.split("-").map(Number);
+
+    const localDate = new Date(
+      year,
+      month - 1,
+      day,
+      12, // midday local time
+      0,
+      0
+    );
+
+    return localDate.getTime();
+  }
   function slugify(text: string) {
     return text
       .toString()
