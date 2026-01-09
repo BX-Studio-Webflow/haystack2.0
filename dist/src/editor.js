@@ -200,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
             internalNote: internalNoteInput.value,
             insightDetails: await insightDetails.then((val) => val.getData()),
             curated: curatedInput.value.trim() !== ""
-                ? new Date(curatedInput.value).getTime()
+                ? convert_MM_DD_YYYY_to_midday_timestamp(curatedInput.value)
                 : "",
             source: sourceInput.value,
             sourceAuthor: sourceAuthorInput.value,
@@ -287,6 +287,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function convert_MM_DD_YYYY_to_YYYY_MM_DD(date) {
         const [month, day, year] = date.split("-");
         return `${year}-${month}-${day}`;
+    }
+    function convert_MM_DD_YYYY_to_midday_timestamp(date) {
+        const [month, day, year] = date.split("-").map(Number);
+        // Create a UTC timestamp for midday (12:00) of that date
+        return Date.UTC(year, month - 1, day, 12, 0, 0);
     }
     function slugify(text) {
         return text
