@@ -234,12 +234,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       const deleteRejectedInsight = row.querySelector<HTMLButtonElement>(
         "[dev-target=delete-rejected-insight]"
       )!;
-      const curatedOnDate = new Date(insight.curated);
 
       deleteRejectedInsight.style.display = "none";
 
       if (name) name.textContent = insight.name;
-      if (curatedOn) curatedOn.textContent = curatedOnDate.toDateString();
+      if (curatedOn) {
+        const curatedDate = new Date(insight.curated);
+        curatedOn.textContent = curatedDate.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric',
+          timeZone: 'UTC'
+        });
+      }
       if (status) status.textContent = insight.status;
       if (company)
         company.textContent = insight._company
