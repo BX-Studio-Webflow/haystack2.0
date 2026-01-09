@@ -411,16 +411,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function convert_MM_DD_YYYY_to_midday_timestamp(date: string) {
     const [month, day, year] = date.split("-").map(Number);
 
-    const localDate = new Date(
-      year,
-      month - 1,
-      day,
-      12, // midday local time
-      0,
-      0
-    );
+    // Create date at UTC noon to avoid timezone shifting the date
+    const utcDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 
-    return localDate.getTime();
+    return utcDate.getTime();
   }
   function slugify(text: string) {
     return text
