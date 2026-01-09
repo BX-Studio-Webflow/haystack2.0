@@ -200,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
             internalNote: internalNoteInput.value,
             insightDetails: await insightDetails.then((val) => val.getData()),
             curated: curatedInput.value.trim() !== ""
-                ? new Date(convert_MM_DD_YYYY_to_YYYY_MM_DD(curatedInput.value)).toISOString()
+                ? new Date(curatedInput.value).getTime()
                 : "",
             source: sourceInput.value,
             sourceAuthor: sourceAuthorInput.value,

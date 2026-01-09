@@ -297,8 +297,8 @@ document.addEventListener("DOMContentLoaded", () => {
       curated:
         curatedInput.value.trim() !== ""
           ? new Date(
-            convert_MM_DD_YYYY_to_YYYY_MM_DD(curatedInput.value)
-          ).toISOString()
+            curatedInput.value
+          ).getTime()
           : "",
       source: sourceInput.value,
       sourceAuthor: sourceAuthorInput.value,
