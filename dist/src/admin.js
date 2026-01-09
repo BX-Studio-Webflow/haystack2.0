@@ -496,7 +496,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             internalNote: internalNoteInput.value,
             insightDetails: await insightDetails.then((val) => val.getData()),
             curated: curatedInput.value.trim() !== ""
-                ? new Date(convert_MM_DD_YYYY_to_YYYY_MM_DD(curatedInput.value)).toISOString()
+                ? convert_MM_DD_YYYY_to_midday_timestamp(curatedInput.value)
                 : "",
             source: sourceInput.value,
             sourceAuthor: sourceAuthorInput.value,
@@ -528,6 +528,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             event: event.getValue() ? event.getValue().value : [],
             published: publishedInput ? publishedInput.checked : false,
         };
+    }
+    function convert_MM_DD_YYYY_to_midday_timestamp(date) {
+        const [month, day, year] = date.split("-").map(Number);
+        // Create a UTC timestamp for midday (12:00) of that date
+        return Date.UTC(year, month - 1, day, 12, 0, 0);
     }
     const debounceSlugCheck = debounce(async (value) => {
         const res = await fetch(`https://xhka-anc3-3fve.n7c.xano.io/api:OsMcE9hv/insight_slug_checker?slug=${value}`, {
